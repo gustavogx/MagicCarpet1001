@@ -62,14 +62,36 @@ screenScrollX_29:		.res 1
 .res 8
 addressPtr_32:			.res 2
 objectPtr_34: 			.res 2 ; object address in rom
-.res 4
+.res 2
+otherObjPtr_38:			.res 2
 anotherObjPtr_3A:		.res 2
 .res 2
 oamAddressPtr_3E:		.res 1
-.res 14
+;3F
+;40
+;41
+.res 3
+spriteY_42:				.res 1
+;43
+;44
+;46
+.res 3
+spriteX_46:				.res 1
+;47
+;48
+;49
+;4A
+;4B
+;4C
+.res 6
 temp_4D:				.res 1
 var_4E:					.res 1
-.res 10
+.res 5
+var_54:					.res 1
+var_55:					.res 1
+var_56:					.res 1
+var_57:					.res 1
+var_58:					.res 1
 var_59:					.res 1 ; flag that is either $06 or $FA (250)
 .res 1
 var_5B:					.res 1
@@ -412,7 +434,7 @@ MaybeStartingNewGame:
 	ldy #$00                 
 	loopY:
 		jsr CheckSomethingUnknown1                
-		CPX #$F0                 
+		cpx #$F0                 
 		bcs doneLooping                
 		lda (anotherObjPtr_3A),y              
 		cmp  #$F8                 
@@ -466,19 +488,19 @@ MaybeStartingNewGame:
 		iny                      
 		lda (anotherObjPtr_3A),y              
 		:
-		sta $58                  
+		sta var_58
 		iny                      
 		lda (anotherObjPtr_3A),y              
-		sta $54                  
+		sta var_54                  
 		iny                      
 		lda (anotherObjPtr_3A),y              
-		sta $55                  
+		sta var_55                  
 		iny                      
 		lda (anotherObjPtr_3A),y              
-		sta $56                  
+		sta var_56                  
 		iny                      
 		lda (anotherObjPtr_3A),y              
-		sta $57                  
+		sta var_57                  
 		jsr LoadSomethingImportant                
 		iny                      
 		jmp loopY
@@ -512,47 +534,47 @@ leaveThisRountine:
 	asl A                    
 	tay                      
 	lda (objectPtr_34),y              
-	sta $38                  
+	sta otherObjPtr_38+0
 	iny                      
 	lda (objectPtr_34),y              
-	sta $39                  
+	sta otherObjPtr_38+1
 	ldy #$00                 
-	lda ($38),y              
+	lda (otherObjPtr_38),y
 	sta $0501,X              
 	iny                      
-	lda ($38),y              
+	lda (otherObjPtr_38),y
 	sta $0502,X              
 	iny                      
-	lda ($38),y              
+	lda (otherObjPtr_38),y
 	sta $0602,X              
 	iny                      
-	lda ($38),y              
+	lda (otherObjPtr_38),y              
 	ora #$60                 
 	ora $2D                  
 	sta $0405,X              
 	iny                      
-	lda ($38),y              
+	lda (otherObjPtr_38),y              
 	sta $0600,X              
 	iny                      
-	lda ($38),y              
+	lda (otherObjPtr_38),y
 	sta $0601,X              
 	iny                      
-	lda ($38),y              
+	lda (otherObjPtr_38),y
 	sta hitPoints_0603,X     
 	iny                      
-	lda ($38),y              
+	lda (otherObjPtr_38),y
 	sta $0302,X              
 	iny                      
-	lda ($38),y              
+	lda (otherObjPtr_38),y
 	sta $0301,X              
 	iny                      
-	lda ($38),y              
+	lda (otherObjPtr_38),y
 	sta $0604,X              
 	iny                      
-	lda ($38),y              
+	lda (otherObjPtr_38),y
 	sta $0605,X              
 	iny                      
-	lda ($38),y              
+	lda (otherObjPtr_38),y
 	sta $0700,X              
 	sta $0300,X              
 	lda $54                  
@@ -1223,7 +1245,7 @@ leaveThisRountine:
 ; $86A9
 .proc UnknownSub7
 	jsr CheckSomethingUnknown1
-	CPX #$F0                 
+	cpx #$F0                 
 	bcc :+               
 	rts                       
 	
@@ -1413,32 +1435,32 @@ DATA_BLOCK_8B7A:
 	ldx powerUp_P_64         
 	txa                      
 	beq secondPart
-	CPX #$01                 
+	cpx #$01                 
 	bne :+
 	lda #$01                 
 	bne secondPart
 	
 	:
-	CPX #$02                 
+	cpx #$02                 
 	bne :+
 	lda #$02                 
 	bne secondPart
 	
 	:
-	CPX #$03                 
+	cpx #$03                 
 	bne :+
 	lda #$02                 
 	bne secondPart
 	
 	:
-	CPX #$04                 
+	cpx #$04                 
 	bne skipOtherPath                
 	lda #$03                 
 	
 	secondPart:
 	cmp  $60                  
 	bcc skipThisRoutine                
-	CPX #$03                 
+	cpx #$03                 
 	bcc :+
 	inc $60                  
 	inc $60                  
@@ -1487,7 +1509,7 @@ DATA_BLOCK_8B7A:
 	rts                       
 	
 	skipOtherPath:
-	CPX #$05                 
+	cpx #$05                 
 	bcc :+
 	lda #$02                 
 	sta powerUp_P_64         
@@ -1502,7 +1524,7 @@ DATA_BLOCK_8B7A:
 
 	pha                      
 	jsr UnknownSub14
-	CPX #$30                 
+	cpx #$30                 
 	bcc :+
 	pla                      
 	rts                       
@@ -1570,7 +1592,7 @@ DATA_BLOCK_8D1D:
 	txa                      
 	adc #$06                 
 	tax                      
-	CPX #$30                 
+	cpx #$30                 
 	bcc :-
 	
 	:
@@ -1588,7 +1610,7 @@ DATA_BLOCK_8D1D:
 		txa                      
 		adc #$06                 
 		tax                      
-		CPX #$F0                 
+		cpx #$F0                 
 		bcc :-
 	:
 	rts                       
@@ -1728,7 +1750,7 @@ DATA_BLOCK_8E25:
 	sta $4A                  
 	jsr UnknownSub17 ; ==========================
 	inx                      
-	CPX #$08                 
+	cpx #$08                 
 	bne :-
 	rts                       
 .endproc
@@ -1744,7 +1766,7 @@ DATA_BLOCK_8E3F:
 	tya                      
 	pha                      
 	jsr CheckSomethingUnknown1
-	CPX #$F0                 
+	cpx #$F0                 
 	bcs doneWithThis
 	jsr UnknownSub18
 	ldy $4A                  
@@ -1819,7 +1841,7 @@ DATA_BLOCK_8EBE:
 	sta $4A                  
 	jsr UnknownSub17                
 	inx                      
-	CPX #$05                 
+	cpx #$05                 
 	bne :-
 	rts                       
 .endproc
@@ -1839,7 +1861,7 @@ DATA_BLOCK_9291:
 	sta $4A                  
 	jsr UnknownSub17                
 	inx                      
-	CPX #$03                 
+	cpx #$03                 
 	bne :-
 	rts                       
 .endproc
@@ -1859,7 +1881,7 @@ DATA_BLOCK_92A8:
 	sta $4A                  
 	jsr UnknownSub17                
 	inx                      
-	CPX #$05                 
+	cpx #$05                 
 	bne :-
 	rts                       
 .endproc
@@ -1878,7 +1900,7 @@ DATA_BLOCK_92BD:
 	sta $4A                  
 	jsr UnknownSub17                
 	inx                      
-	CPX #$08                 
+	cpx #$08                 
 	bne :-
 	rts                       
 .endproc
@@ -1935,7 +1957,7 @@ DATA_BLOCK_92D4:
 ; $9362
 .proc LivesHUD
 	ldx livesCounter_11      
-	CPX #$0A                 
+	cpx #$0A                 
 	bcc :+
 	ldx #$0A                 
 
@@ -2123,7 +2145,7 @@ LivesGraphicData:
 		sta bgPalette_E0,X 
 		iny                      
 		inx                      
-		CPX temp_4D                  
+		cpx temp_4D                  
 		bne :-
 	rts                       
 .endproc
@@ -2353,7 +2375,7 @@ loopDarkenBGFiveSteps:
 		lda bgPalette_E0,X       
 		sta PpuData_2007         
 		inx                      
-		CPX #$20                 
+		cpx #$20                 
 		bne :-
 	lda flagPPUControl_19   
 	sta PpuControl_2000      
@@ -2372,7 +2394,7 @@ loopDarkenBGFiveSteps:
 		paletteDidNotUnderflow:  
 		sta bgPalette_E0,X       
 		inx                      
-		CPX #$20                 
+		cpx #$20                 
 		bne loopDarkenONETone    
 	dey                      
 	bne loopDarkenBGFiveSteps
@@ -2713,7 +2735,7 @@ StillUnkownData:
 	ldx levelProgression_16  
 	
 	testIfScrolled_14_Screens:
-	CPX #$0E                 
+	cpx #$0E                 
 	bcc doKeepScrollingStage 
 	lda #$02                 
 	sta flagGameMode_26      
@@ -2747,7 +2769,7 @@ StillUnkownData:
 	ldx #$00                 
 	:
 	inx                      
-	CPX #$0F                 
+	cpx #$0F                 
 	bne :-
 	pla                      
 	tax                      
@@ -2830,7 +2852,7 @@ StillUnkownData:
 	clc                      
 	adc $0402,X              
 	sta $0402,X              
-	sta $42                  
+	sta spriteY_42                  
 	lda $49                  
 	adc $0403,X              
 	sta $0403,X              
@@ -2843,7 +2865,7 @@ StillUnkownData:
 	lda $0401,X              
 	sta $41                  
 	lda $0402,X              
-	sta $42                  
+	sta spriteY_42                  
 	lda $0403,X              
 	sta $43                  
 	
@@ -2947,7 +2969,7 @@ StillUnkownData:
 	lda ($36),y              
 	
 	:
-	sta $46                  
+	sta spriteX_46                  
 	bpl :+
 	lda #$FF                 
 	bne :++
@@ -2957,7 +2979,7 @@ StillUnkownData:
 	
 	:
 	sta $47                  
-	lda $46                  
+	lda spriteX_46                  
 	clc                      
 	adc $0400,X              
 	sta $0400,X              
@@ -2992,7 +3014,7 @@ StillUnkownData:
 	clc                      
 	adc $0402,X              
 	sta $0402,X              
-	sta $42                  
+	sta spriteY_42                  
 	lda $49                  
 	adc $0403,X              
 	sta $0403,X              
@@ -3051,7 +3073,7 @@ StillUnkownData:
 	lda $44                  
 	sta $3C                  
 	lda $40                  
-	sta $46                  
+	sta spriteX_46                  
 	lda $41                  
 	sta $47                  
 	
@@ -3062,15 +3084,15 @@ StillUnkownData:
 	bne :++
 	lda $43                  
 	bne :++
-	lda (addressPtr_32),y
-	sta $0201,X              
-	lda $42                  
-	sta OAM_0200,X           
+	lda (addressPtr_32),y ; XXX
+	sta OAM_0200+1,X	; tile #
+	lda spriteY_42				
+	sta OAM_0200+0,X    ; y - 1       
 	iny                      
 	lda (addressPtr_32),y
-	sta $0202,X              
-	lda $46                  
-	sta $0203,X              
+	sta OAM_0200+2,X	; attributes
+	lda spriteX_46                  
+	sta OAM_0200+3,X	; x
 	txa                      
 	clc                      
 	adc #$04                 
@@ -3081,9 +3103,9 @@ StillUnkownData:
 	iny                      
 	dec $3C                  
 	beq :++
-	lda $46                  
+	lda spriteX_46                  
 	adc #$08                 
-	sta $46                  
+	sta spriteX_46                  
 	bcc ReplaceMeLabel_10
 	inc $47                  
 	jmp ReplaceMeLabel_10
@@ -3095,10 +3117,10 @@ StillUnkownData:
 	:
 	dec $45                  
 	beq :+
-	lda $42                  
+	lda spriteY_42                  
 	clc                      
 	adc #$08                 
-	sta $42                  
+	sta spriteY_42                  
 	bcc ReplaceMeLabel_11
 	inc $43                  
 	jmp ReplaceMeLabel_11
@@ -3131,7 +3153,7 @@ StillUnkownData:
 	bne SecondPart                
 	lda $43                  
 	bne SecondPart                
-	lda $42                  
+	lda spriteY_42                  
 	sta OAM_0200,X           
 	iny                      
 	lda (addressPtr_32),y
@@ -3150,7 +3172,7 @@ StillUnkownData:
 	
 	ReplaceMeLabel_12:
 	ldx oamAddressPtr_3E                  
-	CPX #$00                 
+	cpx #$00                 
 	beq ReplaceMeLabel_9                
 	lda #$00                 
 	
@@ -3166,7 +3188,7 @@ StillUnkownData:
 	lda #$00                 
 	sta $5F                  
 	sec                       
-	sbc  var_59               
+	sbc var_59               
 	sta var_59               
 
 	:

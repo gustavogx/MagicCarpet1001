@@ -243,364 +243,37 @@ DATA_ADDR_67: ; $ac94 - offset $0a
 
 ; ======================================
 ; Stage 01 Enemies
-Data_atAC98: ; Address book
-.word DATA_ADDR_68, DATA_ADDR_69, DATA_ADDR_70, DATA_ADDR_71
-.word DATA_ADDR_72, DATA_ADDR_73, DATA_ADDR_74, DATA_ADDR_73
-.word DATA_ADDR_75, DATA_ADDR_76, DATA_ADDR_75, DATA_ADDR_77
-.word DATA_ADDR_78, DATA_ADDR_79, DATA_ADDR_80
+Data_atAC98: 
+.include "objects_S1.inc"
 
-.word $ffff
-
-DATA_ADDR_68: ; $acb8
-.incbin "rom-prg/objects/data-object-atACB8.bin" ; 
-
-DATA_ADDR_69: ; $ace1
-.incbin "rom-prg/objects/data-object-atACE1.bin"
-
-DATA_ADDR_70: ; $ad05
-.incbin "rom-prg/objects/data-object-atAD05.bin"
-
-DATA_ADDR_71: ; $ad29
-.incbin "rom-prg/objects/data-object-atAD29.bin"
-
-DATA_ADDR_72: ; $ad5c
-.incbin "rom-prg/objects/data-object-atAD5C.bin"
-
-DATA_ADDR_73: ; $ad83
-.incbin "rom-prg/objects/data-object-atAD83.bin"
-
-DATA_ADDR_74: ; $adcd
-.incbin "rom-prg/objects/data-object-atADAC.bin"
-
-DATA_ADDR_75: ; $add3
-.incbin "rom-prg/objects/data-object-atADD3.bin"
-
-DATA_ADDR_76: ; $ae25
-.incbin "rom-prg/objects/data-object-atAE25.bin"
-
-DATA_ADDR_77: ; $ae63
-.incbin "rom-prg/objects/data-object-atAE63.bin"
-
-DATA_ADDR_78: ; $ae85
-.incbin "rom-prg/objects/data-object-atAE85.bin"
-
-DATA_ADDR_79: ; $aea2
-.incbin "rom-prg/objects/data-object-atAEA2.bin"
-
-DATA_ADDR_80: ; $aebf
-.incbin "rom-prg/objects/data-object-atAEBF.bin"
-
-; ======================================
 Data_atAEC6:
+.include "objects_S1_data.inc"
+; ======================================
 
-;; First Block
-.word Data_atAF06
-.word Data_atAF12
-.word Data_atAF1E
-.word Data_atAF2A
-.word Data_atAF36
-.word Data_atAF42
-.word Data_atAF4E
-.word Data_atAF5A
-.word Data_atAF66
-.word Data_atAF72
-.word Data_atAF7E
-.word Data_atAF8A
-
-;; Second Block
-.word Data_atB27D
-.word Data_atB289
-.word Data_atB295
-.word Data_atB2A1
-.word Data_atB2AD
-.word Data_atB2B9
-.word Data_atB2C5
-.word Data_atB2D1
-.word Data_atB2DD
-.word Data_atB2E9
-.word Data_atB2F5
-.word Data_atB301 
-.word Data_atB30D
-.word Data_atB319
-.word Data_atB325
-.word Data_atB331
-
-.word Data_atAF96
-
-.word Data_atB33D
-.word Data_atB349
-.word Data_atB355
-
-;; These below are PROBABLY enemies, followed by their AI
-
-Data_atAF06:
-.word Data_atAFA2
-.incbin "rom-prg/objects/data-12bytes-atAF08.bin"
-
-Data_atAF12:
-.word Data_atB004
-.incbin "rom-prg/objects/data-12bytes-atAF14.bin"
-
-Data_atAF1E:
-.word Data_atB03A
-.incbin "rom-prg/objects/data-12bytes-atAF20.bin"
-
-Data_atAF2A:
-.word Data_atB070
-.incbin "rom-prg/objects/data-12bytes-atAF2C.bin"
-
-Data_atAF36:
-.word Data_atB09A
-.incbin "rom-prg/objects/data-12bytes-atAF38.bin"
-
-Data_atAF42:
-.word Data_atB0AD
-.incbin "rom-prg/objects/data-12bytes-atAF44.bin"
-
-Data_atAF4E:
-.word Data_atB0BF
-.incbin "rom-prg/objects/data-12bytes-atAF50.bin"
-
-Data_atAF5A:
-.word Data_atB123
-.incbin "rom-prg/objects/data-12bytes-atAF5C.bin"
-
-Data_atAF66:
-.word Data_atB169
-.incbin "rom-prg/objects/data-12bytes-atAF68.bin"
-
-Data_atAF72:
-.word Data_atB18F
-.incbin "rom-prg/objects/data-12bytes-atAF74.bin"
-
-Data_atAF7E:
-.word Data_atB211
-.incbin "rom-prg/objects/data-12bytes-atAF80.bin"
-
-Data_atAF8A:
-.word Data_atB247
-.incbin "rom-prg/objects/data-12bytes-atAF8C.bin"
-
-Data_atAF96:
-.word Data_atB146
-.incbin "rom-prg/objects/data-12bytes-atAF98.bin"
-
-; Each one of the above has one below (enemy AI?)
-Data_atAFA2:
-.incbin "rom-prg/objects/data-block-atAFA2.bin"
-
-Data_atB004:
-.incbin "rom-prg/objects/data-block-atB004.bin"
-
-Data_atB03A:
-.incbin "rom-prg/objects/data-block-atB03A.bin"
-
-Data_atB070:
-.incbin "rom-prg/objects/data-block-atB070.bin"
-
-Data_atB09A:
-.incbin "rom-prg/objects/data-block-atB09A.bin"
-
-Data_atB0AD:
-.incbin "rom-prg/objects/data-block-atB0AD.bin"
-
-Data_atB0BF:
-.incbin "rom-prg/objects/data-block-atB0BF.bin"
-
-Data_atB123:
-.incbin "rom-prg/objects/data-block-atB123.bin"
-
-Data_atB146:
-.incbin "rom-prg/objects/data-block-atB146.bin"
-
-Data_atB169:
-.incbin "rom-prg/objects/data-block-atB169.bin"
-
-Data_atB18F:
-.incbin "rom-prg/objects/data-block-atB18F.bin"
-
-Data_atB211:
-.incbin "rom-prg/objects/data-block-atB211.bin"
-
-Data_atB247:
-.incbin "rom-prg/objects/data-block-atB247.bin" 
-
-;==========================
-
-
-;; These below are PROBABLY enemies, followed by their AI
-
-Data_atB27D:
-.word Data_atB361
-.incbin "rom-prg/objects/data-12bytes-atB27F.bin" 
-
-Data_atB289:
-.word Data_atB377
-.incbin "rom-prg/objects/data-12bytes-atB28B.bin" 
-
-Data_atB295:
-.word Data_atB38D
-.incbin "rom-prg/objects/data-12bytes-atB297.bin" 
-
-Data_atB2A1:
-.word Data_atB397
-.incbin "rom-prg/objects/data-12bytes-atB2A3.bin" 
-
-Data_atB2AD:
-.word Data_atB3AD
-.incbin "rom-prg/objects/data-12bytes-atB2AF.bin" 
-
-Data_atB2B9:
-.word Data_atB3C3
-.incbin "rom-prg/objects/data-12bytes-atB2BB.bin" 
-
-Data_atB2C5:
-.word Data_atB3E9
-.incbin "rom-prg/objects/data-12bytes-atB2C7.bin" 
-
-Data_atB2D1:
-.word Data_atB40F
-.incbin "rom-prg/objects/data-12bytes-atB2D3.bin" 
-
-Data_atB2DD:
-.word Data_atB421
-.incbin "rom-prg/objects/data-12bytes-atB2DF.bin" 
-
-Data_atB2E9:
-.word Data_atB447
-.incbin "rom-prg/objects/data-12bytes-atB2EB.bin" 
-
-Data_atB2F5:
-.word Data_atB46D
-.incbin "rom-prg/objects/data-12bytes-atB2F7.bin" 
-
-Data_atB301:
-.word Data_atB511
-.incbin "rom-prg/objects/data-12bytes-atB303.bin" 
-
-Data_atB30D:
-.word Data_atB5B5
-.incbin "rom-prg/objects/data-12bytes-atB30F.bin" 
-
-Data_atB319:
-.word Data_atB659
-.incbin "rom-prg/objects/data-12bytes-atB31B.bin" 
-
-Data_atB325:
-.word Data_atB6FD
-.incbin "rom-prg/objects/data-12bytes-atB327.bin" 
-
-Data_atB331:
-.word Data_atB7A1
-.incbin "rom-prg/objects/data-12bytes-atB333.bin" 
-
-Data_atB33D:
-.word Data_atB845
-.incbin "rom-prg/objects/data-12bytes-atB33F.bin" 
-
-Data_atB349:
-.word Data_atB859
-.incbin "rom-prg/objects/data-12bytes-atB34B.bin" 
-
-Data_atB355:
-.word Data_atB86D
-.incbin "rom-prg/objects/data-12bytes-atB357.bin"
-
-; Each one of the above has one below (enemy AI?)
-
-Data_atB361:
-.incbin "rom-prg/objects/data-block-atB361.bin"
-
-Data_atB377:
-.incbin "rom-prg/objects/data-block-atB377.bin"
-
-Data_atB38D:
-.incbin "rom-prg/objects/data-block-atB38D.bin"
-
-Data_atB397:
-.incbin "rom-prg/objects/data-block-atB397.bin"
-
-Data_atB3AD:
-.incbin "rom-prg/objects/data-block-atB3AD.bin"
-
-Data_atB3C3:
-.incbin "rom-prg/objects/data-block-atB3C3.bin"
-
-Data_atB3E9:
-.incbin "rom-prg/objects/data-block-atB3E9.bin"
-
-Data_atB40F:
-.incbin "rom-prg/objects/data-block-atB40F.bin"
-
-Data_atB421:
-.incbin "rom-prg/objects/data-block-atB421.bin"
-
-Data_atB447:
-.incbin "rom-prg/objects/data-block-atB447.bin"
-
-Data_atB46D:
-.incbin "rom-prg/objects/data-block-atB46D.bin"
-
-Data_atB511:
-.incbin "rom-prg/objects/data-block-atB511.bin"
-
-Data_atB5B5:
-.incbin "rom-prg/objects/data-block-atB5B5.bin"
-
-Data_atB659:
-.incbin "rom-prg/objects/data-block-atB659.bin"
-
-Data_atB6FD:
-.incbin "rom-prg/objects/data-block-atB6FD.bin"
-
-Data_atB7A1:
-.incbin "rom-prg/objects/data-block-atB7A1.bin"
-
-Data_atB845:
-.incbin "rom-prg/objects/data-block-atB845.bin"
-
-Data_atB859:
-.incbin "rom-prg/objects/data-block-atB859.bin"
-
-Data_atB86D:
-.incbin "rom-prg/objects/data-block-atB86D.bin"
 
 
 ; ======================================
 ; Stage 02 Enemies
-Data_atB8ED:
-.incbin "rom-prg/objects/temp-address-atB8ED.bin"
-
-.word $ffff
-
-.incbin "rom-prg/objects/data-block-atB90D.bin"
-
-; ======================================
+Data_atB8ED: 
+.include "objects_S2.inc"
 
 Data_atBB5D:
-.incbin "rom-prg/objects/data-block-atBB5D.bin"
+.include "objects_S2_data.inc"
+; ======================================
+
 
 ; ======================================
 ; Stage 03 Enemies
 Data_atC50D:
-.incbin "rom-prg/objects/temp-address-atC50D.bin"
-
-.word $ffff
-
-.incbin "rom-prg/objects/data-block-atC52D.bin"
-
-; ======================================
+.include "objects_S3.inc"
 
 Data_atC8B9:
-.incbin "rom-prg/objects/temp-address-atC8B9.bin"
+.include "objects_S3_data.inc"
+; ======================================
 
-.incbin "rom-prg/objects/data-block-atC947.bin"
 
 ; ======================================
 ; Stage 04 Enemies
 Data_atE3A6:
-.incbin "rom-prg/objects/temp-address-atE3A6.bin"
-
-.word $ffff
-
-.incbin "rom-prg/objects/data-block-atE3C6.bin"
+.include "objects_S4.inc"
+; ======================================
