@@ -9,13 +9,13 @@
 .word Data_atC999 ;$c999 
 .word Data_atC9A5 ;$c9a5
 .word Data_atC9B1 ;$c9b1
-.word $c9bd
-.word $c9c9 
-.word $c9d5
-.word $c9e1
-.word $c9ed
-.word $c9f9 
-.word $ca05
+.word Data_atC9BD ;$c9bd
+.word Data_atC9C9 ;$c9c9 
+.word Data_atC9D5 ;$c9d5
+.word Data_atC9E1 ;$c9e1
+.word Data_atC9ED ;$c9ed
+.word Data_atC9F9 ;$c9f9 
+.word Data_atCA05 ;$ca05
 .word $ca11
 .word $ca1d
 .word $ca29
@@ -110,7 +110,33 @@ Data_atC9B1:
 .word $d00d
 .incbin "rom-prg/objects/data-block-atC9B3.bin"
 
+Data_atC9BD:
+.word $d09a
+.incbin "rom-prg/objects/data-block-atC9BF.bin"
 
+Data_atC9C9:
+.word $d127
+.incbin "rom-prg/objects/data-block-atC9CB.bin"
+
+Data_atC9D5:
+.word $d1b4
+.incbin "rom-prg/objects/data-block-atC9D7.bin"
+
+Data_atC9E1:
+.word $d241
+.incbin "rom-prg/objects/data-block-atC9E3.bin"
+
+Data_atC9ED:
+.word $d291
+.incbin "rom-prg/objects/data-block-atC9EF.bin"
+
+Data_atC9F9:
+.word $d2E1
+.incbin "rom-prg/objects/data-block-atC9FB.bin"
+
+Data_atCA05:
+.word $d331
+.incbin "rom-prg/objects/data-block-atCA07.bin" ;;;; PAREI AQUI XXX
 
 ; ===; Each one of the above has one below (enemy AI?)
 
