@@ -123,41 +123,51 @@ NameTable_Blank:
 .incbin "rom-prg/stages/BlankScreen_AT.bin"
 
 NameTable_TitleScreen:
-.incbin "rom-prg/stages/TitleScreen_NT.bin"
-.incbin "rom-prg/stages/TitleScreen_AT.bin"
+.incbin "rom-prg/stages/TitleScreen_RLE.nam"
+;.incbin "rom-prg/stages/TitleScreen_NT.bin"
+;.incbin "rom-prg/stages/TitleScreen_AT.bin"
 
 NameTable_Stage01_A:
-.incbin "rom-prg/stages/Stage01_A_NT.bin"
-.incbin "rom-prg/stages/Stage01_A_AT.bin"
+.incbin "rom-prg/stages/Stage01_A_RLE.nam"
+;.incbin "rom-prg/stages/Stage01_A_NT.bin"
+;.incbin "rom-prg/stages/Stage01_A_AT.bin"
 
 NameTable_Stage01_B:
-.incbin "rom-prg/stages/Stage01_B_NT.bin"
-.incbin "rom-prg/stages/Stage01_B_AT.bin"
+.incbin "rom-prg/stages/Stage01_B_RLE.nam"
+;.incbin "rom-prg/stages/Stage01_B_NT.bin"
+;.incbin "rom-prg/stages/Stage01_B_AT.bin"
 
 NameTable_Stage03_A:
-.incbin "rom-prg/stages/Stage03_A_NT.bin"
-.incbin "rom-prg/stages/Stage03_A_AT.bin"
+.incbin "rom-prg/stages/Stage03_A_RLE.nam"
+;.incbin "rom-prg/stages/Stage03_A_NT.bin"
+;.incbin "rom-prg/stages/Stage03_A_AT.bin"
 
 NameTable_Stage03_B:
-.incbin "rom-prg/stages/Stage03_B_NT.bin"
-.incbin "rom-prg/stages/Stage03_B_AT.bin"
+.incbin "rom-prg/stages/Stage03_B_RLE.nam"
+;.incbin "rom-prg/stages/Stage03_B_NT.bin"
+;.incbin "rom-prg/stages/Stage03_B_AT.bin"
 
 NameTable_Stage02_A:
-.incbin "rom-prg/stages/Stage02_A_NT.bin"
-.incbin "rom-prg/stages/Stage02_A_AT.bin"
+.incbin "rom-prg/stages/Stage02_A_RLE.nam"
+;.incbin "rom-prg/stages/Stage02_A_NT.bin"
+;.incbin "rom-prg/stages/Stage02_A_AT.bin"
 
 NameTable_Stage02_B:
-.incbin "rom-prg/stages/Stage02_B_NT.bin"
-.incbin "rom-prg/stages/Stage02_B_AT.bin"
+.incbin "rom-prg/stages/Stage02_B_RLE.nam"
+;.incbin "rom-prg/stages/Stage02_B_NT.bin"
+;.incbin "rom-prg/stages/Stage02_B_AT.bin"
 
 NameTable_Stage04_A:
-.incbin "rom-prg/stages/Stage04_A_NT.bin"
-.incbin "rom-prg/stages/Stage04_A_AT.bin"
+.incbin "rom-prg/stages/Stage04_A_RLE.nam"
+;.incbin "rom-prg/stages/Stage04_A_NT.bin"
+;.incbin "rom-prg/stages/Stage04_A_AT.bin"
 
 NameTable_Stage04_B:
-.incbin "rom-prg/stages/Stage04_B_NT.bin"
-.incbin "rom-prg/stages/Stage04_B_AT.bin"
+.incbin "rom-prg/stages/Stage04_B_RLE.nam"
+;.incbin "rom-prg/stages/Stage04_B_NT.bin"
+;.incbin "rom-prg/stages/Stage04_B_AT.bin"
 
 NameTable_Ending:
-.incbin "rom-prg/stages/Ending_NT.bin"
-.incbin "rom-prg/stages/Ending_AT.bin"
+.incbin "rom-prg/stages/Ending_RLE.nam"
+;.incbin "rom-prg/stages/Ending_NT.bin"
+;.incbin "rom-prg/stages/Ending_AT.bin"

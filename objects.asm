@@ -79,7 +79,7 @@ DATA_ADDR_13: ; $a993 - offset $1e
 .incbin "rom-prg/objects/data-object-atA993.bin" ; Player Flying Frame 3/3
 
 DATA_ADDR_14: ; $a9b0 - offset $1d
-.incbin "rom-prg/objects/data-object-atA9b0.bin" ; Player Shooting
+.incbin "rom-prg/objects/data-object-atA9B0.bin" ; Player Shooting
 
 DATA_ADDR_15: ; $a9ce - offset $1e
 .incbin "rom-prg/objects/data-object-atA9CE.bin" ; Player Death Frame 1/2

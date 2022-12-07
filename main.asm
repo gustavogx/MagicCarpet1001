@@ -22,7 +22,6 @@
 .define Ctrl1_4016			$4016
 .define Ctrl2_FrameCtr_4017 $4017
 .define BankSwitching_FFF0 			$FFF0
-.define BankSequenceArray_800C 		$800C
 .define UpdateDuringVBlank_Flag1	$57
 .define UpdateDuringVBlank_Flag2	$75
 
@@ -2021,7 +2020,7 @@ LivesGraphicData:
 	lda #$02                 
 	jsr HandleAliveTimer                
 	lda bankIndex_15         
-	cmp  #$04                 
+	cmp  #$04	;; Check if the last stage was completed
 	bne :+
 		jmp EndGame
 	:                
