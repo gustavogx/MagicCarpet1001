@@ -22,7 +22,6 @@
 .define Ctrl1_4016			$4016
 .define Ctrl2_FrameCtr_4017 $4017
 .define BankSwitching_FFF0 			$FFF0
-.define UpdateDuringVBlank_Flag1	$57
 .define UpdateDuringVBlank_Flag2	$75
 
 .segment "HEADER"
@@ -89,7 +88,7 @@ var_4E:					.res 1
 var_54:					.res 1
 var_55:					.res 1
 var_56:					.res 1
-var_57:					.res 1
+var_57:					.res 1 ;.define UpdateDuringVBlank_Flag1	$57
 var_58:					.res 1
 var_59:					.res 1 ; flag that is either $06 or $FA (250)
 .res 1
@@ -112,18 +111,42 @@ apuStatusFlag_C9:		.res 1
 .res 22
 bgPalette_E0:			.res 16
 
+.define var_2C	$2C
+.define var_2D	$2D
+
 .segment "SPRITES" ; LSB 0 - FF
 
 .segment "RAM" ; LSB 0 - FF
-.res 255
-playerX_0400:	.res 1
-.res 1
+
+.define someObjProperty_0300 $0300
+.define someObjProperty_0301 $0301
+.define someObjProperty_0302 $0302
+.define someObjProperty_0303 $0303
+
+.define someObjProperty_0400 $0400 ; playerX_0400
+.define someObjProperty_0401 $0401
+.define someObjProperty_0402 $0402 ; playerY_0402
+.define someObjProperty_0403 $0403
+.define someObjProperty_0404 $0404
+.define someObjProperty_0405 $0405
+
+.define someObjProperty_0500 $0500
+.define someObjProperty_0501 $0501
+.define someObjProperty_0502 $0502
+.define someObjProperty_0503 $0503
+.define someObjProperty_0504 $0504
+.define someObjProperty_0505 $0505
+
+.define someObjProperty_0600 $0600
+.define someObjProperty_0601 $0601
+.define someObjProperty_0602 $0602
+.define hitPoints_0603 		 $0603
+.define someObjProperty_0604 $0604
+.define someObjProperty_0605 $0605
+
+.define someObjProperty_0700 $0700
 
 
-
-playerY_0402:	.res 1
-.res 513
-hitPoints_0603:	.res 1
 
 .segment "STARTUP"
 
@@ -323,7 +346,7 @@ MaybeStartingNewGame:
 		lda HeartHUDData,y
 		sta OAM_0200,y           
 		iny                      
-		CPY #$04                 
+		cpy #$04                 
 		bne :-
 		
 	SetupNewLevel:                  
@@ -358,7 +381,7 @@ MaybeStartingNewGame:
 		nop  ;
 		nop  ;
 		nop  ; jsr Sound_DontKnowWhatItDoes
-		jsr $97AD                
+		jsr UnknownSub5             
 		jsr PaletteFading        
 		jsr RenderingOFF                
 		lda #$FF                 
@@ -459,16 +482,16 @@ MaybeStartingNewGame:
 		cmp  #$F0                 
 		bne :+
 		and #$00                 
-		sta $2D                  
+		sta var_2D                  
 		iny                      
 		lda (anotherObjPtr_3A),y              
 		:
-		cmp  #$FF                 
+		cmp #$FF                 
 		beq doneLooping                
-		cmp  #$F1                 
+		cmp #$F1                 
 		bne :+                
 		and #$03                 
-		sta $2D                  
+		sta var_2D                  
 		iny                      
 		lda (anotherObjPtr_3A),y              
 		sta $2B                  
@@ -479,11 +502,11 @@ MaybeStartingNewGame:
 		cmp  #$F2                 
 		bne :+                
 		and #$03                 
-		sta $2D                  
+		sta var_2D                  
 		iny                      
 		lda (anotherObjPtr_3A),y              
-		sta $2C                  
-		inc $2C                  
+		sta var_2C                  
+		inc var_2C                  
 		iny                      
 		lda (anotherObjPtr_3A),y              
 		:
@@ -529,7 +552,7 @@ leaveThisRountine:
 	sta objectPtr_34                  
 	lda ObjectStart+3,y              
 	sta objectPtr_34+1                  
-	lda $58                  
+	lda var_58                  
 	asl A                    
 	tay                      
 	lda (objectPtr_34),y              
@@ -539,58 +562,58 @@ leaveThisRountine:
 	sta otherObjPtr_38+1
 	ldy #$00                 
 	lda (otherObjPtr_38),y
-	sta $0501,X              
+	sta someObjProperty_0501,X              
 	iny                      
 	lda (otherObjPtr_38),y
-	sta $0502,X              
+	sta someObjProperty_0502,X              
 	iny                      
 	lda (otherObjPtr_38),y
-	sta $0602,X              
+	sta someObjProperty_0602,X              
 	iny                      
 	lda (otherObjPtr_38),y              
 	ora #$60                 
-	ora $2D                  
-	sta $0405,X              
+	ora var_2D                  
+	sta someObjProperty_0405,X              
 	iny                      
 	lda (otherObjPtr_38),y              
-	sta $0600,X              
+	sta someObjProperty_0600,X              
 	iny                      
 	lda (otherObjPtr_38),y
-	sta $0601,X              
+	sta someObjProperty_0601,X              
 	iny                      
 	lda (otherObjPtr_38),y
 	sta hitPoints_0603,X     
 	iny                      
 	lda (otherObjPtr_38),y
-	sta $0302,X              
+	sta someObjProperty_0302,X              
 	iny                      
 	lda (otherObjPtr_38),y
-	sta $0301,X              
+	sta someObjProperty_0301,X              
 	iny                      
 	lda (otherObjPtr_38),y
-	sta $0604,X              
+	sta someObjProperty_0604,X              
 	iny                      
 	lda (otherObjPtr_38),y
-	sta $0605,X              
+	sta someObjProperty_0605,X              
 	iny                      
 	lda (otherObjPtr_38),y
-	sta $0700,X              
-	sta $0300,X              
-	lda $54                  
-	sta $0400,X              
-	lda $55                  
-	sta $0401,X              
-	lda $56                  
-	sta $0402,X              
-	lda $57                  
-	sta $0403,X              
+	sta someObjProperty_0700,X              
+	sta someObjProperty_0300,X              
+	lda var_54                  
+	sta someObjProperty_0400,X              
+	lda var_55                  
+	sta someObjProperty_0401,X              
+	lda var_56                  
+	sta someObjProperty_0402,X              
+	lda var_57                  
+	sta someObjProperty_0403,X              
 	lda #$00                 
-	sta $0503,X              
-	sta $0504,X              
-	sta $0505,X              
-	sta $0303,X              
+	sta someObjProperty_0503,X              
+	sta someObjProperty_0504,X              
+	sta someObjProperty_0505,X              
+	sta someObjProperty_0303,X              
 	lda #$80                 
-	sta $0404,X              
+	sta someObjProperty_0404,X              
 	pla                      
 	tay                      
 	rts                       
@@ -606,63 +629,63 @@ leaveThisRountine:
 	
 	BeginHere:
 	ldx $4D                  
-	lda $0404,X              
+	lda someObjProperty_0404,X              
 	BIT BIT_4                
 	beq :++
 	jsr HandleObjectCollision
-	lda $0303,X              
+	lda someObjProperty_0303,X              
 	cmp  #$02                 
 	bne :+                
 	lda #$FF                 
 	sta flagPlayerHit_1E        
 	lda #$00                 
-	sta $0303,X              
+	sta someObjProperty_0303,X              
 	:
 	jmp doneWithThis                
 	:
-	lda $0404,X              
+	lda someObjProperty_0404,X              
 	bpl doneWithThis                
-	lda $0401,X              
+	lda someObjProperty_0401,X              
 	beq :+                
 	cmp  #$FF                 
 	bne SecondPart                
-	lda $0400,X              
+	lda someObjProperty_0400,X              
 	clc                      
-	adc $0600,X              
+	adc someObjProperty_0600,X              
 	bcc SecondPart                
 	:
-	lda $0403,X              
+	lda someObjProperty_0403,X              
 	beq ThirdPart                
 	cmp  #$FF                 
 	bne SecondPart                
-	lda $0402,X              
+	lda someObjProperty_0402,X              
 	clc                      
-	adc $0601,X              
+	adc someObjProperty_0601,X              
 	bcs ThirdPart                
 	
 	SecondPart:
-	lda $0405,X              
+	lda someObjProperty_0405,X              
 	and #$10                 
 	beq :+
-	lda $0404,X              
+	lda someObjProperty_0404,X              
 	and #$20                 
 	beq :++
 	:
 	lda #$10                 
-	sta $0404,X              
+	sta someObjProperty_0404,X              
 	jmp doneWithThis                
 	:
-	lda $0404,X              
+	lda someObjProperty_0404,X              
 	and #$DF                 
-	sta $0404,X              
+	sta someObjProperty_0404,X              
 	jmp doneWithThis                
 	
 	ThirdPart:
-	lda $0404,X              
+	lda someObjProperty_0404,X              
 	ora #$20                 
-	sta $0404,X              
+	sta someObjProperty_0404,X              
 	jsr UnknownSub3
-	lda $0404,X              
+	lda someObjProperty_0404,X              
 	and #$08                 
 	beq doneWithThis                
 	lda $5A                  
@@ -684,19 +707,19 @@ leaveThisRountine:
 ;
 ; $8369
 .proc UnknownSub2
-	lda $0400                
+	lda someObjProperty_0400                
 	clc                      
 	adc #$08                 
 	sta $0702                
-	lda $0400                
-	adc $0600                
+	lda someObjProperty_0400                
+	adc someObjProperty_0600                
 	sbc  #$08                 
 	sta $0703                
-	lda $0402                
+	lda someObjProperty_0402                
 	adc #$03                 
 	sta $0704                
-	lda $0402                
-	adc $0601                
+	lda someObjProperty_0402                
+	adc someObjProperty_0601                
 	sbc  #$04                 
 	sta $0705                
 	rts                       
@@ -704,42 +727,42 @@ leaveThisRountine:
 ;
 ; $8391
 .proc UnknownSub3
-	lda $0405,X              
+	lda someObjProperty_0405,X              
 	and #$10                 
 	beq SecondPart                
 	
-	lda $0401,X              
+	lda someObjProperty_0401,X              
 	beq :+
 	lda #$00                 
 	beq :++
 	
 	:
-	lda $0400,X              
+	lda someObjProperty_0400,X              
 	
 	:
 	sta $0702,X              
-	lda $0403,X              
+	lda someObjProperty_0403,X              
 	beq :+
 	lda #$00                 
 	beq :++
 	
 	:
-	lda $0402,X              
+	lda someObjProperty_0402,X              
 	
 	:
 	sta $0704,X              
-	lda $0400,X              
+	lda someObjProperty_0400,X              
 	clc                      
-	adc $0600,X              
+	adc someObjProperty_0600,X              
 	cmp  $0702,X              
 	bcs :+
 	lda #$FF                 
 	
 	:
 	sta $0703,X              
-	lda $0402,X              
+	lda someObjProperty_0402,X              
 	clc                      
-	adc $0601,X              
+	adc someObjProperty_0601,X              
 	cmp  $0704,X              
 	bcs :+
 	lda #$FF                 
@@ -749,15 +772,15 @@ leaveThisRountine:
 	rts                       
 
 	SecondPart:
-	lda $0400,X              
+	lda someObjProperty_0400,X              
 	sta $0702,X              
 	clc                      
-	adc $0600,X              
+	adc someObjProperty_0600,X              
 	sta $0703,X              
-	lda $0402,X              
+	lda someObjProperty_0402,X              
 	sta $0704,X              
 	clc                      
-	adc $0601,X              
+	adc someObjProperty_0601,X              
 	sta $0705,X              
 	rts                       
 
@@ -768,12 +791,12 @@ leaveThisRountine:
 	ldy #$00                 
 	
 	BeginHere:
-	lda $0404,y              
+	lda someObjProperty_0404,y              
 	bmi :+
 	jmp DoneWithThis                
 	
 	:
-	lda $0405,y              
+	lda someObjProperty_0405,y              
 	BIT BIT_6                
 	bne :+
 	jmp DoneWithThis                
@@ -790,17 +813,17 @@ leaveThisRountine:
 	ldx #$30                 
 	
 	AnotherCheckAndLeave:
-	lda $0404,X              
+	lda someObjProperty_0404,X              
 	bpl StartLeaving
 	and #$20                 
 	beq StartLeaving
-	lda $0405,X              
+	lda someObjProperty_0405,X              
 	BIT BIT_6                
 	beq StartLeaving
 	
 	and #$10                 
 	bne :+
-	CPY #$00                 
+	cpy #$00                 
 	beq :+
 	
 	StartLeaving:
@@ -821,7 +844,7 @@ leaveThisRountine:
 	bcs StartLeaving
 	lda hitPoints_0603,X     
 	sec                       
-	sbc  $0602,y              
+	sbc  someObjProperty_0602,y              
 	beq :+
 	bcs :++
 	
@@ -834,37 +857,37 @@ leaveThisRountine:
 	lda $1A                  
 	bne :+
 	clc                      
-	lda $0400,X              
+	lda someObjProperty_0400,X              
 	adc #$07                 
-	sta $0400,X              
-	lda $0401,X              
+	sta someObjProperty_0400,X              
+	lda someObjProperty_0401,X              
 	adc #$00                 
-	sta $0401,X              
+	sta someObjProperty_0401,X              
 	
 	:
-	CPY #$00                 
+	cpy #$00                 
 	bne :+
 	
 	:
 	lda hitPoints_0603,y     
 	sec                       
-	sbc  $0602,X              
+	sbc  someObjProperty_0602,X              
 	beq doHandleObjCollision                
 	bcc doHandleObjCollision                
 	
-	CPY #$00                 
+	cpy #$00                 
 	bne doStoreHitPointsAndLeave                
 	cmp  #$14                 
 	bcs doStoreHitPointsAndLeave                
 	pha                      
 	lda #$D7                 
-	sta $0501                
+	sta someObjProperty_0501                
 	lda #$8B                 
-	sta $0502                
+	sta someObjProperty_0502                
 	lda #$00                 
-	sta $0503                
-	sta $0504                
-	sta $0505                
+	sta someObjProperty_0503                
+	sta someObjProperty_0504                
+	sta someObjProperty_0505                
 	pla                      
 	cmp  #$01                 
 	bne doStoreHitPointsAndLeave                
@@ -916,7 +939,7 @@ leaveThisRountine:
 	pha                      
 	tya                      
 	pha                      
-	lda $0405,X              
+	lda someObjProperty_0405,X              
 	BIT BIT_4                
 	bne :+
 	jmp doHandleObjCollision                
@@ -938,11 +961,11 @@ leaveThisRountine:
 	:
 	BIT BIT_1                
 	beq :+
-	lda $2C                  
+	lda var_2C                  
 	beq doHandleObjCollision                
 	sec                       
 	sbc  #$01                 
-	sta $2C                  
+	sta var_2C                  
 	cmp  #$01                 
 	bne doALSOHandleObjCollision
 	sta $2E                  
@@ -952,7 +975,7 @@ leaveThisRountine:
 	:
 	BIT BIT_3                
 	beq doALSOHandleObjCollision
-	CPY #$00                 
+	cpy #$00                 
 	bne skipHandlingCollision
 	
 	doALSOHandleObjCollision:
@@ -990,13 +1013,13 @@ leaveThisRountine:
 	pha                      
 	tya                      
 	pha                      
-	lda $0405,X              
+	lda someObjProperty_0405,X              
 	BIT BIT_6                
 	bne :+
 	jmp doneWithThisRoutine_X
 	
 	:
-	lda $0302,X              
+	lda someObjProperty_0302,X              
 	bne :+
 	
 	:
@@ -1101,7 +1124,7 @@ leaveThisRountine:
 	:
 	cmp  #$2C                 
 	bne :++
-	lda $0401,X              
+	lda someObjProperty_0401,X              
 	beq :+
 	jmp doneWithThisRoutine_X
 	
@@ -1115,13 +1138,13 @@ leaveThisRountine:
 	lda #$50                 
 	sta hitPoints_0603       
 	lda #$BD                 
-	sta $0501                
+	sta someObjProperty_0501                
 	lda #$8B                 
-	sta $0502                
+	sta someObjProperty_0502                
 	lda #$00                 
-	sta $0503                
-	sta $0504                
-	sta $0505                
+	sta someObjProperty_0503                
+	sta someObjProperty_0504                
+	sta someObjProperty_0505                
 	lda #$D8                 
 	sta OAM_0200             
 	jmp doneWithThisRoutine_X
@@ -1199,22 +1222,22 @@ leaveThisRountine:
 	sbc  #$00                 
 	
 	SecondPart:
-	sta $58                  
-	lda $0404,X              
+	sta var_58                  
+	lda someObjProperty_0404,X              
 	and #$20                 
 	beq doneWithThisRoutine_X
 	clc                      
-	lda $0400,X              
-	sta $54                  
-	lda $0401,X              
+	lda someObjProperty_0400,X              
+	sta var_54                  
+	lda someObjProperty_0401,X              
 	adc #$00                 
-	sta $55                  
+	sta var_55                  
 	clc                      
-	lda $0402,X              
-	sta $56                  
-	lda $0403,X              
+	lda someObjProperty_0402,X              
+	sta var_56                  
+	lda someObjProperty_0403,X              
 	adc #$00                 
-	sta $57                  
+	sta var_57                  
 	jsr UnknownSub7                
 	doneWithThisRoutine_X:   
 	pla                      
@@ -1222,7 +1245,7 @@ leaveThisRountine:
 	pla                      
 	tax                      
 	lda #$00                 
-	sta $0404,X              
+	sta someObjProperty_0404,X              
 	rts                       
 .endproc
 ;
@@ -1249,44 +1272,44 @@ leaveThisRountine:
 	rts                       
 	
 	:
-	lda $58                  
+	lda var_58                  
 	asl A                    
 	asl A                    
 	asl A                    
 	tay                      
 	lda DATA_BLOCK_8715+0,y              
-	sta $0501,X              
+	sta someObjProperty_0501,X              
 	lda DATA_BLOCK_8715+1,y              
-	sta $0502,X              
+	sta someObjProperty_0502,X              
 	lda DATA_BLOCK_8715+2,y              
-	sta $0602,X              
+	sta someObjProperty_0602,X              
 	lda DATA_BLOCK_8715+3,y              
-	sta $0405,X              
+	sta someObjProperty_0405,X              
 	lda DATA_BLOCK_8715+4,y              
-	sta $0600,X              
+	sta someObjProperty_0600,X              
 	lda DATA_BLOCK_8715+5,y              
-	sta $0601,X              
+	sta someObjProperty_0601,X              
 	lda DATA_BLOCK_8715+6,y              
-	sta $0302,X              
+	sta someObjProperty_0302,X              
 	lda DATA_BLOCK_8715+7,y              
-	sta $0303,X              
-	lda $54                  
-	sta $0400,X              
-	lda $55                  
-	sta $0401,X              
-	lda $56                  
-	sta $0402,X              
-	lda $57                  
-	sta $0403,X              
+	sta someObjProperty_0303,X              
+	lda var_54                  
+	sta someObjProperty_0400,X              
+	lda var_55                  
+	sta someObjProperty_0401,X              
+	lda var_56                  
+	sta someObjProperty_0402,X              
+	lda var_57                  
+	sta someObjProperty_0403,X              
 	lda #$00                 
-	sta $0503,X              
-	sta $0504,X              
-	sta $0505,X              
-	sta $0700,X              
-	sta $0300,X              
-	sta $0301,X              
+	sta someObjProperty_0503,X              
+	sta someObjProperty_0504,X              
+	sta someObjProperty_0505,X              
+	sta someObjProperty_0700,X              
+	sta someObjProperty_0300,X              
+	sta someObjProperty_0301,X              
 	lda #$80                 
-	sta $0404,X              
+	sta someObjProperty_0404,X              
 	rts                       
 .endproc
 ;
@@ -1324,7 +1347,7 @@ DATA_BLOCK_8715:
 	lda #$00                 
 	sta $2E                  
 	pla                      
-	sta $0302,X              
+	sta someObjProperty_0302,X              
 	
 	doneWithThisRoutine:
 	rts                       
@@ -1333,37 +1356,37 @@ DATA_BLOCK_8715:
 ; $8B16
 .proc InitializeGameVariables
 	lda #$F2                 
-	sta $0400                
+	sta someObjProperty_0400                
 	lda #$FF                 
-	sta $0401                
+	sta someObjProperty_0401                
 	lda #$70                 
-	sta $0402                
+	sta someObjProperty_0402                
 	lda #$7D                 
-	sta $0501                
+	sta someObjProperty_0501                
 	lda #$8B                 
-	sta $0502                
+	sta someObjProperty_0502                
 	lda #$A0                 
-	sta $0404                
+	sta someObjProperty_0404                
 	lda #$00                 
-	sta $0503                
-	sta $0504                
-	sta $0505                
+	sta someObjProperty_0503                
+	sta someObjProperty_0504                
+	sta someObjProperty_0505                
 	sta aliveTimer_14        
 	sta soundAddress_8D      
 	lda #$1A                 
-	sta $0302                
+	sta someObjProperty_0302                
 	lda #$03                 
-	sta $0602                
+	sta someObjProperty_0602                
 	lda #$14                 
-	sta $0600                
+	sta someObjProperty_0600                
 	lda #$18                 
-	sta $0601                
+	sta someObjProperty_0601                
 	lda #$18                 
-	sta $0604                
+	sta someObjProperty_0604                
 	lda #$0E                 
-	sta $0605                
+	sta someObjProperty_0605                
 	lda #$00                 
-	sta $0405                
+	sta someObjProperty_0405                
 	lda #$00                 
 	sta $60                  
 	lda flagNextLevel_1B     
@@ -1385,27 +1408,27 @@ DATA_BLOCK_8B7A:
 .proc InitializeGameVariables2
 	ldy #$06                 
 	lda #$C0                 
-	sta $0400,y              
+	sta someObjProperty_0400,y              
 	lda #$D8                 
-	sta $0402,y              
+	sta someObjProperty_0402,y              
 	lda #$A0                 
-	sta $0404,y              
+	sta someObjProperty_0404,y              
 	lda #$00                 
-	sta $0405,y              
-	sta $0503,y              
-	sta $0504,y              
-	sta $0505,y              
-	sta $0302,y              
-	sta $0303,y              
-	sta $0604,y              
-	sta $0605,y              
-	sta $0602,y              
+	sta someObjProperty_0405,y              
+	sta someObjProperty_0503,y              
+	sta someObjProperty_0504,y              
+	sta someObjProperty_0505,y              
+	sta someObjProperty_0302,y              
+	sta someObjProperty_0303,y              
+	sta someObjProperty_0604,y              
+	sta someObjProperty_0605,y              
+	sta someObjProperty_0602,y              
 	lda #$FF                 
 	sta hitPoints_0603,y     
 	lda #$07                 
-	sta $0600,y              
+	sta someObjProperty_0600,y              
 	lda #$07                 
-	sta $0601,y              
+	sta someObjProperty_0601,y              
 	rts                       
 .endproc
 ;
@@ -1535,42 +1558,42 @@ DATA_BLOCK_8B7A:
 	asl A                    
 	tay                      
 	lda DATA_BLOCK_8D1D+0,y              
-	sta $0501,X              
+	sta someObjProperty_0501,X              
 	lda DATA_BLOCK_8D1D+1,y              
-	sta $0502,X              
+	sta someObjProperty_0502,X              
 	lda DATA_BLOCK_8D1D+2,y              
-	CPY #$00                 
+	cpy #$00                 
 	beq :+
 	clc                      
 	adc #$02                 
 	
 	:
-	sta $0602,X              
+	sta someObjProperty_0602,X              
 	lda DATA_BLOCK_8D1D+3,y              
-	sta $0302,X              
+	sta someObjProperty_0302,X              
 	lda DATA_BLOCK_8D1D+4,y              
-	sta $0600,X              
+	sta someObjProperty_0600,X              
 	lda DATA_BLOCK_8D1D+5,y              
-	sta $0601,X              
-	lda $0400                
+	sta someObjProperty_0601,X              
+	lda someObjProperty_0400                
 	clc                      
 	adc DATA_BLOCK_8D1D+6,y              
-	sta $0400,X              
-	lda $0402                
+	sta someObjProperty_0400,X              
+	lda someObjProperty_0402                
 	clc                      
 	adc DATA_BLOCK_8D1D+7,y              
-	sta $0402,X              
+	sta someObjProperty_0402,X              
 	lda #$00                 
-	sta $0503,X              
-	sta $0504,X              
-	sta $0505,X              
-	sta $0401,X              
-	sta $0403,X              
+	sta someObjProperty_0503,X              
+	sta someObjProperty_0504,X              
+	sta someObjProperty_0505,X              
+	sta someObjProperty_0401,X              
+	sta someObjProperty_0403,X              
 	sta hitPoints_0603,X     
 	lda #$40                 
-	sta $0405,X              
+	sta someObjProperty_0405,X              
 	lda #$80                 
-	sta $0404,X              
+	sta someObjProperty_0404,X              
 	rts                       
 
 .endproc
@@ -1585,7 +1608,7 @@ DATA_BLOCK_8D1D:
 	ldx #$0C                 
 	
 	:
-	lda $0404,X              
+	lda someObjProperty_0404,X              
 	and #$90                 
 	beq :+
 	txa                      
@@ -1603,7 +1626,7 @@ DATA_BLOCK_8D1D:
 	clc                      
 	ldx #$30                 
 	:
-		lda $0404,X              
+		lda someObjProperty_0404,X              
 		and #$90                 
 		beq :+
 		txa                      
@@ -1617,17 +1640,17 @@ DATA_BLOCK_8D1D:
 ;
 ; $8D73
 .proc UnknownSub24
-	lda $0301,X              
+	lda someObjProperty_0301,X              
 	bne :+
 	rts                       
 
 	:
-	lda $0404,X              
+	lda someObjProperty_0404,X              
 	and #$F7                 
-	sta $0404,X              
-	lda $0700,X              
-	sta $0300,X              
-	lda $0301,X              
+	sta someObjProperty_0404,X              
+	lda someObjProperty_0700,X              
+	sta someObjProperty_0300,X              
+	lda someObjProperty_0301,X              
 	cmp  #$01                 
 	bne :+
 	jsr UnknownSub25
@@ -1684,18 +1707,18 @@ DATA_BLOCK_8D1D:
 .proc UnknownSub25
 	lda #$00                 
 	sta $4B                  
-	lda $0400,X              
+	lda someObjProperty_0400,X              
 	sec                       
-	sbc  $0400                
+	sbc  someObjProperty_0400                
 	bcs :+
 	EOR #$FF                 
 	
 	:
 	ROL $4B                  
 	sta $4C                  
-	lda $0402,X              
+	lda someObjProperty_0402,X              
 	sec                       
-	sbc  $0402                
+	sbc  someObjProperty_0402                
 	bcs :+
 	EOR #$FF                 
 	
@@ -1718,7 +1741,7 @@ DATA_BLOCK_8D1D:
 	sbc  $4C                  
 	bcc :+
 	iny                      
-	CPY #$04                 
+	cpy #$04                 
 	bcc :-
 	
 	:
@@ -1771,18 +1794,18 @@ DATA_BLOCK_8E3F:
 	ldy $4A                  
 	jsr UnknownSub19
 	lda #$01                 
-	sta $0602,X              
+	sta someObjProperty_0602,X              
 	lda #$60                 
-	sta $0405,X              
+	sta someObjProperty_0405,X              
 	lda #$04                 
-	sta $0600,X              
-	sta $0601,X              
+	sta someObjProperty_0600,X              
+	sta someObjProperty_0601,X              
 	lda #$00                 
 	sta hitPoints_0603,X     
-	sta $0301,X              
-	sta $0302,X              
+	sta someObjProperty_0301,X              
+	sta someObjProperty_0302,X              
 	lda #$80                 
-	sta $0404,X              
+	sta someObjProperty_0404,X              
 	
 	doneWithThis:
 	pla                      
@@ -1795,33 +1818,33 @@ DATA_BLOCK_8E3F:
 ; $8E81
 .proc UnknownSub18
 
-	lda $0400,y              
+	lda someObjProperty_0400,y              
 	clc                      
-	adc $0604,y              
-	sta $0400,X              
-	lda $0401,y              
+	adc someObjProperty_0604,y              
+	sta someObjProperty_0400,X              
+	lda someObjProperty_0401,y              
 	adc #$00                 
-	sta $0401,X              
-	lda $0402,y              
+	sta someObjProperty_0401,X              
+	lda someObjProperty_0402,y              
 	clc                      
-	adc $0605,y              
-	sta $0402,X              
-	lda $0403,y              
+	adc someObjProperty_0605,y              
+	sta someObjProperty_0402,X              
+	lda someObjProperty_0403,y              
 	adc #$00                 
-	sta $0403,X              
+	sta someObjProperty_0403,X              
 	rts                       
 .endproc
 ;
 ; $8EA6
 .proc UnknownSub19
 	lda DATA_BLOCK_8EBE+0,y              
-	sta $0501,X              
+	sta someObjProperty_0501,X              
 	lda DATA_BLOCK_8EBE+1,y              
-	sta $0502,X              
+	sta someObjProperty_0502,X              
 	lda #$00                 
-	sta $0505,X              
-	sta $0503,X              
-	sta $0504,X              
+	sta someObjProperty_0505,X              
+	sta someObjProperty_0503,X              
+	sta someObjProperty_0504,X              
 	rts                       
 .endproc
 ;
@@ -1966,9 +1989,9 @@ DATA_BLOCK_92D4:
 	tax                      
 	ldy #$06                 
 	lda LivesGraphicData,X              
-	sta $0501,y              
+	sta someObjProperty_0501,y              
 	lda LivesGraphicData+1,X              
-	sta $0502,y              
+	sta someObjProperty_0502,y              
 	rts                       
 .endproc
 ;
@@ -1982,13 +2005,13 @@ LivesGraphicData:
 	lda #$00
 	TAY
 	:
-		sta $0300,y
-		sta $0400,y
-		sta $0500,y
-		sta $0600,y
-		sta $0700,y
+		sta someObjProperty_0300,y
+		sta someObjProperty_0400,y
+		sta someObjProperty_0500,y
+		sta someObjProperty_0600,y
+		sta someObjProperty_0700,y
 		INY
-		CPY #$DF
+		cpy #$DF
 		bne :-
 	rts 
 .endproc
@@ -2003,7 +2026,7 @@ LivesGraphicData:
 	ldy #$36                 
 	lda #$00                 
 	:
-		sta $0400,y              
+		sta someObjProperty_0400,y              
 		iny                      
 		bne :-
 	pla                      
@@ -2034,7 +2057,7 @@ LivesGraphicData:
 		lda $8008,y              
 		sta OAM_0200,y           
 		iny                      
-		CPY #$04                 
+		cpy #$04                 
 		bne :-
 	lda hitPoints_0603       
 	pha                      
@@ -2557,6 +2580,7 @@ loopDarkenBGFiveSteps:
 EndCreditsData:
 .incbin "rom-prg/stages/EndCredits.bin"
 ;
+; $97AD
 .proc UnknownSub5
 	lda #$00                 
 	sta bankIndex_15         
@@ -2574,7 +2598,7 @@ EndCreditsData:
 		lda StillUnkownData,y              
 		sta OAM_0200,y           
 		iny                      
-		CPY #$20                 
+		cpy #$20                 
 		bne :-
 	jsr UpdatePPUSettings
 	lda #$02                 
@@ -2624,7 +2648,7 @@ StillUnkownData:
 	tya                      
 	pha                      
 	lda updateDuringVBlank_0E
-	cmp  #$57                 
+	cmp #$57                 
 	beq doKeepUpdatingAtVBlank_from0E
 	jmp doUpdateSoundOnly    
 
@@ -2785,23 +2809,23 @@ StillUnkownData:
 	
 	BeginHere:
 	ldx $5F                  
-	lda $0404,X              
+	lda someObjProperty_0404,X              
 	bmi :+
 	jmp SecondPart                
 	
 	:
-	ldy $0504,X              
+	ldy someObjProperty_0504,X              
 	beq :+
-	dec $0504,X              
-	dec $0503,X              
+	dec someObjProperty_0504,X              
+	dec someObjProperty_0503,X              
 	jmp ReplaceMeLabel_2                
 	
 	:
-	lda $0501,X              
+	lda someObjProperty_0501,X              
 	sta $36                  
-	lda $0502,X              
+	lda someObjProperty_0502,X              
 	sta $37                  
-	ldy $0503,X              
+	ldy someObjProperty_0503,X              
 	
 	ReplaceMeLabel_7:
 	lda ($36),y              
@@ -2813,10 +2837,10 @@ StillUnkownData:
 	bmi ReplaceMeLabel_1                
 	lsr  A                    
 	sbc  #$00                 
-	sta $0504,X              
+	sta someObjProperty_0504,X              
 	
 	ReplaceMeLabel_2:
-	lda $0405,X              
+	lda someObjProperty_0405,X              
 	bpl ReplaceMeLabel_4                
 	lda $0C                  
 	bpl :+
@@ -2830,12 +2854,12 @@ StillUnkownData:
 	sta $47                  
 	lda $0C                  
 	clc                      
-	adc $0400,X              
-	sta $0400,X              
+	adc someObjProperty_0400,X              
+	sta someObjProperty_0400,X              
 	sta $40                  
 	lda $47                  
-	adc $0401,X              
-	sta $0401,X              
+	adc someObjProperty_0401,X              
+	sta someObjProperty_0401,X              
 	sta $41                  
 	lda $0D                  
 	bpl :+
@@ -2849,27 +2873,27 @@ StillUnkownData:
 	sta $49                  
 	lda $0D                  
 	clc                      
-	adc $0402,X              
-	sta $0402,X              
+	adc someObjProperty_0402,X              
+	sta someObjProperty_0402,X              
 	sta spriteY_42                  
 	lda $49                  
-	adc $0403,X              
-	sta $0403,X              
+	adc someObjProperty_0403,X              
+	sta someObjProperty_0403,X              
 	sta $43                  
 	jmp ReplaceMeLabel_5
 	
 	ReplaceMeLabel_4:
-	lda $0400,X              
+	lda someObjProperty_0400,X              
 	sta $40                  
-	lda $0401,X              
+	lda someObjProperty_0401,X              
 	sta $41                  
-	lda $0402,X              
+	lda someObjProperty_0402,X              
 	sta spriteY_42                  
-	lda $0403,X              
+	lda someObjProperty_0403,X              
 	sta $43                  
 	
 	ReplaceMeLabel_5:
-	inc $0503,X              
+	inc someObjProperty_0503,X              
 	lda $0701,X              
 	tax                      
 	lda Data_atA895+0,X              
@@ -2882,8 +2906,8 @@ StillUnkownData:
 	ReplaceMeLabel_1:
 	asl A                    
 	bmi loopTest
-	dec $0505,X              
-	lda $0505,X              
+	dec someObjProperty_0505,X              
+	lda someObjProperty_0505,X              
 	bne :+
 	iny                      
 	iny                      
@@ -2893,7 +2917,7 @@ StillUnkownData:
 	bpl loop          
 	lda ($36),y              
 	and #$1F                 
-	sta $0505,X              
+	sta someObjProperty_0505,X              
 	
 	loop:
 		iny                      
@@ -2912,13 +2936,13 @@ StillUnkownData:
 	lsr  A                    
 	lsr  A                    
 	and #$0F                 
-	lda $0404,X              
+	lda someObjProperty_0404,X              
 	ora #$08                 
-	sta $0404,X              
+	sta someObjProperty_0404,X              
 	jmp SecondPart                
 	
 	:
-	lda $0303,X              
+	lda someObjProperty_0303,X              
 	cmp  #$03                 
 	bne :+                
 	beq :++
@@ -2931,8 +2955,8 @@ StillUnkownData:
 	
 	:
 	lda #$00                 
-	sta $0302,X              
-	sta $0303,X              
+	sta someObjProperty_0302,X              
+	sta someObjProperty_0303,X              
 	
 	:
 	cmp  #$05                 
@@ -2942,7 +2966,7 @@ StillUnkownData:
 	
 	:
 	lda #$10                 
-	sta $0404,X              
+	sta someObjProperty_0404,X              
 	
 	:
 	jmp SecondPart                
@@ -2957,7 +2981,7 @@ StillUnkownData:
 	sta $33                  
 	iny                      
 	ldx $5F                  
-	lda $0405,X              
+	lda someObjProperty_0405,X              
 	bpl :+
 	lda ($36),y              
 	clc                      
@@ -2980,15 +3004,15 @@ StillUnkownData:
 	sta $47                  
 	lda spriteX_46                  
 	clc                      
-	adc $0400,X              
-	sta $0400,X              
+	adc someObjProperty_0400,X              
+	sta someObjProperty_0400,X              
 	sta $40                  
 	lda $47                  
-	adc $0401,X              
-	sta $0401,X              
+	adc someObjProperty_0401,X              
+	sta someObjProperty_0401,X              
 	sta $41                  
 	iny                      
-	lda $0405,X              
+	lda someObjProperty_0405,X              
 	bpl :+
 	lda ($36),y              
 	clc                      
@@ -3011,36 +3035,36 @@ StillUnkownData:
 	sta $49                  
 	lda $48                  
 	clc                      
-	adc $0402,X              
-	sta $0402,X              
+	adc someObjProperty_0402,X              
+	sta someObjProperty_0402,X              
 	sta spriteY_42                  
 	lda $49                  
-	adc $0403,X              
-	sta $0403,X              
+	adc someObjProperty_0403,X              
+	sta someObjProperty_0403,X              
 	sta $43                  
 	iny                      
 	tya                      
-	sta $0503,X              
+	sta someObjProperty_0503,X              
 	
 	ReplaceMeLabel_6:
-	lda $0404,X              
+	lda someObjProperty_0404,X              
 	and #$20                 
 	bne :+
 	jmp SecondPart                
 	
 	:
-	lda $0405,X              
+	lda someObjProperty_0405,X              
 	and #$18                 
 	beq :+
 	lda frameCounter_12      
 	and #$03                 
 	bne :+
-	dec $0300,X              
-	lda $0300,X              
+	dec someObjProperty_0300,X              
+	lda someObjProperty_0300,X              
 	bne :+
-	lda $0404,X              
+	lda someObjProperty_0404,X              
 	ora #$08                 
-	sta $0404,X              
+	sta someObjProperty_0404,X              
 	
 	:
 	ldy #$00                 
@@ -3049,7 +3073,7 @@ StillUnkownData:
 	jmp ReplaceMeLabel_8
 	
 	:
-	sta $0600,X              
+	sta someObjProperty_0600,X              
 	lsr  A                    
 	lsr  A                    
 	lsr  A                    
@@ -3058,7 +3082,7 @@ StillUnkownData:
 	sta $44                  
 	iny                      
 	lda (addressPtr_32),y
-	sta $0601,X              
+	sta someObjProperty_0601,X              
 	lsr  A                    
 	lsr  A                    
 	lsr  A                    
@@ -3235,13 +3259,13 @@ StillUnkownData:
 	jsr ReadControl_A        
 	lda flagPause_1C         
 	bne doGameIsPaused       
-	lda $0401                
+	lda someObjProperty_0401                
 	bne doGameIsPaused       
 	lda aliveTimer_14        
 	cmp  #$02                 
 	bcc HandlePlayerActions  
 	lda #$50                 
-	sta $0405                
+	sta someObjProperty_0405                
 	bne HandlePlayerActions  
 	
 	doGameIsPaused:          
@@ -3260,7 +3284,7 @@ checkInputRight:
 	BIT BUTTON_RIGHT
 	beq checkInputLeft       
 
-	lda $0400                
+	lda someObjProperty_0400                
 	cmp  #$DC                 
 	bcs checkInputDown       
 	adc speed_66             
@@ -3269,19 +3293,19 @@ checkInputRight:
 checkInputLeft:          
 	BIT BUTTON_LEFT
 	beq checkInputDown       
-	lda $0400                
+	lda someObjProperty_0400                
 	cmp  #$12                 
 	bcc checkInputDown       
 	sbc  speed_66             
 
 	:
-	sta $0400                
+	sta someObjProperty_0400                
 	
 	checkInputDown:          
 	lda input1_20            
 	BIT BUTTON_DOWN                
 	beq checkInputUp         
-	lda $0402                
+	lda someObjProperty_0402                
 	cmp  #$B8                 
 	bcs checkInputA          
 	adc speed_66             
@@ -3290,12 +3314,12 @@ checkInputLeft:
 	checkInputUp:            
 	BIT BUTTON_UP
 	beq checkInputA          
-	lda $0402                
+	lda someObjProperty_0402                
 	cmp  #$14                 
 	bcc checkInputA          
 	sbc  speed_66             
 	:
-	sta $0402                
+	sta someObjProperty_0402                
 	
 	checkInputA:             
 	lda input1_20            
@@ -3311,19 +3335,19 @@ checkInputLeft:
 	cmp  #$14                 
 	bcc :+
 	lda #$0A                 
-	sta $0501                
+	sta someObjProperty_0501                
 	lda #$A8                 
-	sta $0502                
+	sta someObjProperty_0502                
 	lda #$00                 
-	sta $0503                
+	sta someObjProperty_0503                
 	beq OnlyCheckForPause
 	:                
 	lda #$F0                 
-	sta $0501                
+	sta someObjProperty_0501                
 	lda #$A7                 
-	sta $0502                
+	sta someObjProperty_0502                
 	lda #$00                 
-	sta $0503                
+	sta someObjProperty_0503                
 	
 	OnlyCheckForPause:
 	jsr CheckForPause        
@@ -3338,7 +3362,7 @@ checkInputLeft:
 ; $A83C
 .proc UnknownSub6
 	pha                      
-	lda $0404                
+	lda someObjProperty_0404                
 	BIT BIT_5                
 	beq :+                
 	pla                      
