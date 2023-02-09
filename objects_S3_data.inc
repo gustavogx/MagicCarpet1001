@@ -359,7 +359,7 @@ Data_atCCF5:
 .incbin "rom-prg/objects/data-block-atCCF5.bin"
 
 Data_atCD5D:
-.incbin "rom-prg/objects/data-block-atCC5D.bin"
+.incbin "rom-prg/objects/data-block-atCD5D.bin"
 
 Data_atCE2B:
 .incbin "rom-prg/objects/data-block-atCE2B.bin"

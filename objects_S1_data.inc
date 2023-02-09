@@ -39,67 +39,67 @@
 Data_atAF06:
 .word Data_atAFA2
 .incbin "rom-prg/objects/data-12bytes-atAF08.bin"
-;.incbin "rom-prg/objects/data-12bytes-zero.bin"
+
 
 Data_atAF12:
 .word Data_atB004
 .incbin "rom-prg/objects/data-12bytes-atAF14.bin"
-;.incbin "rom-prg/objects/data-12bytes-zero.bin"
+
 
 Data_atAF1E:
 .word Data_atB03A
 .incbin "rom-prg/objects/data-12bytes-atAF20.bin"
-;.incbin "rom-prg/objects/data-12bytes-zero.bin"
+
 
 Data_atAF2A:
 .word Data_atB070
 .incbin "rom-prg/objects/data-12bytes-atAF2C.bin"
-;.incbin "rom-prg/objects/data-12bytes-zero.bin"
+
 
 Data_atAF36:
 .word Data_atB09A
 .incbin "rom-prg/objects/data-12bytes-atAF38.bin"
-;.incbin "rom-prg/objects/data-12bytes-zero.bin"
+
 
 Data_atAF42:
 .word Data_atB0AD
 .incbin "rom-prg/objects/data-12bytes-atAF44.bin"
-;.incbin "rom-prg/objects/data-12bytes-zero.bin"
+
 
 Data_atAF4E:
 .word Data_atB0BF
 .incbin "rom-prg/objects/data-12bytes-atAF50.bin"
-;.incbin "rom-prg/objects/data-12bytes-zero.bin"
+
 
 Data_atAF5A:
 .word Data_atB123
 .incbin "rom-prg/objects/data-12bytes-atAF5C.bin"
-;.incbin "rom-prg/objects/data-12bytes-zero.bin"
+
 
 Data_atAF66:
 .word Data_atB169
 .incbin "rom-prg/objects/data-12bytes-atAF68.bin"
-;.incbin "rom-prg/objects/data-12bytes-zero.bin"
+
 
 Data_atAF72:
 .word Data_atB18F
 .incbin "rom-prg/objects/data-12bytes-atAF74.bin"
-;.incbin "rom-prg/objects/data-12bytes-zero.bin"
+
 
 Data_atAF7E:
 .word Data_atB211
 .incbin "rom-prg/objects/data-12bytes-atAF80.bin"
-;.incbin "rom-prg/objects/data-12bytes-zero.bin"
+
 
 Data_atAF8A:
 .word Data_atB247
 .incbin "rom-prg/objects/data-12bytes-atAF8C.bin"
-;.incbin "rom-prg/objects/data-12bytes-zero.bin"
+
 
 Data_atAF96:
 .word Data_atB146
 .incbin "rom-prg/objects/data-12bytes-atAF98.bin"
-;.incbin "rom-prg/objects/data-12bytes-zero.bin"
+
 
 ; Each one of the above has one below (enemy AI?)
 Data_atAFA2:

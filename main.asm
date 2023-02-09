@@ -182,6 +182,8 @@
 
 .segment "RAM" ; LSB 0 - FF
 
+.define someObjProperty_0100 $0100 ; 1 only used once
+
 ; page 02 - OAM
 .define OAM_0200	$0200
 .define someObjProperty_0201 $0201
@@ -193,6 +195,8 @@
 .define someObjProperty_0301 $0301
 .define someObjProperty_0302 $0302
 .define someObjProperty_0303 $0303
+
+.define someObjProperty_0333 $0333 ; 1 used once!
 
 ; page 04
 .define someObjProperty_0400 $0400 ; playerX_0400
@@ -209,6 +213,18 @@
 .define someObjProperty_0503 $0503
 .define someObjProperty_0504 $0504
 .define someObjProperty_0505 $0505
+
+.define someObjProperty_0531 $0531
+.define someObjProperty_0532 $0532
+.define someObjProperty_0533 $0533
+.define someObjProperty_0534 $0534
+.define someObjProperty_0535 $0535
+
+.define someObjProperty_05FB $05FB ;$0531
+.define someObjProperty_05FC $05FC ;$0532
+.define someObjProperty_05FD $05FD ;$0533
+.define someObjProperty_05FE $05FE ;$0534
+.define someObjProperty_05FF $05FF ;$0535
 
 ; page 06
 .define someObjProperty_0600 $0600
@@ -770,7 +786,7 @@ leaveThisRountine:
 	beq doneWithThis                
 	lda var_5A                  
 	bne doneWithThis                
-	jsr $8D73                
+	jsr UnknownSub24
 	
 	doneWithThis:
 	lda var_4D                  
@@ -1707,7 +1723,7 @@ DATA_BLOCK_8D1D:
 	ldx #$30                 
 	:
 		lda someObjProperty_0404,x
-		and #$90                 
+		and #%10010000 ; #$90
 		beq :+
 		txa                      
 		adc #$06                 
@@ -2018,21 +2034,21 @@ DATA_BLOCK_92D4:
 	tya                      
 	pha                      
 	lda #$05                 
-	sta $0333                
-	lda $0531                
-	sta $05FB                
-	lda $0532                
-	sta $05FC                
-	lda $0533                
-	sta $05FD                
-	lda $0534                
-	sta $05FE                
-	lda $0535                
-	sta $05FF                
+	sta someObjProperty_0333 ; not used in any other place
+	lda someObjProperty_0531                
+	sta someObjProperty_05FB                
+	lda someObjProperty_0532                
+	sta someObjProperty_05FC                
+	lda someObjProperty_0533                
+	sta someObjProperty_05FD                
+	lda someObjProperty_0534                
+	sta someObjProperty_05FE                
+	lda someObjProperty_0535                
+	sta someObjProperty_05FF                
 	lda #$00                 
-	sta $0533                
-	sta $0534                
-	sta $0535                
+	sta someObjProperty_0533                
+	sta someObjProperty_0534                
+	sta someObjProperty_0535                
 	lda #<Data_at932D ;; see data below
 	sta objectPtr_34+0
 	lda #>Data_at932D ;; see data below
@@ -2043,10 +2059,10 @@ DATA_BLOCK_92D4:
 	asl A                    
 	tay                      
 	lda (objectPtr_34),y              
-	sta $0531 ; boss AI?
+	sta someObjProperty_0531 ; boss AI?
 	iny                      
 	lda (objectPtr_34),y              
-	sta $0532 ; boss AI?
+	sta someObjProperty_0532 ; boss AI?
 	pla                      
 	tay                      
 	pla                      
@@ -2150,7 +2166,7 @@ LivesGraphicData:
 	sta OAM_0200             
 	ldy #$01
 	:                 
-		lda $8008,y              
+		lda HeartHUDData,y              
 		sta OAM_0200,y           
 		iny                      
 		cpy #$04                 
@@ -2730,9 +2746,10 @@ StillUnkownData:
 .segment "SOUNDENGINE"
 ;.include "sound-engine.asm"
 
+.res 1293
 
 ; $9D22 data
-;.incbin "rom-prg/sounds/sound-data-at9D32.bin"
+.incbin "rom-prg/sound/sound-data-at9D32.bin"
 
 ;
 ; $A3AC
@@ -2875,7 +2892,7 @@ StillUnkownData:
 	
 	:
 	jsr UnknownSub11
-	bit $0100                
+	bit someObjProperty_0100                
 	dex                      
 	bne :-                
 	rts                       
@@ -3316,16 +3333,16 @@ StillUnkownData:
 ;
 ; $A709
 .proc Copy_5BytesPage05_FromEnd_ToBeginning
-	lda $05FB                
-	sta $0531                
-	lda $05FC                
-	sta $0532                
-	lda $05FD                
-	sta $0533                
-	lda $05FE                
-	sta $0534                
-	lda $05FF                
-	sta $0535                
+	lda someObjProperty_05FB                
+	sta someObjProperty_0531                
+	lda someObjProperty_05FC                
+	sta someObjProperty_0532                
+	lda someObjProperty_05FD                
+	sta someObjProperty_0533                
+	lda someObjProperty_05FE                
+	sta someObjProperty_0534                
+	lda someObjProperty_05FF                
+	sta someObjProperty_0535                
 	rts                       
 .endproc
 ;

@@ -16,7 +16,7 @@ Data_atA895:
 ; Player
 .word DATA_ADDR_11, DATA_ADDR_12, DATA_ADDR_13  ; Player Flying (3 frames)
 .word DATA_ADDR_14                              ; Player Shooting
-.word DATA_ADDR_15, DATA_ADDR_16                ;  Player Death (2 frames)
+.word DATA_ADDR_15, DATA_ADDR_16                ; Player Death (2 frames)
 
 .word DATA_ADDR_17, DATA_ADDR_18, DATA_ADDR_19
 .word DATA_ADDR_20, DATA_ADDR_21, DATA_ADDR_22, DATA_ADDR_23
