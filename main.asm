@@ -294,207 +294,207 @@ HandleReset:
 		bne :-
 
 	lda BankSwitching_FFF0	; Loads a $00 from ROM filling (dangerous!)
-	sta BankSwitching_FFF0  ; Set mapper to Bank0
+	sta BankSwitching_FFF0; Set mapper to Bank0
 	
 	ldx #$00
 	jsr SetupAfterReset	
 
 	jsr SetFlag_59
-	nop  ;
-	nop  ;
-	nop  ; jsr ResetSoundEngine
+	nop;
+	nop;
+	nop; jsr ResetSoundEngine
 
 	lda #$01 
 	sta flagGameMode_26
 
 	lda #$00 
 	TAX
-	jsr LoadStage                
+	jsr LoadStage
 
-	lda #$01                 
-	ldx #$01                 
-	jsr LoadStage                
+	lda #$01
+	ldx #$01
+	jsr LoadStage
 
-	lda #$88                 
-	and #$F7                 
-	sta flagPPUControl_17                  
-	sta flagPPUControl_19   
-	lda #$1C                 
-	sta flagPPUMask_18                  
-	lda #$00                 
-	sta bankIndex_15         
-	lda #$00                 
-	sta powerUp_P_64         
+	lda #$88
+	and #$F7
+	sta flagPPUControl_17
+	sta flagPPUControl_19
+	lda #$1C
+	sta flagPPUMask_18
+	lda #$00
+	sta bankIndex_15
+	lda #$00
+	sta powerUp_P_64
 	lda #$10
-	sta livesCounter_11      
-	lda #$00                 
-	sta soundAddress_8F               
-	sta PpuScroll_2005       
-	sta PpuScroll_2005       
-	jsr RenderON                
-	lda #$00                 
-	sta soundAddress_8D                  
-	nop  ;
-	nop  ;
-	nop  ; jsr InitializeSound ; see sound engine                
+	sta livesCounter_11
+	lda #$00
+	sta soundAddress_8F
+	sta PpuScroll_2005
+	sta PpuScroll_2005
+	jsr RenderON
+	lda #$00
+	sta soundAddress_8D
+	nop;
+	nop;
+	nop; jsr InitializeSound ; see sound engine
 
-WaitForPressStart:       
-	lda #$00                 
-	jsr ReadControl_A        
-	lda input1_20            
+WaitForPressStart:
+	lda #$00
+	jsr ReadControl_A
+	lda input1_20
 	
-	checkInputStart:         
+	checkInputStart:
 	cmp #BIT4 ; not cmp BUTTON_START for some reason
-	beq :+     
-	jmp WaitForPressStart    
+	beq :+
+	jmp WaitForPressStart
 	:
 
 	sta inputPrev_22
 	:
-		lda input1_20            
-		cmp inputPrev_22         
+		lda input1_20
+		cmp inputPrev_22
 		beq :-
 
-	nop  ;
-	nop  ;
-	nop  ;jsr Sound_DontKnowWhatItDoes
+	nop;
+	nop;
+	nop;jsr Sound_DontKnowWhatItDoes
 
-	lda #$07                 
-	sta soundAddress_8D      
+	lda #$07
+	sta soundAddress_8D
 	
-	nop  ;
-	nop  ;
-	nop  ; jsr PlaySFX              
+	nop;
+	nop;
+	nop; jsr PlaySFX
 	
-	lda #$00                 
-	sta bankIndex_15         
+	lda #$00
+	sta bankIndex_15
 	jmp MaybeStartGame ; Check what this one does
 
 MaybeStartingNewGame:
-	jsr RenderingOFF                
+	jsr RenderingOFF
 
-	nop  ;
-	nop  ;
-	nop  ; jsr DoSomethingWithSound 
+	nop;
+	nop;
+	nop; jsr DoSomethingWithSound 
 
-	lda #$00                 
-	sta PpuControl_2000      
+	lda #$00
+	sta PpuControl_2000
 	jsr ClearNametablePattern
-	lda #$01                 
+	lda #$01
 	jsr ClearNametablePattern
-	ldy bankIndex_15         
-	lda BankSequenceArray,y        
-	tax                      
+	ldy bankIndex_15
+	lda BankSequenceArray,y
+	tax
 	sta BankSwitching_FFF0+0,X
-	inc bankIndex_15         
-	clc                      
-	lda bankIndex_15         
-	asl A                    
-	pha                      
-	ldx #$00                 
-	jsr LoadStage            
-	pla                      
-	clc                      
-	adc #$01                 
-	ldx #$01                 
-	jsr LoadStage            
-	lda #$FF                 
-	sta var_0C                  
-	lda #$00                 
-	sta flagGameMode_26      
-	ldx #$02                 
-	stx frameScrollAt_27     
-	ldx #$01                 
-	stx levelProgression_16  
-	lda #%00011100                 
-	sta flagPPUMask_18      
-	lda #%10001000                 
-	sta flagPPUControl_17   
-	sta flagPPUControl_19   
-	lda #$0A                 
+	inc bankIndex_15
+	clc
+	lda bankIndex_15
+	asl A
+	pha
+	ldx #$00
+	jsr LoadStage
+	pla
+	clc
+	adc #$01
+	ldx #$01
+	jsr LoadStage
+	lda #$FF
+	sta var_0C
+	lda #$00
+	sta flagGameMode_26
+	ldx #$02
+	stx frameScrollAt_27
+	ldx #$01
+	stx levelProgression_16
+	lda #%00011100
+	sta flagPPUMask_18
+	lda #%10001000
+	sta flagPPUControl_17
+	sta flagPPUControl_19
+	lda #$0A
 	sta var_5C
-	lda #$00                 
-	sta input1_20            
-	sta inputPrev_22         
+	lda #$00
+	sta input1_20
+	sta inputPrev_22
 	sta var_5B
-	sta aliveTimer_14        
-	sta frameCounter64_13    
-	jsr InitializeGameVariables                
-	jsr InitializeGameVariables2                
-	jsr MaybeTriggerNextLevel                
-	lda #$00                 
-	sta flagNextLevel_1B     
-	sta flagUnknown_1A                  
-	jsr RenderON             
+	sta aliveTimer_14
+	sta frameCounter64_13
+	jsr InitializeGameVariables
+	jsr InitializeGameVariables2
+	jsr MaybeTriggerNextLevel
+	lda #$00
+	sta flagNextLevel_1B
+	sta flagUnknown_1A
+	jsr RenderON
 
-	lda #$01                 
-	sta soundAddress_8D      
-	nop  ;
-	nop  ;
-	nop  ; jsr InitializeSound      
-	lda bankIndex_15         
-	cmp #$02                 
-	bcs loopMain             
-	ldy #$00                 
+	lda #$01
+	sta soundAddress_8D
+	nop;
+	nop;
+	nop; jsr InitializeSound
+	lda bankIndex_15
+	cmp #$02
+	bcs loopMain
+	ldy #$00
 
 	EnableHeartAsSpriteZero:
 	:
 		lda HeartHUDData,y
-		sta OAM_0200,y           
-		iny                      
-		cpy #$04                 
+		sta OAM_0200,y
+		iny
+		cpy #$04
 		bne :-
 		
-	SetupNewLevel:                  
-		lda #$F8                 
+	SetupNewLevel:
+		lda #$F8
 		sta OAM_0200
 
-		jsr InitializeGameVariables                
-		jsr MaybeTriggerNextLevel                
+		jsr InitializeGameVariables
+		jsr MaybeTriggerNextLevel
 
-	loopMain:                
-		jsr UnknownSub1                
+	loopMain:
+		jsr UnknownSub1
 		jsr LoadEnemies
 		jsr LivesHUD
-		lda var_62                  
+		lda var_62
 		beq :+
-		sta var_4E                  
+		sta var_4E
 		jsr UnknownSub12
 		:
-		lda flagPlayerHit_1E        
-		beq skipPlayerHit        
-		dec livesCounter_11      
-		lda #$01                 
-		jsr HandleAliveTimer     
-		lda #$00                 
-		sta flagPlayerHit_1E        
-		sta soundAddress_8F               
-		jmp SetupNewLevel          
+		lda flagPlayerHit_1E
+		beq skipPlayerHit
+		dec livesCounter_11
+		lda #$01
+		jsr HandleAliveTimer
+		lda #$00
+		sta flagPlayerHit_1E
+		sta soundAddress_8F
+		jmp SetupNewLevel
 
-		skipPlayerHit:           
-		lda livesCounter_11      
+		skipPlayerHit:
+		lda livesCounter_11
 		bne skipSomethingImportant
-		nop  ;
-		nop  ;
-		nop  ; jsr Sound_DontKnowWhatItDoes
-		jsr UnknownSub5             
-		jsr PaletteFading        
-		jsr RenderingOFF                
-		lda #$FF                 
+		nop;
+		nop;
+		nop; jsr Sound_DontKnowWhatItDoes
+		jsr UnknownSub5
+		jsr PaletteFading
+		jsr RenderingOFF
+		lda #$FF
 		sta updateDuringVBlank_0E
 		sta updateDuringVBlank_0F
-		jmp HandleReset          
+		jmp HandleReset
 		
-		skipSomethingImportant:  
-		lda flagNextLevel_1B     
-		beq dontAdvanceLevel     
-		nop  ;
-		nop  ;
-		nop  ; jsr Sound_DontKnowWhatItDoes
+		skipSomethingImportant:
+		lda flagNextLevel_1B
+		beq dontAdvanceLevel
+		nop;
+		nop;
+		nop; jsr Sound_DontKnowWhatItDoes
 		jmp MaybeStartGame
 
-		dontAdvanceLevel:        
-		jmp loopMain             
+		dontAdvanceLevel:
+		jmp loopMain
 ;
 
 
@@ -505,9 +505,9 @@ MaybeStartingNewGame:
 
 ; $8170
 .proc SetFlag_59
-	lda #$06                 
-	sta var_59                  
-	rts                       
+	lda #$06
+	sta var_59
+	rts
 .endproc
 ;
 ; $8175
@@ -515,321 +515,321 @@ MaybeStartingNewGame:
 ; Checks variable var_5C for a value grater than #$FA (250). If not, skip
 
 .proc LoadEnemies
-	lda var_5C                  
-	cmp #$FA                 
+	lda var_5C
+	cmp #$FA
 	bcs :+
-	jmp leaveThisRountine                
+	jmp leaveThisRountine
 	:
-	ldy bankIndex_15         
-	dey                      
-	tya                      
-	asl A                    
-	asl A                    
-	tay                      
-	lda ObjectsData_A885+0,y              
+	ldy bankIndex_15
+	dey
+	tya
+	asl A
+	asl A
+	tay
+	lda ObjectsData_A885+0,y
 	sta objectPtr_34+0
-	lda ObjectsData_A885+1,y              
-	sta objectPtr_34+1                  
-	lda var_5B                  
-	asl A                    
-	tay                      
-	lda (objectPtr_34),y              
-	cmp #$FF                 
+	lda ObjectsData_A885+1,y
+	sta objectPtr_34+1
+	lda var_5B
+	asl A
+	tay
+	lda (objectPtr_34),y
+	cmp #$FF
 	bne :++
-	iny                      
-	lda (objectPtr_34),y              
-	cmp #$FF                 
-	bne :+                
-	jmp leaveThisRountine                
+	iny
+	lda (objectPtr_34),y
+	cmp #$FF
+	bne :+
+	jmp leaveThisRountine
 	:
-	dey                      
-	lda (objectPtr_34),y              
+	dey
+	lda (objectPtr_34),y
 	:
 	sta objectPtr_3A+0
-	iny                      
-	lda (objectPtr_34),y              
-	sta objectPtr_3A+1                  
-	ldy #$00                 
+	iny
+	lda (objectPtr_34),y
+	sta objectPtr_3A+1
+	ldy #$00
 	loopY:
-		jsr CheckSomethingUnknown1                
-		cpx #$F0                 
-		bcs doneLooping                
-		lda (objectPtr_3A),y              
-		cmp #$F8                 
+		jsr CheckSomethingUnknown1
+		cpx #$F0
+		bcs doneLooping
+		lda (objectPtr_3A),y
+		cmp #$F8
 		bne :+
-		lda #$01                 
-		sta flagUnknown_1A                  
-		ldx #$30                 
-		jsr Clear54Bytes_Page04  
-		nop  ;
-		nop  ;
-		nop  ; jsr Sound_DontKnowWhatItDoes
-		nop  ;
-		nop  ;
-		nop  ; jsr DoSomethingWithSound 
-		lda #$02                 
-		sta soundAddress_8D      
-		nop  ;
-		nop  ;
-		nop  ; jsr InitializeSound      
-		iny                      
-		lda (objectPtr_3A),y              
+		lda #$01
+		sta flagUnknown_1A
+		ldx #$30
+		jsr Clear54Bytes_Page04
+		nop;
+		nop;
+		nop; jsr Sound_DontKnowWhatItDoes
+		nop;
+		nop;
+		nop; jsr DoSomethingWithSound 
+		lda #$02
+		sta soundAddress_8D
+		nop;
+		nop;
+		nop; jsr InitializeSound
+		iny
+		lda (objectPtr_3A),y
 		:
-		cmp #$F0                 
+		cmp #$F0
 		bne :+
-		and #$00                 
-		sta var_2D                  
-		iny                      
-		lda (objectPtr_3A),y              
+		and #$00
+		sta var_2D
+		iny
+		lda (objectPtr_3A),y
 		:
-		cmp #$FF                 
-		beq doneLooping                
-		cmp #$F1                 
-		bne :+                
-		and #$03                 
-		sta var_2D                  
-		iny                      
-		lda (objectPtr_3A),y              
-		sta var_2B                  
-		inc var_2B                  
-		iny                      
-		lda (objectPtr_3A),y              
+		cmp #$FF
+		beq doneLooping
+		cmp #$F1
+		bne :+
+		and #$03
+		sta var_2D
+		iny
+		lda (objectPtr_3A),y
+		sta var_2B
+		inc var_2B
+		iny
+		lda (objectPtr_3A),y
 		:
-		cmp #$F2                 
-		bne :+                
-		and #$03                 
-		sta var_2D                  
-		iny                      
-		lda (objectPtr_3A),y              
-		sta var_2C                  
-		inc var_2C                  
-		iny                      
-		lda (objectPtr_3A),y              
+		cmp #$F2
+		bne :+
+		and #$03
+		sta var_2D
+		iny
+		lda (objectPtr_3A),y
+		sta var_2C
+		inc var_2C
+		iny
+		lda (objectPtr_3A),y
 		:
 		sta var_58
-		iny                      
-		lda (objectPtr_3A),y              
-		sta var_54                  
-		iny                      
-		lda (objectPtr_3A),y              
-		sta var_55                  
-		iny                      
-		lda (objectPtr_3A),y              
-		sta var_56                  
-		iny                      
-		lda (objectPtr_3A),y              
-		sta var_57                  
-		jsr LoadSomethingImportant                
-		iny                      
+		iny
+		lda (objectPtr_3A),y
+		sta var_54
+		iny
+		lda (objectPtr_3A),y
+		sta var_55
+		iny
+		lda (objectPtr_3A),y
+		sta var_56
+		iny
+		lda (objectPtr_3A),y
+		sta var_57
+		jsr LoadSomethingImportant
+		iny
 		jmp loopY
 
 doneLooping:
-	inc var_5B                  
-	lda var_5C                  
-	clc                      
-	adc #$F0                 
-	sta var_5C                  
+	inc var_5B
+	lda var_5C
+	clc
+	adc #$F0
+	sta var_5C
 
 leaveThisRountine:
-	rts                       
+	rts
 .endproc
 ;
 ; $822F
 .proc LoadSomethingImportant
-	tya                      
-	pha                      
-	ldy bankIndex_15         
-	dey                      
-	tya                      
-	asl A                    
-	asl A                    
-	tay                      
-	lda ObjectsData_A885+2,y              
+	tya
+	pha
+	ldy bankIndex_15
+	dey
+	tya
+	asl A
+	asl A
+	tay
+	lda ObjectsData_A885+2,y
 	sta objectPtr_34+0
-	lda ObjectsData_A885+3,y              
-	sta objectPtr_34+1                  
-	lda var_58                  
-	asl A                    
-	tay                      
-	lda (objectPtr_34),y              
+	lda ObjectsData_A885+3,y
+	sta objectPtr_34+1
+	lda var_58
+	asl A
+	tay
+	lda (objectPtr_34),y
 	sta objectPtr_38+0
-	iny                      
-	lda (objectPtr_34),y              
+	iny
+	lda (objectPtr_34),y
 	sta objectPtr_38+1
-	ldy #$00                 
+	ldy #$00
 	lda (objectPtr_38),y
 	sta someObjProperty_0501,x
-	iny                      
+	iny
 	lda (objectPtr_38),y
 	sta someObjProperty_0502,x
-	iny                      
+	iny
 	lda (objectPtr_38),y
 	sta someObjProperty_0602,x
-	iny                      
-	lda (objectPtr_38),y              
-	ora #$60                 
-	ora var_2D                  
+	iny
+	lda (objectPtr_38),y
+	ora #$60
+	ora var_2D
 	sta someObjProperty_0405,x
-	iny                      
-	lda (objectPtr_38),y              
+	iny
+	lda (objectPtr_38),y
 	sta someObjProperty_0600,x
-	iny                      
+	iny
 	lda (objectPtr_38),y
 	sta someObjProperty_0601,x
-	iny                      
+	iny
 	lda (objectPtr_38),y
 	sta hitPoints_0603,x
-	iny                      
+	iny
 	lda (objectPtr_38),y
 	sta someObjProperty_0302,x
-	iny                      
+	iny
 	lda (objectPtr_38),y
 	sta someObjProperty_0301,x
-	iny                      
+	iny
 	lda (objectPtr_38),y
 	sta someObjProperty_0604,x
-	iny                      
+	iny
 	lda (objectPtr_38),y
 	sta someObjProperty_0605,x
-	iny                      
+	iny
 	lda (objectPtr_38),y
 	sta someObjProperty_0700,x
 	sta someObjProperty_0300,x
-	lda var_54                  
+	lda var_54
 	sta someObjProperty_0400,x
-	lda var_55                  
+	lda var_55
 	sta someObjProperty_0401,x
-	lda var_56                  
+	lda var_56
 	sta someObjProperty_0402,x
-	lda var_57                  
+	lda var_57
 	sta someObjProperty_0403,x
-	lda #$00                 
+	lda #$00
 	sta someObjProperty_0503,x
 	sta someObjProperty_0504,x
 	sta someObjProperty_0505,x
 	sta someObjProperty_0303,x
-	lda #$80                 
+	lda #$80
 	sta someObjProperty_0404,x
-	pla                      
-	tay                      
-	rts                       
+	pla
+	tay
+	rts
 .endproc
 ;
 ; $82C9
 .proc UnknownSub1
 	jsr UnknownSub2
-	lda #$00                 
-	sta var_5A                  
-	lda #$06                 
-	sta var_4D                  
+	lda #$00
+	sta var_5A
+	lda #$06
+	sta var_4D
 	
 	BeginHere:
-	ldx var_4D                  
+	ldx var_4D
 	lda someObjProperty_0404,x
-	bit BIT_4                
+	bit BIT_4
 	beq :++
 	jsr HandleObjectCollision
 	lda someObjProperty_0303,x
-	cmp #$02                 
-	bne :+                
-	lda #$FF                 
-	sta flagPlayerHit_1E        
-	lda #$00                 
+	cmp #$02
+	bne :+
+	lda #$FF
+	sta flagPlayerHit_1E
+	lda #$00
 	sta someObjProperty_0303,x
 	:
-	jmp doneWithThis                
+	jmp doneWithThis
 	:
 	lda someObjProperty_0404,x
-	bpl doneWithThis                
+	bpl doneWithThis
 	lda someObjProperty_0401,x
-	beq :+                
-	cmp #$FF                 
-	bne SecondPart                
+	beq :+
+	cmp #$FF
+	bne SecondPart
 	lda someObjProperty_0400,x
-	clc                      
+	clc
 	adc someObjProperty_0600,x
-	bcc SecondPart                
+	bcc SecondPart
 	:
 	lda someObjProperty_0403,x
-	beq ThirdPart                
-	cmp #$FF                 
-	bne SecondPart                
+	beq ThirdPart
+	cmp #$FF
+	bne SecondPart
 	lda someObjProperty_0402,x
-	clc                      
+	clc
 	adc someObjProperty_0601,x
-	bcs ThirdPart                
+	bcs ThirdPart
 	
 	SecondPart:
 	lda someObjProperty_0405,x
-	and #$10                 
+	and #$10
 	beq :+
 	lda someObjProperty_0404,x
-	and #$20                 
+	and #$20
 	beq :++
 	:
-	lda #$10                 
+	lda #$10
 	sta someObjProperty_0404,x
-	jmp doneWithThis                
+	jmp doneWithThis
 	:
 	lda someObjProperty_0404,x
-	and #$DF                 
+	and #$DF
 	sta someObjProperty_0404,x
-	jmp doneWithThis                
+	jmp doneWithThis
 	
 	ThirdPart:
 	lda someObjProperty_0404,x
-	ora #$20                 
+	ora #$20
 	sta someObjProperty_0404,x
 	jsr UnknownSub3
 	lda someObjProperty_0404,x
-	and #$08                 
-	beq doneWithThis                
-	lda var_5A                  
-	bne doneWithThis                
+	and #$08
+	beq doneWithThis
+	lda var_5A
+	bne doneWithThis
 	jsr UnknownSub24
 	
 	doneWithThis:
-	lda var_4D                  
-	clc                      
-	adc #$06                 
-	sta var_4D                  
-	cmp #$F0                 
+	lda var_4D
+	clc
+	adc #$06
+	sta var_4D
+	cmp #$F0
 	beq :+
-	jmp BeginHere                
+	jmp BeginHere
 	:
-	jsr UnknownSub8                
-	rts                       
+	jsr UnknownSub8
+	rts
 .endproc
 ;
 ; $8369
 .proc UnknownSub2
-	lda someObjProperty_0400                
-	clc                      
-	adc #$08                 
-	sta someObjProperty_0702                
-	lda someObjProperty_0400                
-	adc someObjProperty_0600                
-	sbc #$08                 
-	sta someObjProperty_0703                
-	lda someObjProperty_0402                
-	adc #$03                 
-	sta someObjProperty_0704                
-	lda someObjProperty_0402                
-	adc someObjProperty_0601                
-	sbc #$04                 
-	sta someObjProperty_0705                
-	rts                       
+	lda someObjProperty_0400
+	clc
+	adc #$08
+	sta someObjProperty_0702
+	lda someObjProperty_0400
+	adc someObjProperty_0600
+	sbc #$08
+	sta someObjProperty_0703
+	lda someObjProperty_0402
+	adc #$03
+	sta someObjProperty_0704
+	lda someObjProperty_0402
+	adc someObjProperty_0601
+	sbc #$04
+	sta someObjProperty_0705
+	rts
 .endproc
 ;
 ; $8391
 .proc UnknownSub3
 	lda someObjProperty_0405,x
-	and #$10                 
-	beq SecondPart                
+	and #$10
+	beq SecondPart
 	
 	lda someObjProperty_0401,x
 	beq :+
-	lda #$00                 
+	lda #$00
 	beq :++
 	
 	:
@@ -839,7 +839,7 @@ leaveThisRountine:
 	sta someObjProperty_0702,x
 	lda someObjProperty_0403,x
 	beq :+
-	lda #$00                 
+	lda #$00
 	beq :++
 	
 	:
@@ -848,269 +848,269 @@ leaveThisRountine:
 	:
 	sta someObjProperty_0704,x
 	lda someObjProperty_0400,x
-	clc                      
+	clc
 	adc someObjProperty_0600,x
 	cmp someObjProperty_0702,x
 	bcs :+
-	lda #$FF                 
+	lda #$FF
 	
 	:
 	sta someObjProperty_0703,x
 	lda someObjProperty_0402,x
-	clc                      
+	clc
 	adc someObjProperty_0601,x
 	cmp someObjProperty_0704,x
 	bcs :+
-	lda #$FF                 
+	lda #$FF
 	
 	:
 	sta someObjProperty_0705,x
-	rts                       
+	rts
 
 	SecondPart:
 	lda someObjProperty_0400,x
 	sta someObjProperty_0702,x
-	clc                      
+	clc
 	adc someObjProperty_0600,x
 	sta someObjProperty_0703,x
 	lda someObjProperty_0402,x
 	sta someObjProperty_0704,x
-	clc                      
+	clc
 	adc someObjProperty_0601,x
 	sta someObjProperty_0705,x
-	rts                       
+	rts
 
 .endproc
 ;
 ; $83F4
 .proc UnknownSub8
-	ldy #$00                 
+	ldy #$00
 	
 	BeginHere:
-	lda someObjProperty_0404,y              
+	lda someObjProperty_0404,y
 	bmi :+
-	jmp DoneWithThis                
+	jmp DoneWithThis
 	
 	:
-	lda someObjProperty_0405,y              
-	bit BIT_6                
+	lda someObjProperty_0405,y
+	bit BIT_6
 	bne :+
-	jmp DoneWithThis                
+	jmp DoneWithThis
 	
 	:
-	lda someObjProperty_0702,y              
-	sta var_4F                  
-	lda someObjProperty_0703,y              
-	sta var_50                  
-	lda someObjProperty_0704,y              
-	sta var_51                  
-	lda someObjProperty_0705,y              
-	sta var_52                  
-	ldx #$30                 
+	lda someObjProperty_0702,y
+	sta var_4F
+	lda someObjProperty_0703,y
+	sta var_50
+	lda someObjProperty_0704,y
+	sta var_51
+	lda someObjProperty_0705,y
+	sta var_52
+	ldx #$30
 	
 	AnotherCheckAndLeave:
 	lda someObjProperty_0404,x
 	bpl StartLeaving
-	and #$20                 
+	and #$20
 	beq StartLeaving
 	lda someObjProperty_0405,x
-	bit BIT_6                
+	bit BIT_6
 	beq StartLeaving
 	
-	and #$10                 
+	and #$10
 	bne :+
-	cpy #$00                 
+	cpy #$00
 	beq :+
 	
 	StartLeaving:
-	jmp dontHandleObjCollision                
+	jmp dontHandleObjCollision
 	
 	: ; $843B
 	lda someObjProperty_0702,x
-	cmp var_50                  
+	cmp var_50
 	bcs StartLeaving
-	lda var_4F                  
+	lda var_4F
 	cmp someObjProperty_0703,x
 	bcs StartLeaving
 	lda someObjProperty_0704,x
-	cmp var_52                  
+	cmp var_52
 	bcs StartLeaving
-	lda var_51                  
+	lda var_51
 	cmp someObjProperty_0705,x
 	bcs StartLeaving
 	lda hitPoints_0603,x
-	sec                       
-	sbc someObjProperty_0602,y              
+	sec
+	sbc someObjProperty_0602,y
 	beq :+
 	bcs :++
 	
 	:
-	jsr UnknownSub9                
+	jsr UnknownSub9
 	jmp :++
 	
 	:
 	sta hitPoints_0603,x
 	lda flagUnknown_1A
 	bne :+
-	clc                      
+	clc
 	lda someObjProperty_0400,x
-	adc #$07                 
+	adc #$07
 	sta someObjProperty_0400,x
 	lda someObjProperty_0401,x
-	adc #$00                 
+	adc #$00
 	sta someObjProperty_0401,x
 	
 	:
-	cpy #$00                 
+	cpy #$00
 	bne :+
 	
 	:
-	lda hitPoints_0603,y     
-	sec                       
+	lda hitPoints_0603,y
+	sec
 	sbc someObjProperty_0602,x
-	beq doHandleObjCollision                
-	bcc doHandleObjCollision                
+	beq doHandleObjCollision
+	bcc doHandleObjCollision
 	
-	cpy #$00                 
-	bne doStoreHitPointsAndLeave                
-	cmp #$14                 
-	bcs doStoreHitPointsAndLeave                
-	pha                      
-	lda #$D7                 
-	sta someObjProperty_0501                
-	lda #$8B                 
-	sta someObjProperty_0502                
-	lda #$00                 
-	sta someObjProperty_0503                
-	sta someObjProperty_0504                
-	sta someObjProperty_0505                
-	pla                      
-	cmp #$01                 
-	bne doStoreHitPointsAndLeave                
-	pha                      
-	lda #$F8                 
-	sta OAM_0200             
-	pla                      
+	cpy #$00
+	bne doStoreHitPointsAndLeave
+	cmp #$14
+	bcs doStoreHitPointsAndLeave
+	pha
+	lda #$D7
+	sta someObjProperty_0501
+	lda #$8B
+	sta someObjProperty_0502
+	lda #$00
+	sta someObjProperty_0503
+	sta someObjProperty_0504
+	sta someObjProperty_0505
+	pla
+	cmp #$01
+	bne doStoreHitPointsAndLeave
+	pha
+	lda #$F8
+	sta OAM_0200
+	pla
 	
 	doStoreHitPointsAndLeave:
-	sta hitPoints_0603,y     
-	jmp DoneWithThis                
+	sta hitPoints_0603,y
+	jmp DoneWithThis
 	
 	doHandleObjCollision:
-	tya                      
-	tax                      
+	tya
+	tax
 	jsr HandleObjectCollision
-	jmp DoneWithThis                
+	jmp DoneWithThis
 	
 	dontHandleObjCollision:
-	txa                      
-	clc                      
-	adc #$06                 
-	tax                      
-	cmp #$F0                 
+	txa
+	clc
+	adc #$06
+	tax
+	cmp #$F0
 	bcc :+
-	bcs DoneWithThis                
+	bcs DoneWithThis
 	
 	:
 	jmp AnotherCheckAndLeave
 	
 	DoneWithThis:
-	tya                      
-	clc                      
+	tya
+	clc
 	
 	EvenMoreDone:
-	adc #$06                 
-	cmp #$30                 
+	adc #$06
+	cmp #$30
 	bcs :+
-	tay                      
-	jmp BeginHere                
+	tay
+	jmp BeginHere
 	
 	:
-	rts                       
+	rts
 .endproc
 ;
 ; $84E2
 .proc UnknownSub9
-	txa                      
-	pha                      
-	tya                      
-	pha                      
+	txa
+	pha
+	tya
+	pha
 	lda someObjProperty_0405,x
-	bit BIT_4                
+	bit BIT_4
 	bne :+
-	jmp doHandleObjCollision                
+	jmp doHandleObjCollision
 	
 	:
-	bit BIT_0                
+	bit BIT_0
 	beq :+
-	lda var_2B                  
-	beq doHandleObjCollision                
-	sec                       
-	sbc #$01                 
-	sta var_2B                  
-	cmp #$01                 
+	lda var_2B
+	beq doHandleObjCollision
+	sec
+	sbc #$01
+	sta var_2B
+	cmp #$01
 	bne doALSOHandleObjCollision
-	sta var_2E                  
-	jsr UnknownSub4                
-	jmp doHandleObjCollision                
+	sta var_2E
+	jsr UnknownSub4
+	jmp doHandleObjCollision
 	
 	:
-	bit BIT_1                
+	bit BIT_1
 	beq :+
-	lda var_2C                  
-	beq doHandleObjCollision                
-	sec                       
-	sbc #$01                 
-	sta var_2C                  
-	cmp #$01                 
+	lda var_2C
+	beq doHandleObjCollision
+	sec
+	sbc #$01
+	sta var_2C
+	cmp #$01
 	bne doALSOHandleObjCollision
-	sta var_2E                  
-	jsr UnknownSub4                
-	jmp doHandleObjCollision                
+	sta var_2E
+	jsr UnknownSub4
+	jmp doHandleObjCollision
 	
 	:
-	bit BIT_3                
+	bit BIT_3
 	beq doALSOHandleObjCollision
-	cpy #$00                 
+	cpy #$00
 	bne skipHandlingCollision
 	
 	doALSOHandleObjCollision:
 	jsr HandleObjectCollision
-	lda soundAddress_8D      
-	cmp #$05                 
+	lda soundAddress_8D
+	cmp #$05
 	beq skipHandlingCollision
-	nop  ;
-	nop  ;
-	nop  ;	jsr DoSomethingWithSound 
+	nop;
+	nop;
+	nop;	jsr DoSomethingWithSound 
 
-	lda #$04                 
-	sta soundAddress_8D      
-	nop  ;
-	nop  ;
-	nop  ; jsr PlaySFX              
+	lda #$04
+	sta soundAddress_8D
+	nop;
+	nop;
+	nop; jsr PlaySFX
 
 	jmp skipHandlingCollision
 	
 	doHandleObjCollision:
 	jsr HandleObjectCollision
-	skipHandlingCollision:   
-	pla                      
-	tay                      
-	pla                      
-	tax                      
-	rts                       
+	skipHandlingCollision:
+	pla
+	tay
+	pla
+	tax
+	rts
 .endproc
 ;
 ; $854C
 ; Checks is object with index in X hit something important.
 ; X = 0 is the player
 .proc HandleObjectCollision
-	txa                      
-	pha                      
-	tya                      
-	pha                      
+	txa
+	pha
+	tya
+	pha
 	lda someObjProperty_0405,x
-	bit BIT_6                
+	bit BIT_6
 	bne :+
 	jmp doneWithThisRoutine_X
 	
@@ -1119,294 +1119,294 @@ leaveThisRountine:
 	bne :+
 	
 	:
-	cmp #$06                 
+	cmp #$06
 	bne handlePlayerGotExtraLife
-	lda var_60                  
+	lda var_60
 	beq :+
-	dec var_60                  
+	dec var_60
 	
 	:
-	lda #$00                 
+	lda #$00
 	jmp SecondPart
 	handlePlayerGotExtraLife:
-	cmp #$28                 
+	cmp #$28
 	bne handlePlayerGotPowerUp
-	nop  ;
-	nop  ;
-	nop  ; jsr UnknownSoundSub2
-                
-	nop  ;
-	nop  ;
-	nop  ; jsr DoSomethingWithSound             
+	nop;
+	nop;
+	nop; jsr UnknownSoundSub2
+
+	nop;
+	nop;
+	nop; jsr DoSomethingWithSound
  
-	lda #$06                 
-	sta soundAddress_8D      
-	nop  ;
-	nop  ;
-	nop  ; jsr PlaySFX              
-	inc livesCounter_11      
+	lda #$06
+	sta soundAddress_8D
+	nop;
+	nop;
+	nop; jsr PlaySFX
+	inc livesCounter_11
 	jmp doneWithThisRoutine_X
-	handlePlayerGotPowerUp:  
-	cmp #$29                 
+	handlePlayerGotPowerUp:
+	cmp #$29
 	bne handlePlayerGotHeart 
-	nop  ;
-	nop  ;
-	nop  ; jsr UnknownSoundSub2
-                
-	nop  ;
-	nop  ;
-	nop  ; jsr DoSomethingWithSound             
+	nop;
+	nop;
+	nop; jsr UnknownSoundSub2
+
+	nop;
+	nop;
+	nop; jsr DoSomethingWithSound
  
-	lda #$07                 
-	sta soundAddress_8D      
-	nop  ;
-	nop  ;
-	nop  ; jsr PlaySFX              
-              
-	lda powerUp_P_64         
-	cmp #$04                 
+	lda #$07
+	sta soundAddress_8D
+	nop;
+	nop;
+	nop; jsr PlaySFX
+
+	lda powerUp_P_64
+	cmp #$04
 	bcc :+
-	nop  ;
-	nop  ;
-	nop  ; jsr DoSomethingWithSound             
+	nop;
+	nop;
+	nop; jsr DoSomethingWithSound
  
 	jmp doneWithThisRoutine_X
 	
 	:
-	inc powerUp_P_64         
+	inc powerUp_P_64
 	jmp doneWithThisRoutine_X
 	
-	handlePlayerGotHeart:    
-	cmp #$2A                 
-	bne skipHeart            
-	nop  ;
-	nop  ;
-	nop  ; jsr UnknownSoundSub2
-          
-	nop  ;
-	nop  ;
-	nop  ; jsr DoSomethingWithSound             
+	handlePlayerGotHeart:
+	cmp #$2A
+	bne skipHeart
+	nop;
+	nop;
+	nop; jsr UnknownSoundSub2
+
+	nop;
+	nop;
+	nop; jsr DoSomethingWithSound
  
-	lda #$07                 
-	sta soundAddress_8D      
-	nop  ;
-	nop  ;
-	nop  ; jsr PlaySFX              
-              
-	jsr AddOneHeart          
+	lda #$07
+	sta soundAddress_8D
+	nop;
+	nop;
+	nop; jsr PlaySFX
+
+	jsr AddOneHeart
 	jmp doneWithThisRoutine_X
 	
-	skipHeart:               
-	cmp #$2B                 
+	skipHeart:
+	cmp #$2B
 	bne :+
-	nop  ;
-	nop  ;
-	nop  ; jsr UnknownSoundSub2
-                
-	nop  ;
-	nop  ;
-	nop  ; jsr DoSomethingWithSound             
+	nop;
+	nop;
+	nop; jsr UnknownSoundSub2
+
+	nop;
+	nop;
+	nop; jsr DoSomethingWithSound
  
-	lda #$07                 
-	sta soundAddress_8D      
-	nop  ;
-	nop  ;
-	nop  ; jsr PlaySFX              
-              
-	lda #$03                 
-	sta speed_66             
+	lda #$07
+	sta soundAddress_8D
+	nop;
+	nop;
+	nop; jsr PlaySFX
+
+	lda #$03
+	sta speed_66
 	jmp doneWithThisRoutine_X
 	
 	:
-	cmp #$2C                 
+	cmp #$2C
 	bne :++
 	lda someObjProperty_0401,x
 	beq :+
 	jmp doneWithThisRoutine_X
 	
 	:
-	lda #$0C                 
-	sta soundAddress_8D      
-	nop  ;
-	nop  ;
-	nop  ; jsr PlaySFX              
-              
-	lda #$50                 
-	sta hitPoints_0603       
-	lda #$BD                 
-	sta someObjProperty_0501                
-	lda #$8B                 
-	sta someObjProperty_0502                
-	lda #$00                 
-	sta someObjProperty_0503                
-	sta someObjProperty_0504                
-	sta someObjProperty_0505                
-	lda #$D8                 
-	sta OAM_0200             
+	lda #$0C
+	sta soundAddress_8D
+	nop;
+	nop;
+	nop; jsr PlaySFX
+
+	lda #$50
+	sta hitPoints_0603
+	lda #$BD
+	sta someObjProperty_0501
+	lda #$8B
+	sta someObjProperty_0502
+	lda #$00
+	sta someObjProperty_0503
+	sta someObjProperty_0504
+	sta someObjProperty_0505
+	lda #$D8
+	sta OAM_0200
 	jmp doneWithThisRoutine_X
 	
 	:
-	cmp #$1F                 
+	cmp #$1F
 	bne :+
-	lda #$02                 
+	lda #$02
 	bne SecondPart
 	
 	:
-	cmp #$1A                 
+	cmp #$1A
 	bne :+
-	nop  ;
-	nop  ;
-	nop  ; jsr UnknownSoundSub2
-                
-	nop  ;
-	nop  ;
-	nop  ; jsr DoSomethingWithSound             
- 
-	lda #$05                 
-	sta soundAddress_8D      
-	nop  ;
-	nop  ;
-	nop  ; jsr PlaySFX              
-              
-	lda #$01                 
-	sta soundAddress_8F               
-	lda #$03                 
-	bne SecondPart
-	
-	:
-	cmp #$32                 
-	bne :+
-	lda #$04                 
-	bne SecondPart
-	
-	:
-	cmp #$33                 
-	bne :+
-	lda #$05                 
-	bne SecondPart
-	
-	:
-	cmp #$34                 
-	bne :+
-	lda #$06                 
-	bne SecondPart
-	
-	:
-	cmp #$35                 
-	bne :+
-	lda #$07                 
-	bne SecondPart
-	
-	:
-	cmp #$36                 
-	bne :+
-	lda #$0C                 
-	bne SecondPart
-	
-	:
-	cmp #$24                 
-	bne doneWithThisRoutine_X
-	lda #$09                 
-	sta soundAddress_8D      
-	nop  ;
-	nop  ;
-	nop  ; jsr InitializeSound      
+	nop;
+	nop;
+	nop; jsr UnknownSoundSub2
 
-	lda #$08                 
-	clc                      
-	adc bankIndex_15         
-	sbc #$00                 
+	nop;
+	nop;
+	nop; jsr DoSomethingWithSound
+ 
+	lda #$05
+	sta soundAddress_8D
+	nop;
+	nop;
+	nop; jsr PlaySFX
+
+	lda #$01
+	sta soundAddress_8F
+	lda #$03
+	bne SecondPart
+	
+	:
+	cmp #$32
+	bne :+
+	lda #$04
+	bne SecondPart
+	
+	:
+	cmp #$33
+	bne :+
+	lda #$05
+	bne SecondPart
+	
+	:
+	cmp #$34
+	bne :+
+	lda #$06
+	bne SecondPart
+	
+	:
+	cmp #$35
+	bne :+
+	lda #$07
+	bne SecondPart
+	
+	:
+	cmp #$36
+	bne :+
+	lda #$0C
+	bne SecondPart
+	
+	:
+	cmp #$24
+	bne doneWithThisRoutine_X
+	lda #$09
+	sta soundAddress_8D
+	nop;
+	nop;
+	nop; jsr InitializeSound
+
+	lda #$08
+	clc
+	adc bankIndex_15
+	sbc #$00
 	
 	SecondPart:
-	sta var_58                  
+	sta var_58
 	lda someObjProperty_0404,x
-	and #$20                 
+	and #$20
 	beq doneWithThisRoutine_X
-	clc                      
+	clc
 	lda someObjProperty_0400,x
-	sta var_54                  
+	sta var_54
 	lda someObjProperty_0401,x
-	adc #$00                 
-	sta var_55                  
-	clc                      
+	adc #$00
+	sta var_55
+	clc
 	lda someObjProperty_0402,x
-	sta var_56                  
+	sta var_56
 	lda someObjProperty_0403,x
-	adc #$00                 
-	sta var_57                  
-	jsr UnknownSub7                
-	doneWithThisRoutine_X:   
-	pla                      
-	tay                      
-	pla                      
-	tax                      
-	lda #$00                 
+	adc #$00
+	sta var_57
+	jsr UnknownSub7
+	doneWithThisRoutine_X:
+	pla
+	tay
+	pla
+	tax
+	lda #$00
 	sta someObjProperty_0404,x
-	rts                       
+	rts
 .endproc
 ;
 ; $8696
 .proc AddOneHeart
-	lda hitPoints_0603       
-	clc                      
-	adc #$04                 
-	bcc didNotExceedFF       
-	lda #$FF                 
-	didNotExceedFF:          
-	sta hitPoints_0603       
-	updateHeartDisplay:      
-	lda #$D8                 
-	sta OAM_0200             
-	rts                       
+	lda hitPoints_0603
+	clc
+	adc #$04
+	bcc didNotExceedFF
+	lda #$FF
+	didNotExceedFF:
+	sta hitPoints_0603
+	updateHeartDisplay:
+	lda #$D8
+	sta OAM_0200
+	rts
 .endproc
 ;
 ; $86A9
 .proc UnknownSub7
 	jsr CheckSomethingUnknown1
-	cpx #$F0                 
-	bcc :+               
-	rts                       
+	cpx #$F0
+	bcc :+
+	rts
 	
 	:
-	lda var_58                  
-	asl A                    
-	asl A                    
-	asl A                    
-	tay                      
-	lda Data_at8715+0,y              
+	lda var_58
+	asl A
+	asl A
+	asl A
+	tay
+	lda Data_at8715+0,y
 	sta someObjProperty_0501,x
-	lda Data_at8715+1,y              
+	lda Data_at8715+1,y
 	sta someObjProperty_0502,x
-	lda Data_at8715+2,y              
+	lda Data_at8715+2,y
 	sta someObjProperty_0602,x
-	lda Data_at8715+3,y              
+	lda Data_at8715+3,y
 	sta someObjProperty_0405,x
-	lda Data_at8715+4,y              
+	lda Data_at8715+4,y
 	sta someObjProperty_0600,x
-	lda Data_at8715+5,y              
+	lda Data_at8715+5,y
 	sta someObjProperty_0601,x
-	lda Data_at8715+6,y              
+	lda Data_at8715+6,y
 	sta someObjProperty_0302,x
-	lda Data_at8715+7,y              
+	lda Data_at8715+7,y
 	sta someObjProperty_0303,x
-	lda var_54                  
+	lda var_54
 	sta someObjProperty_0400,x
-	lda var_55                  
+	lda var_55
 	sta someObjProperty_0401,x
-	lda var_56                  
+	lda var_56
 	sta someObjProperty_0402,x
-	lda var_57                  
+	lda var_57
 	sta someObjProperty_0403,x
-	lda #$00                 
+	lda #$00
 	sta someObjProperty_0503,x
 	sta someObjProperty_0504,x
 	sta someObjProperty_0505,x
 	sta someObjProperty_0700,x
 	sta someObjProperty_0300,x
 	sta someObjProperty_0301,x
-	lda #$80                 
+	lda #$80
 	sta someObjProperty_0404,x
-	rts                       
+	rts
 .endproc
 ;
 ; $8715
@@ -1415,85 +1415,85 @@ Data_at8715:
 ;
 ; $8AEA
 .proc UnknownSub4
-	lda var_2E                  
+	lda var_2E
 	beq doneWithThisRoutine
-	lda frameCounter_12      
-	and #$07                 
+	lda frameCounter_12
+	and #$07
 	bne :+
-	lda #$32                 
+	lda #$32
 	bne doStartToLeave
 	
 	:
-	bit BIT_0                
+	bit BIT_0
 	bne :+
-	lda #$33                 
+	lda #$33
 	bne doStartToLeave
 	
 	:
-	bit BIT_1                
+	bit BIT_1
 	bne :+
-	lda #$34                 
+	lda #$34
 	bne doStartToLeave
 	
 	:
-	lda #$35                 
+	lda #$35
 	
 	doStartToLeave:
-	pha                      
-	lda #$00                 
-	sta var_2E                  
-	pla                      
+	pha
+	lda #$00
+	sta var_2E
+	pla
 	sta someObjProperty_0302,x
 	
 	doneWithThisRoutine:
-	rts                       
+	rts
 .endproc
 ;
 ; $8B16
 .proc InitializeGameVariables
-	lda #$F2                 
-	sta someObjProperty_0400                
-	lda #$FF                 
-	sta someObjProperty_0401                
-	lda #$70                 
-	sta someObjProperty_0402                
-	lda #$7D                 
-	sta someObjProperty_0501                
-	lda #$8B                 
-	sta someObjProperty_0502                
-	lda #$A0                 
-	sta someObjProperty_0404                
-	lda #$00                 
-	sta someObjProperty_0503                
-	sta someObjProperty_0504                
-	sta someObjProperty_0505                
-	sta aliveTimer_14        
-	sta soundAddress_8D      
-	lda #$1A                 
-	sta someObjProperty_0302                
-	lda #$03                 
-	sta someObjProperty_0602                
-	lda #$14                 
-	sta someObjProperty_0600                
-	lda #$18                 
-	sta someObjProperty_0601                
-	lda #$18                 
-	sta someObjProperty_0604                
-	lda #$0E                 
-	sta someObjProperty_0605                
-	lda #$00                 
-	sta someObjProperty_0405                
-	lda #$00                 
-	sta var_60                  
-	lda flagNextLevel_1B     
+	lda #$F2
+	sta someObjProperty_0400
+	lda #$FF
+	sta someObjProperty_0401
+	lda #$70
+	sta someObjProperty_0402
+	lda #$7D
+	sta someObjProperty_0501
+	lda #$8B
+	sta someObjProperty_0502
+	lda #$A0
+	sta someObjProperty_0404
+	lda #$00
+	sta someObjProperty_0503
+	sta someObjProperty_0504
+	sta someObjProperty_0505
+	sta aliveTimer_14
+	sta soundAddress_8D
+	lda #$1A
+	sta someObjProperty_0302
+	lda #$03
+	sta someObjProperty_0602
+	lda #$14
+	sta someObjProperty_0600
+	lda #$18
+	sta someObjProperty_0601
+	lda #$18
+	sta someObjProperty_0604
+	lda #$0E
+	sta someObjProperty_0605
+	lda #$00
+	sta someObjProperty_0405
+	lda #$00
+	sta var_60
+	lda flagNextLevel_1B
 	bne :+
-	lda #$01                 
-	sta hitPoints_0603       
-	lda powerUp_P_64         
+	lda #$01
+	sta hitPoints_0603
+	lda powerUp_P_64
 	beq :+
-	dec powerUp_P_64         
-	:           
-	rts                       
+	dec powerUp_P_64
+	:
+	rts
 .endproc
 ;
 ; $8B7D ;;;;;;; objects?
@@ -1502,135 +1502,135 @@ Data_at8B7A:
 ;
 ; $8BE5
 .proc InitializeGameVariables2
-	ldy #$06                 
-	lda #$C0                 
-	sta someObjProperty_0400,y              
-	lda #$D8                 
-	sta someObjProperty_0402,y              
-	lda #$A0                 
-	sta someObjProperty_0404,y              
-	lda #$00                 
-	sta someObjProperty_0405,y              
-	sta someObjProperty_0503,y              
-	sta someObjProperty_0504,y              
-	sta someObjProperty_0505,y              
-	sta someObjProperty_0302,y              
-	sta someObjProperty_0303,y              
-	sta someObjProperty_0604,y              
-	sta someObjProperty_0605,y              
-	sta someObjProperty_0602,y              
-	lda #$FF                 
-	sta hitPoints_0603,y     
-	lda #$07                 
-	sta someObjProperty_0600,y              
-	lda #$07                 
-	sta someObjProperty_0601,y              
-	rts                       
+	ldy #$06
+	lda #$C0
+	sta someObjProperty_0400,y
+	lda #$D8
+	sta someObjProperty_0402,y
+	lda #$A0
+	sta someObjProperty_0404,y
+	lda #$00
+	sta someObjProperty_0405,y
+	sta someObjProperty_0503,y
+	sta someObjProperty_0504,y
+	sta someObjProperty_0505,y
+	sta someObjProperty_0302,y
+	sta someObjProperty_0303,y
+	sta someObjProperty_0604,y
+	sta someObjProperty_0605,y
+	sta someObjProperty_0602,y
+	lda #$FF
+	sta hitPoints_0603,y
+	lda #$07
+	sta someObjProperty_0600,y
+	lda #$07
+	sta someObjProperty_0601,y
+	rts
 .endproc
 ;
 ; $8C23
 .proc MaybeTriggerNextLevel
-	lda #$00                 
-	sta var_5F                  
-	lda flagNextLevel_1B     
+	lda #$00
+	sta var_5F
+	lda flagNextLevel_1B
 	bne :+
-	lda #$02                 
-	sta speed_66             
+	lda #$02
+	sta speed_66
 	:
-	lda #$FF                 
-	sta var_5E                  
-	rts                       
+	lda #$FF
+	sta var_5E
+	rts
 .endproc
 ;
 ; $8C34
 .proc UnknownSub12
-	txa                      
-	pha                      
-	lda var_4E                  
+	txa
+	pha
+	lda var_4E
 	bit BIT_1
 	beq skipThisRoutine
 	
-	ldx powerUp_P_64         
-	txa                      
+	ldx powerUp_P_64
+	txa
 	beq secondPart
-	cpx #$01                 
+	cpx #$01
 	bne :+
-	lda #$01                 
+	lda #$01
 	bne secondPart
 	
 	:
-	cpx #$02                 
+	cpx #$02
 	bne :+
-	lda #$02                 
+	lda #$02
 	bne secondPart
 	
 	:
-	cpx #$03                 
+	cpx #$03
 	bne :+
-	lda #$02                 
+	lda #$02
 	bne secondPart
 	
 	:
-	cpx #$04                 
-	bne skipOtherPath                
-	lda #$03                 
+	cpx #$04
+	bne skipOtherPath
+	lda #$03
 	
 	secondPart:
-	cmp var_60                  
-	bcc skipThisRoutine                
-	cpx #$03                 
+	cmp var_60
+	bcc skipThisRoutine
+	cpx #$03
 	bcc :+
-	inc var_60                  
-	inc var_60                  
-	lda #$01                 
-	jsr UnknownSub13                
-	lda #$02                 
-	jsr UnknownSub13                
+	inc var_60
+	inc var_60
+	lda #$01
+	jsr UnknownSub13
+	lda #$02
+	jsr UnknownSub13
 	
 	
 	:
-	inc var_60                  
-	lda #$00                 
-	jsr UnknownSub13                
-	lda soundAddress_8D      
-	cmp #$07                 
+	inc var_60
+	lda #$00
+	jsr UnknownSub13
+	lda soundAddress_8D
+	cmp #$07
 	bne :+
-	lda frameCounter_12      
-	and #$03                 
-	bne skipThisRoutine                
-	nop  ;
-	nop  ;
-	nop  ; jsr $9C91  ; This is sound              
-	nop  ;
-	nop  ;
-	nop  ; jsr DoSomethingWithSound 
+	lda frameCounter_12
+	and #$03
+	bne skipThisRoutine
+	nop;
+	nop;
+	nop; jsr $9C91; This is sound
+	nop;
+	nop;
+	nop; jsr DoSomethingWithSound 
 	
 	beq :++
 	
 	:
-	cmp #$05                 
-	beq skipThisRoutine                
+	cmp #$05
+	beq skipThisRoutine
 	
 	:
-	lda #$03                 
-	sta soundAddress_8D      
-	nop  ; 
-	nop  ; 
-	nop  ; jsr PlaySFX              
+	lda #$03
+	sta soundAddress_8D
+	nop; 
+	nop; 
+	nop; jsr PlaySFX
 	
 	skipThisRoutine:
-	lda #$00                 
-	sta var_62                  
-	sta var_4E                  
-	pla                      
-	tax                      
-	rts                       
+	lda #$00
+	sta var_62
+	sta var_4E
+	pla
+	tax
+	rts
 	
 	skipOtherPath:
-	cpx #$05                 
+	cpx #$05
 	bcc :+
-	lda #$02                 
-	sta powerUp_P_64         
+	lda #$02
+	sta powerUp_P_64
 
 	:
 	jmp skipThisRoutine
@@ -1640,57 +1640,57 @@ Data_at8B7A:
 ; $8CB0
 .proc UnknownSub13
 
-	pha                      
+	pha
 	jsr UnknownSub14
-	cpx #$30                 
+	cpx #$30
 	bcc :+
-	pla                      
-	rts                       
+	pla
+	rts
 
 	:
-	pla                      
-	asl A                    
-	asl A                    
-	asl A                    
-	tay                      
-	lda Data_at8D1D+0,y              
+	pla
+	asl A
+	asl A
+	asl A
+	tay
+	lda Data_at8D1D+0,y
 	sta someObjProperty_0501,x
-	lda Data_at8D1D+1,y              
+	lda Data_at8D1D+1,y
 	sta someObjProperty_0502,x
-	lda Data_at8D1D+2,y              
-	cpy #$00                 
+	lda Data_at8D1D+2,y
+	cpy #$00
 	beq :+
-	clc                      
-	adc #$02                 
+	clc
+	adc #$02
 	
 	:
 	sta someObjProperty_0602,x
-	lda Data_at8D1D+3,y              
+	lda Data_at8D1D+3,y
 	sta someObjProperty_0302,x
-	lda Data_at8D1D+4,y              
+	lda Data_at8D1D+4,y
 	sta someObjProperty_0600,x
-	lda Data_at8D1D+5,y              
+	lda Data_at8D1D+5,y
 	sta someObjProperty_0601,x
-	lda someObjProperty_0400                
-	clc                      
-	adc Data_at8D1D+6,y              
+	lda someObjProperty_0400
+	clc
+	adc Data_at8D1D+6,y
 	sta someObjProperty_0400,x
-	lda someObjProperty_0402                
-	clc                      
-	adc Data_at8D1D+7,y              
+	lda someObjProperty_0402
+	clc
+	adc Data_at8D1D+7,y
 	sta someObjProperty_0402,x
-	lda #$00                 
+	lda #$00
 	sta someObjProperty_0503,x
 	sta someObjProperty_0504,x
 	sta someObjProperty_0505,x
 	sta someObjProperty_0401,x
 	sta someObjProperty_0403,x
 	sta hitPoints_0603,x
-	lda #$40                 
+	lda #$40
 	sta someObjProperty_0405,x
-	lda #$80                 
+	lda #$80
 	sta someObjProperty_0404,x
-	rts                       
+	rts
 
 .endproc
 ;
@@ -1700,68 +1700,68 @@ Data_at8D1D:
 ;
 ; $8D4D
 .proc UnknownSub14
-	clc                      
-	ldx #$0C                 
+	clc
+	ldx #$0C
 	
 	:
 	lda someObjProperty_0404,x
-	and #$90                 
+	and #$90
 	beq :+
-	txa                      
-	adc #$06                 
-	tax                      
-	cpx #$30                 
+	txa
+	adc #$06
+	tax
+	cpx #$30
 	bcc :-
 	
 	:
-	rts                       
+	rts
 .endproc
 ;
 ; $8D60
 .proc CheckSomethingUnknown1
-	clc                      
-	ldx #$30                 
+	clc
+	ldx #$30
 	:
 		lda someObjProperty_0404,x
 		and #%10010000 ; #$90
 		beq :+
-		txa                      
-		adc #$06                 
-		tax                      
-		cpx #$F0                 
+		txa
+		adc #$06
+		tax
+		cpx #$F0
 		bcc :-
 	:
-	rts                       
+	rts
 .endproc
 ;
 ; $8D73
 .proc UnknownSub24
 	lda someObjProperty_0301,x
 	bne :+
-	rts                       
+	rts
 
 	:
 	lda someObjProperty_0404,x
-	and #$F7                 
+	and #$F7
 	sta someObjProperty_0404,x
 	lda someObjProperty_0700,x
 	sta someObjProperty_0300,x
 	lda someObjProperty_0301,x
-	cmp #$01                 
+	cmp #$01
 	bne :+
 	jsr UnknownSub25
 	jmp skipThisRoutine
 	
 	:
-	cmp #$03                 
+	cmp #$03
 	bne :+
-	jsr UnknownSub16         
+	jsr UnknownSub16
 	jmp skipThisRoutine
 	
 	:
-	cmp #$05                 
+	cmp #$05
 	bne :+++
-	lda #$0F                 
+	lda #$0F
 	bit frameCounter_12
 	beq :+
 	jsr UnknownSub20
@@ -1771,86 +1771,86 @@ Data_at8D1D:
 	jsr UnknownSub25
 	
 	:
-	lda flagUnknown_1A                  
+	lda flagUnknown_1A
 	beq :+
 	jsr UnknownSub15
 	
 	:
-	cmp #$06                 
+	cmp #$06
 	bne :+
 	jsr UnknownSub21
 	jsr UnknownSub15
 	
 	:
-	cmp #$07                 
+	cmp #$07
 	bne :+
 	jsr UnknownSub22
 	jsr UnknownSub15
 	
 	:
-	cmp #$08                 
+	cmp #$08
 	bne skipThisRoutine
 	jsr UnknownSub23
 	jsr UnknownSub15
 	
 	skipThisRoutine:
-	lda #$01                 
-	sta var_5A                  
-	rts                       
+	lda #$01
+	sta var_5A
+	rts
 .endproc
 ;
 ; $8DDB
 .proc UnknownSub25
-	lda #$00                 
-	sta var_4B                  
+	lda #$00
+	sta var_4B
 	lda someObjProperty_0400,x
-	sec                       
-	sbc someObjProperty_0400                
+	sec
+	sbc someObjProperty_0400
 	bcs :+
-	eor #$FF                 
+	eor #$FF
 	
 	:
-	rol var_4B                  
-	sta var_4C                  
+	rol var_4B
+	sta var_4C
 	lda someObjProperty_0402,x
-	sec                       
-	sbc someObjProperty_0402                
+	sec
+	sbc someObjProperty_0402
 	bcs :+
-	eor #$FF                 
+	eor #$FF
 	
 	:
-	rol var_4B                  
-	cmp var_4C                  
+	rol var_4B
+	cmp var_4C
 	bcs :+
-	ldy var_4C                  
-	sta var_4C                  
-	tya                      
+	ldy var_4C
+	sta var_4C
+	tya
 	
 	:
-	rol var_4B                  
-	sec                       
-	sbc var_4C                  
-	ldy #$00                 
+	rol var_4B
+	sec
+	sbc var_4C
+	ldy #$00
 	
 	:
-	sec                       
-	sbc var_4C                  
+	sec
+	sbc var_4C
 	bcc :+
-	iny                      
-	cpy #$04                 
+	iny
+	cpy #$04
 	bcc :-
 	
 	:
-	tya                      
-	ldy var_4B                  
-	clc                      
-	adc Data_at8E25,y    
-	asl A                    
-	sta var_4A                  
-	txa                      
-	tay                      
+	tya
+	ldy var_4B
+	clc
+	adc Data_at8E25,y
+	asl A
+	sta var_4A
+	txa
+	tay
 	jsr UnknownSub17
-	rts                       
+	rts
 .endproc
 ;
 ; $8E25
@@ -1859,18 +1859,18 @@ Data_at8E25:
 ;
 ; $8E2D
 .proc UnknownSub16
-	txa                      
-	tay                      
-	ldx #$00                 
+	txa
+	tay
+	ldx #$00
 	
 	:
 	lda Data_at8E3F,x
-	sta var_4A                  
+	sta var_4A
 	jsr UnknownSub17 ; ==========================
-	inx                      
-	cpx #$08                 
+	inx
+	cpx #$08
 	bne :-
-	rts                       
+	rts
 .endproc
 ;
 ; $8E3F
@@ -1879,69 +1879,69 @@ Data_at8E3F:
 ;
 ; $8E47
 .proc UnknownSub17
-	txa                      
-	pha                      
-	tya                      
-	pha                      
+	txa
+	pha
+	tya
+	pha
 	jsr CheckSomethingUnknown1
-	cpx #$F0                 
+	cpx #$F0
 	bcs doneWithThis
 	jsr UnknownSub18
-	ldy var_4A                  
+	ldy var_4A
 	jsr UnknownSub19
-	lda #$01                 
+	lda #$01
 	sta someObjProperty_0602,x
-	lda #$60                 
+	lda #$60
 	sta someObjProperty_0405,x
-	lda #$04                 
+	lda #$04
 	sta someObjProperty_0600,x
 	sta someObjProperty_0601,x
-	lda #$00                 
+	lda #$00
 	sta hitPoints_0603,x
 	sta someObjProperty_0301,x
 	sta someObjProperty_0302,x
-	lda #$80                 
+	lda #$80
 	sta someObjProperty_0404,x
 	
 	doneWithThis:
-	pla                      
-	tay                      
-	pla                      
-	tax                      
-	rts                       
+	pla
+	tay
+	pla
+	tax
+	rts
 .endproc
 ;
 ; $8E81
 .proc UnknownSub18
 
-	lda someObjProperty_0400,y              
-	clc                      
-	adc someObjProperty_0604,y              
+	lda someObjProperty_0400,y
+	clc
+	adc someObjProperty_0604,y
 	sta someObjProperty_0400,x
-	lda someObjProperty_0401,y              
-	adc #$00                 
+	lda someObjProperty_0401,y
+	adc #$00
 	sta someObjProperty_0401,x
-	lda someObjProperty_0402,y              
-	clc                      
-	adc someObjProperty_0605,y              
+	lda someObjProperty_0402,y
+	clc
+	adc someObjProperty_0605,y
 	sta someObjProperty_0402,x
-	lda someObjProperty_0403,y              
-	adc #$00                 
+	lda someObjProperty_0403,y
+	adc #$00
 	sta someObjProperty_0403,x
-	rts                       
+	rts
 .endproc
 ;
 ; $8EA6
 .proc UnknownSub19
-	lda Data_at8EBE+0,y              
+	lda Data_at8EBE+0,y
 	sta someObjProperty_0501,x
-	lda Data_at8EBE+1,y              
+	lda Data_at8EBE+1,y
 	sta someObjProperty_0502,x
-	lda #$00                 
+	lda #$00
 	sta someObjProperty_0505,x
 	sta someObjProperty_0503,x
 	sta someObjProperty_0504,x
-	rts                       
+	rts
 .endproc
 ;
 ; $8EBE
@@ -1950,18 +1950,18 @@ Data_at8EBE:
 ;
 ; $927F
 .proc UnknownSub20
-	txa                      
-	tay                      
-	ldx #$00                 
+	txa
+	tay
+	ldx #$00
 	
 	:
 	lda Data_at9291,x
-	sta var_4A                  
-	jsr UnknownSub17                
-	inx                      
-	cpx #$05                 
+	sta var_4A
+	jsr UnknownSub17
+	inx
+	cpx #$05
 	bne :-
-	rts                       
+	rts
 .endproc
 ;
 ; $9291
@@ -1970,18 +1970,18 @@ Data_at9291:
 ;
 ; $9296
 .proc UnknownSub21
-	txa                      
-	tay                      
-	ldx #$00                 
+	txa
+	tay
+	ldx #$00
 	
 	:
 	lda Data_at92A8,x
-	sta var_4A                  
-	jsr UnknownSub17                
-	inx                      
-	cpx #$03                 
+	sta var_4A
+	jsr UnknownSub17
+	inx
+	cpx #$03
 	bne :-
-	rts                       
+	rts
 .endproc
 ;
 ; $92A8
@@ -1990,18 +1990,18 @@ Data_at92A8:
 ;
 ; $92AB
 .proc UnknownSub22
-	txa                      
-	tay                      
-	ldx #$00                 
+	txa
+	tay
+	ldx #$00
 	
 	:
 	lda Data_at92BD,x
-	sta var_4A                  
-	jsr UnknownSub17                
-	inx                      
-	cpx #$05                 
+	sta var_4A
+	jsr UnknownSub17
+	inx
+	cpx #$05
 	bne :-
-	rts                       
+	rts
 .endproc
 ;
 ; $92BD
@@ -2010,17 +2010,17 @@ Data_at92BD:
 ;
 ; $92C2
 .proc UnknownSub23
-	txa                      
-	tay                      
-	ldx #$00                 
+	txa
+	tay
+	ldx #$00
 	:
 	lda Data_at92D4,x
-	sta var_4A                  
-	jsr UnknownSub17                
-	inx                      
-	cpx #$08                 
+	sta var_4A
+	jsr UnknownSub17
+	inx
+	cpx #$08
 	bne :-
-	rts                       
+	rts
 .endproc
 ;
 ; $92D4
@@ -2029,45 +2029,45 @@ Data_at92D4:
 ;
 ; $92DC
 .proc UnknownSub15
-	txa                      
-	pha                      
-	tya                      
-	pha                      
-	lda #$05                 
+	txa
+	pha
+	tya
+	pha
+	lda #$05
 	sta someObjProperty_0333 ; not used in any other place
-	lda someObjProperty_0531                
-	sta someObjProperty_05FB                
-	lda someObjProperty_0532                
-	sta someObjProperty_05FC                
-	lda someObjProperty_0533                
-	sta someObjProperty_05FD                
-	lda someObjProperty_0534                
-	sta someObjProperty_05FE                
-	lda someObjProperty_0535                
-	sta someObjProperty_05FF                
-	lda #$00                 
-	sta someObjProperty_0533                
-	sta someObjProperty_0534                
-	sta someObjProperty_0535                
+	lda someObjProperty_0531
+	sta someObjProperty_05FB
+	lda someObjProperty_0532
+	sta someObjProperty_05FC
+	lda someObjProperty_0533
+	sta someObjProperty_05FD
+	lda someObjProperty_0534
+	sta someObjProperty_05FE
+	lda someObjProperty_0535
+	sta someObjProperty_05FF
+	lda #$00
+	sta someObjProperty_0533
+	sta someObjProperty_0534
+	sta someObjProperty_0535
 	lda #<Data_at932D ;; see data below
 	sta objectPtr_34+0
 	lda #>Data_at932D ;; see data below
 	sta objectPtr_34+1
-	lda bankIndex_15         
-	sec                       
-	sbc #$01                 
-	asl A                    
-	tay                      
-	lda (objectPtr_34),y              
+	lda bankIndex_15
+	sec
+	sbc #$01
+	asl A
+	tay
+	lda (objectPtr_34),y
 	sta someObjProperty_0531 ; boss AI?
-	iny                      
-	lda (objectPtr_34),y              
+	iny
+	lda (objectPtr_34),y
 	sta someObjProperty_0532 ; boss AI?
-	pla                      
-	tay                      
-	pla                      
-	tax                      
-	rts                       
+	pla
+	tay
+	pla
+	tax
+	rts
 .endproc
 ; $932D
 Data_at932D:
@@ -2090,21 +2090,21 @@ Data_at934D: ; Boss 4 shoot animation (five frames)
 ;
 ; $9362
 .proc LivesHUD
-	ldx livesCounter_11      
-	cpx #$0A                 
+	ldx livesCounter_11
+	cpx #$0A
 	bcc :+
-	ldx #$0A                 
+	ldx #$0A
 
 	:
-	txa                      
-	asl A                    
-	tax                      
-	ldy #$06                 
+	txa
+	asl A
+	tax
+	ldy #$06
 	lda LivesGraphicData,x
-	sta someObjProperty_0501,y              
+	sta someObjProperty_0501,y
 	lda LivesGraphicData+1,x
-	sta someObjProperty_0502,y              
-	rts                       
+	sta someObjProperty_0502,y
+	rts
 .endproc
 ;
 ; $937C
@@ -2130,53 +2130,53 @@ LivesGraphicData:
 ;
 ; $93E1
 .proc Clear54Bytes_Page04
-	pha                      
-	txa                      
-	pha                      
-	tya                      
-	pha                      
-	ldy #$36                 
-	lda #$00                 
+	pha
+	txa
+	pha
+	tya
+	pha
+	ldy #$36
+	lda #$00
 	:
-		sta someObjProperty_0400,y              
-		iny                      
+		sta someObjProperty_0400,y
+		iny
 		bne :-
-	pla                      
-	tay                      
-	pla                      
-	tax                      
-	pla                      
-	rts                       
+	pla
+	tay
+	pla
+	tax
+	pla
+	rts
 .endproc
 ;
 ; $93F6
 .proc MaybeStartGame
-	jsr PaletteFading        
-	lda #$02                 
-	jsr HandleAliveTimer                
-	lda bankIndex_15         
+	jsr PaletteFading
+	lda #$02
+	jsr HandleAliveTimer
+	lda bankIndex_15
 	cmp #$04	;; Check if the last stage was completed
 	bne :+
 		jmp EndGame
-	:                
-	lda OAM_0200             
-	pha                      
+	:
+	lda OAM_0200
+	pha
 	jsr ClearMemoryPage0200_OAM
-	pla                      
-	sta OAM_0200             
+	pla
+	sta OAM_0200
 	ldy #$01
-	:                 
-		lda HeartHUDData,y              
-		sta OAM_0200,y           
-		iny                      
-		cpy #$04                 
+	:
+		lda HeartHUDData,y
+		sta OAM_0200,y
+		iny
+		cpy #$04
 		bne :-
-	lda hitPoints_0603       
-	pha                      
-	jsr ClearPages_03_to_07_From_00  
-	pla                      
-	sta hitPoints_0603       
-	jmp MaybeStartingNewGame                
+	lda hitPoints_0603
+	pha
+	jsr ClearPages_03_to_07_From_00
+	pla
+	sta hitPoints_0603
+	jmp MaybeStartingNewGame
 .endproc
 ;
 ; $942D
@@ -2250,196 +2250,196 @@ LivesGraphicData:
 ; LoadPaletteIntoPPU(A,y)
 ; Loads 16 colors from addressPtr_32, offset Y
 ; 	A : 	$00 Background
-;   		$10 Sprites
-;   Y : 	offset from addressPtr_32
+;		$10 Sprites
+;Y : 	offset from addressPtr_32
 .proc LoadPaletteIntoPPU
-	ldx #$3F                 
-	stx PpuAddr_2006         
-	sta PpuAddr_2006         
-	ldx #$10                 
+	ldx #$3F
+	stx PpuAddr_2006
+	sta PpuAddr_2006
+	ldx #$10
 	:
-		lda (addressPtr_32),y              
-		sta PpuData_2007         
-		iny                      
-		dex                      
+		lda (addressPtr_32),y
+		sta PpuData_2007
+		iny
+		dex
 		bne :-
-	rts                       
+	rts
 .endproc
 ;
 ; $949D
 ; LoadPaletteIntoRAM(A,y)
 ;
 .proc LoadPaletteIntoRAM
-	tax                      
-	clc                      
-	adc #$10                 
-	sta var_4D                  
+	tax
+	clc
+	adc #$10
+	sta var_4D
 	:
-		lda (addressPtr_32),y              
+		lda (addressPtr_32),y
 		sta bgPalette_E0,X 
-		iny                      
-		inx                      
-		cpx var_4D                  
+		iny
+		inx
+		cpx var_4D
 		bne :-
-	rts                       
+	rts
 .endproc
 ;
 ; $94AE
 ; LoadNametable(A)
 .proc LoadNametable
-	asl A                    
-	asl A                    
-	clc                      
-	adc #$20                 
-	sta PpuAddr_2006         
-	lda #$00                 
-	sta PpuAddr_2006         
-	tay                      
-	tax                      
+	asl A
+	asl A
+	clc
+	adc #$20
+	sta PpuAddr_2006
+	lda #$00
+	sta PpuAddr_2006
+	tay
+	tax
 ReadData:
-	lda (addressPtr_32),y              
-	beq doneLoading                
-	cmp #$80                 
-	bcc DistinctTiles                
+	lda (addressPtr_32),y
+	beq doneLoading
+	cmp #$80
+	bcc DistinctTiles
 RepeatedTitles:
-	lda #%01111111                 
-	and (addressPtr_32),y              
-	tax                      
-	jsr NextBGByte_Y                
-	lda (addressPtr_32),y              
+	lda #%01111111
+	and (addressPtr_32),y
+	tax
+	jsr NextBGByte_Y
+	lda (addressPtr_32),y
 	:
-		sta PpuData_2007         
-		dex                      
+		sta PpuData_2007
+		dex
 		bne :-
-	jsr NextBGByte_Y                
-	jmp :++                
+	jsr NextBGByte_Y
+	jmp :++
 	
 	DistinctTiles:
-	lda (addressPtr_32),y              
-	tax                      
+	lda (addressPtr_32),y
+	tax
 	:
-		jsr NextBGByte_Y                
-		lda (addressPtr_32),y              
-		sta PpuData_2007         
-		dex                      
+		jsr NextBGByte_Y
+		lda (addressPtr_32),y
+		sta PpuData_2007
+		dex
 		bne :-
-	jsr NextBGByte_Y                
+	jsr NextBGByte_Y
 	:
 	jmp ReadData
 
 	doneLoading:
-	rts                       
+	rts
 .endproc
 ;
 ; $94F0
 .proc NextBGByte_Y
-	iny                      
+	iny
 	bne :+
-		inc addressPtr_32+1                  
+		inc addressPtr_32+1
 	:
-	rts                       
+	rts
 .endproc
 ;
 ; $94F6
 ; LoadStage(A,X)
 ; A : Name
 .proc LoadStage
-	jsr WaitVBlank           
-	ldy #$00                 
-	sty PpuMask_2001         
-	sty PpuControl_2000      
-	asl A                    
-	tay                      
-	txa                      
-	pha                      
+	jsr WaitVBlank
+	ldy #$00
+	sty PpuMask_2001
+	sty PpuControl_2000
+	asl A
+	tay
+	txa
+	pha
 	lda BackgroundData_E847+0,y
 	sta addressPtr_32+0
-	lda BackgroundData_E847+1,y              
-	sta addressPtr_32+1                  
-	lda #$00                 
-	ldy #$03                 
-	jsr LoadPaletteIntoPPU
-	lda #$00                 
-	ldy #$03                 
-	jsr LoadPaletteIntoRAM                
-	ldy #$02                 
-	lda (addressPtr_32),y              
-	tay                      
-	lda #$10                 
-	jsr LoadPaletteIntoPPU                
-	ldy #$02                 
-	lda (addressPtr_32),y              
-	tay                      
-	lda #$10                 
-	jsr LoadPaletteIntoRAM                
-	ldy #$00                 
-	lda (addressPtr_32),y              
-	pha                      
-	iny                      
-	lda (addressPtr_32),y              
+	lda BackgroundData_E847+1,y
 	sta addressPtr_32+1
-	pla                      
+	lda #$00
+	ldy #$03
+	jsr LoadPaletteIntoPPU
+	lda #$00
+	ldy #$03
+	jsr LoadPaletteIntoRAM
+	ldy #$02
+	lda (addressPtr_32),y
+	tay
+	lda #$10
+	jsr LoadPaletteIntoPPU
+	ldy #$02
+	lda (addressPtr_32),y
+	tay
+	lda #$10
+	jsr LoadPaletteIntoRAM
+	ldy #$00
+	lda (addressPtr_32),y
+	pha
+	iny
+	lda (addressPtr_32),y
+	sta addressPtr_32+1
+	pla
 	sta addressPtr_32+0
-	pla                      
-	jsr LoadNametable                
-	lda #$00                 
-	sta PpuAddr_2006         
-	sta PpuAddr_2006         
-	rts                       
+	pla
+	jsr LoadNametable
+	lda #$00
+	sta PpuAddr_2006
+	sta PpuAddr_2006
+	rts
 .endproc
 ;
 ; $954B
 .proc UpdatePPUSettings
-	jsr WaitVBlank           
-	lda flagPPUMask_18      
-	sta PpuMask_2001         
-	lda flagPPUControl_19   
-	sta PpuControl_2000      
-	rts                       
+	jsr WaitVBlank
+	lda flagPPUMask_18
+	sta PpuMask_2001
+	lda flagPPUControl_19
+	sta PpuControl_2000
+	rts
 .endproc
 ;
 ; $9559
 .proc WaitVBlank
-	pha                      
-	jsr CheckForVBlank       
-	doCheckPPUStatus:        
-		lda PpuStatus_2002       
-		bpl doCheckPPUStatus     
-	pla                      
-	rts                       
+	pha
+	jsr CheckForVBlank
+	doCheckPPUStatus:
+		lda PpuStatus_2002
+		bpl doCheckPPUStatus
+	pla
+	rts
 .endproc
 ;
 ; $9564
 .proc CheckForVBlank
-	lda PpuStatus_2002       
-	bmi CheckForVBlank       
-	rts                       
+	lda PpuStatus_2002
+	bmi CheckForVBlank
+	rts
 .endproc
 ;
 ; $956A
 ; HandleAliveTimer(A)
 .proc HandleAliveTimer
 	:
-		pha                      
-		lda #$00                 
-		sta aliveTimer_14  
-		:      
-			lda aliveTimer_14        
-			cmp #$01                 
+		pha
+		lda #$00
+		sta aliveTimer_14
+		:
+			lda aliveTimer_14
+			cmp #$01
 			bne :-
-		pla                      
-		sec                       
-		sbc #$01                 
+		pla
+		sec
+		sbc #$01
 	bne :--
-	rts                       
+	rts
 .endproc
 ; 
 ; $957C
 .proc RenderingOFF
-	jsr WaitVBlank           
-	lda #$00                 
-	sta PpuMask_2001         
-	rts                       
+	jsr WaitVBlank
+	lda #$00
+	sta PpuMask_2001
+	rts
 .endproc
 ;
 ; $9585
@@ -2448,244 +2448,244 @@ RepeatedTitles:
 ; flagPPUMask_18
 ; flagPPUControl_17
 .proc RenderON
-	lda #$00                 
-	sta PpuControl_2000      
-	jsr WaitVBlank           
-	lda flagPPUMask_18                  
-	sta PpuMask_2001         
+	lda #$00
+	sta PpuControl_2000
+	jsr WaitVBlank
+	lda flagPPUMask_18
+	sta PpuMask_2001
 	lda flagPPUControl_17
-	sta PpuControl_2000      
-	rts                       
+	sta PpuControl_2000
+	rts
 .endproc
 ;
 ; $9598
 .proc ReadControl_A
-	ldx #$01                 
-	stx Ctrl1_4016           
-	ldx #$00                 
-	stx Ctrl1_4016           
-	tax                      
+	ldx #$01
+	stx Ctrl1_4016
+	ldx #$00
+	stx Ctrl1_4016
+	tax
 
-	ldy #$08                 
-	:       
-		jsr StrobeControl_X      
-		dey                      
+	ldy #$08
+	:
+		jsr StrobeControl_X
+		dey
 		bne :-
-	rts                       
+	rts
 .endproc
 ;
 ; $95AC
 .proc StrobeControl_X
-	asl input1_20            
-	lda Ctrl1_4016,x    
-	lsr  A                    
-	bcs RegisterInput      
-	lsr  A                    
-	bcs RegisterInput      
-	rts                       
+	asl input1_20
+	lda Ctrl1_4016,x
+	lsrA
+	bcs RegisterInput
+	lsrA
+	bcs RegisterInput
+	rts
 .endproc
 ;
 ; $95B8
 .proc RegisterInput
-	inc input1_20            
-	rts                       
+	inc input1_20
+	rts
 .endproc
 ;
 ; $95BB
 .proc PaletteFading
-	ldy #$05                 
+	ldy #$05
 
-loopDarkenBGFiveSteps:
-	onceEveryThreeFrames:
-		lda frameCounter_12
-		and #$03                 
-		bne onceEveryThreeFrames
-	jsr WaitVBlank           
-	ldx #$00                 
-	lda #$3F                 
-	sta PpuAddr_2006         
-	stx PpuAddr_2006         
-	:      
-		lda bgPalette_E0,x  
-		sta PpuData_2007         
-		inx                      
-		cpx #$20                 
-		bne :-
-	lda flagPPUControl_19   
-	sta PpuControl_2000      
-	lda screenScrollX_29     
-	sta PpuScroll_2005       
-	lda #$00                 
-	sta PpuScroll_2005       
-	ldx #$00                 
-	loopDarkenONETone:       
-		lda bgPalette_E0,x  
-		sec                       
-		sbc #$10                 
-		bcs paletteDidNotUnderflow
-		lda #$0F                 
-		
-		paletteDidNotUnderflow:  
-		sta bgPalette_E0,x  
-		inx                      
-		cpx #$20                 
-		bne loopDarkenONETone    
-	dey                      
-	bne loopDarkenBGFiveSteps
-	rts                       
+	loopDarkenBGFiveSteps:
+		onceEveryThreeFrames:
+			lda frameCounter_12
+			and #$03
+			bne onceEveryThreeFrames
+		jsr WaitVBlank
+		ldx #$00
+		lda #$3F
+		sta PpuAddr_2006
+		stx PpuAddr_2006
+		:
+			lda bgPalette_E0,x
+			sta PpuData_2007
+			inx
+			cpx #$20
+			bne :-
+		lda flagPPUControl_19
+		sta PpuControl_2000
+		lda screenScrollX_29
+		sta PpuScroll_2005
+		lda #$00
+		sta PpuScroll_2005
+		ldx #$00
+		loopDarkenONETone:
+			lda bgPalette_E0,x
+			sec
+			sbc #$10
+			bcs paletteDidNotUnderflow
+			lda #$0F
+			
+			paletteDidNotUnderflow:
+			sta bgPalette_E0,x
+			inx
+			cpx #$20
+			bne loopDarkenONETone
+		dey
+		bne loopDarkenBGFiveSteps
+		rts
 .endproc
 ;
 ; $95FF
 .proc EndGame
 	jsr RenderingOFF
 	jsr ClearMemoryPage0200_OAM
-	lda #$00                 
-	sta PpuControl_2000      
-	sta screenScrollX_29     
-	sta var_2A                  
+	lda #$00
+	sta PpuControl_2000
+	sta screenScrollX_29
+	sta var_2A
 	jsr ClearNametablePattern
-	lda #$01                 
+	lda #$01
 	jsr ClearNametablePattern
-	lda #$00                 
-	tax                      
+	lda #$00
+	tax
 	sta BankSwitching_FFF0+0,X
-	inc bankIndex_15         
-	lda #$0A                 
-	ldx #$00                 
-	jsr LoadStage            
-	lda #$88                 
-	ora #$18                 
-	sta flagPPUControl_17   
-	sta flagPPUControl_19   
-	jsr RenderON             
-	lda #$0B                 
-	sta soundAddress_8D      
+	inc bankIndex_15
+	lda #$0A
+	ldx #$00
+	jsr LoadStage
+	lda #$88
+	ora #$18
+	sta flagPPUControl_17
+	sta flagPPUControl_19
+	jsr RenderON
+	lda #$0B
+	sta soundAddress_8D
 	
-	nop  ;
-	nop  ;
-	nop  ;jsr InitializeSound      
+	nop;
+	nop;
+	nop;jsr InitializeSound
 
 	loopPressANYButton:
-		lda input1_20            
-		beq loopPressANYButton   
+		lda input1_20
+		beq loopPressANYButton
 	
-	sta inputPrev_22         
+	sta inputPrev_22
 	:
-		lda input1_20            
-		cmp inputPrev_22         
+		lda input1_20
+		cmp inputPrev_22
 		beq :-
-	nop  ;
-	nop  ;
-	nop  ; jsr Sound_DontKnowWhatItDoes
-	lda #$00                 
-	sta screenScrollX_29     
-	sta var_2A                  
-	jsr PaletteFading        
+	nop;
+	nop;
+	nop; jsr Sound_DontKnowWhatItDoes
+	lda #$00
+	sta screenScrollX_29
+	sta var_2A
+	jsr PaletteFading
 	jsr RenderingOFF
 	jsr ClearMemoryPage0200_OAM
-	lda #$02                 
-	jsr HandleAliveTimer     
-	lda #$00                 
-	sta PpuControl_2000      
-	sta screenScrollX_29     
-	sta var_2A                  
+	lda #$02
+	jsr HandleAliveTimer
+	lda #$00
+	sta PpuControl_2000
+	sta screenScrollX_29
+	sta var_2A
 	jsr ClearNametablePattern
-	lda #$01                 
+	lda #$01
 	jsr ClearNametablePattern
-	lda #$02                 
-	tax                      
+	lda #$02
+	tax
 	sta BankSwitching_FFF0+0,X
-	lda flagPPUControl_17   
-	and #$EF                 
-	sta flagPPUControl_17   
-	sta flagPPUControl_19   
-	lda #$0B                 
-	ldx #$00                 
-	jsr LoadStage            
-	jsr RenderON             
-	lda #$00                 
-	jsr RollEndCredits       
-	lda #$01                 
-	jsr RollEndCredits       
-	lda #$02                 
-	jsr RollEndCredits       
-	lda #$03                 
-	jsr RollEndCredits       
-	lda #$04                 
-	jsr RollEndCredits       
-	lda #$05                 
-	jsr RollEndCredits       
-	lda #$00                 
-	sta PpuScroll_2005       
-	sta PpuScroll_2005       
-	:    
+	lda flagPPUControl_17
+	and #$EF
+	sta flagPPUControl_17
+	sta flagPPUControl_19
+	lda #$0B
+	ldx #$00
+	jsr LoadStage
+	jsr RenderON
+	lda #$00
+	jsr RollEndCredits
+	lda #$01
+	jsr RollEndCredits
+	lda #$02
+	jsr RollEndCredits
+	lda #$03
+	jsr RollEndCredits
+	lda #$04
+	jsr RollEndCredits
+	lda #$05
+	jsr RollEndCredits
+	lda #$00
+	sta PpuScroll_2005
+	sta PpuScroll_2005
+	:
 	jmp :- ; End of Credits, Must Reset 
 .endproc
 ;
 ; $96AC
 .proc RollEndCredits
-	asl A                    
-	tay                      
-	lda EndCreditsData,y              
+	asl A
+	tay
+	lda EndCreditsData,y
 	sta addressPtr_32+0
-	lda EndCreditsData+1,y              
+	lda EndCreditsData+1,y
 	sta addressPtr_32+1
-	ldy #$00                 
+	ldy #$00
 	lda (addressPtr_32),y
-	sta vramAddress_67+0                  
-	iny                      
+	sta vramAddress_67+0
+	iny
 	lda (addressPtr_32),y
-	sta vramAddress_67+1                  
-	iny                      
-	loopLoadCredits:         
-		lda vramAddress_67+0                  
-		sta PpuAddr_2006         
-		lda vramAddress_67+1                  
-		sta PpuAddr_2006         
+	sta vramAddress_67+1
+	iny
+	loopLoadCredits:
+		lda vramAddress_67+0
+		sta PpuAddr_2006
+		lda vramAddress_67+1
+		sta PpuAddr_2006
 		lda (addressPtr_32),y
-		cmp #$FF                 
-		beq leaveEndCredits      
-		cmp #$20                 
+		cmp #$FF
+		beq leaveEndCredits
+		cmp #$20
 		bne :+
-		lda #$00                 
-		sta PpuData_2007         
-		lda #$00                 
-		sta PpuScroll_2005       
-		sta PpuScroll_2005       
-		beq :++                
+		lda #$00
+		sta PpuData_2007
+		lda #$00
+		sta PpuScroll_2005
+		sta PpuScroll_2005
+		beq :++
 		:
-		sec                       
-		sbc #$36                 
-		sta PpuData_2007         
-		lda #$00                 
-		sta PpuScroll_2005       
-		sta PpuScroll_2005       
-		lda #$0A                 
-		sta soundAddress_8D      
-		nop  ;
-		nop  ;
-		nop  ;jsr PlaySFX              
+		sec
+		sbc #$36
+		sta PpuData_2007
+		lda #$00
+		sta PpuScroll_2005
+		sta PpuScroll_2005
+		lda #$0A
+		sta soundAddress_8D
+		nop;
+		nop;
+		nop;jsr PlaySFX
 		:
-		lda vramAddress_67+1                  
-		clc                      
-		adc #$01                 
-		sta vramAddress_67+1                  
-		lda vramAddress_67+0                  
-		adc #$00                 
-		sta vramAddress_67+0                  
-		doWait_07_Blanks:        
-		ldx #$07                 
-		:     
-			jsr WaitVBlank           
-			dex                      
+		lda vramAddress_67+1
+		clc
+		adc #$01
+		sta vramAddress_67+1
+		lda vramAddress_67+0
+		adc #$00
+		sta vramAddress_67+0
+		doWait_07_Blanks:
+		ldx #$07
+		:
+			jsr WaitVBlank
+			dex
 			bne :-
-		iny                      
-		bne loopLoadCredits      
-	nop  ;
-	nop  ;
-	nop  ;jsr DoSomethingWithSound 
-	leaveEndCredits:         
-	rts                       
+		iny
+		bne loopLoadCredits
+	nop;
+	nop;
+	nop;jsr DoSomethingWithSound 
+	leaveEndCredits:
+	rts
 .endproc
 ;
 ; $9718
@@ -2694,46 +2694,46 @@ EndCreditsData:
 ;
 ; $97AD
 .proc UnknownSub5
-	lda #$00                 
-	sta bankIndex_15         
-	sta PpuControl_2000      
-	jsr WaitVBlank           
-	lda flagPPUMask_18      
-	and #$EF                 
-	sta PpuMask_2001         
-	lda flagPPUControl_19   
-	sta flagPPUControl_17   
-	jsr WaitVBlank           
+	lda #$00
+	sta bankIndex_15
+	sta PpuControl_2000
+	jsr WaitVBlank
+	lda flagPPUMask_18
+	and #$EF
+	sta PpuMask_2001
+	lda flagPPUControl_19
+	sta flagPPUControl_17
+	jsr WaitVBlank
 	jsr ClearMemoryPage0200_OAM
-	ldy #$00                 
+	ldy #$00
 	:
-		lda Data_at97F5,y              
-		sta OAM_0200,y           
-		iny                      
-		cpy #$20                 
+		lda Data_at97F5,y
+		sta OAM_0200,y
+		iny
+		cpy #$20
 		bne :-
 	jsr UpdatePPUSettings
-	lda #$02                 
-	jsr HandleAliveTimer     
-	lda #$00                 
-	sta frameCounter64_13    
+	lda #$02
+	jsr HandleAliveTimer
+	lda #$00
+	sta frameCounter64_13
 	:
-	lda input1_20            
-	bne WaitforButtonPress                
-	lda frameCounter64_13    
-	cmp #$0A                 
+	lda input1_20
+	bne WaitforButtonPress
+	lda frameCounter64_13
+	cmp #$0A
 	bne :-
-	rts                       
+	rts
 .endproc
 ;
 ; $97EC
 .proc WaitforButtonPress
-	sta inputPrev_22         
+	sta inputPrev_22
 	:
-		lda input1_20            
-		cmp inputPrev_22         
+		lda input1_20
+		cmp inputPrev_22
 		beq :-
-	rts                       
+	rts
 .endproc
 ;
 ; $97F5 32 bytes of data
@@ -2756,136 +2756,136 @@ Data_at9D22:
 ; $A3AC
 .segment "CODEBLOCK2"
 .proc HandleVBlank
-	pha                      
-	txa                      
-	pha                      
-	tya                      
-	pha                      
+	pha
+	txa
+	pha
+	tya
+	pha
 	lda updateDuringVBlank_0E
-	cmp #$57                 
+	cmp #$57
 	beq doKeepUpdatingAtVBlank_from0E
-	jmp doUpdateSoundOnly    
+	jmp doUpdateSoundOnly
 
 	doKeepUpdatingAtVBlank_from0E:
 	lda updateDuringVBlank_0F
-	cmp #$75                 
+	cmp #$75
 	beq doKeepUpdatingAtVBlank_from0F
-	jmp doUpdateSoundOnly    
+	jmp doUpdateSoundOnly
 
 	doKeepUpdatingAtVBlank_from0F:
-	lda #$00                 
-	sta OamAddr_2003         
-	lda #$02                 
-	sta SpriteDma_4014       
-	lda PpuStatus_2002       
-	inc frameCounter_12      
-	lda frameCounter_12      
-	and #$3F                 
-	bne dontINCTimer         
-	inc aliveTimer_14        
-	inc frameCounter64_13    
+	lda #$00
+	sta OamAddr_2003
+	lda #$02
+	sta SpriteDma_4014
+	lda PpuStatus_2002
+	inc frameCounter_12
+	lda frameCounter_12
+	and #$3F
+	bne dontINCTimer
+	inc aliveTimer_14
+	inc frameCounter64_13
 
-	dontINCTimer:            
-	lda flagNextLevel_1B     
-	bne doLevelTransition    
-	ldy bankIndex_15         
-	bne dontLevelTransition  
+	dontINCTimer:
+	lda flagNextLevel_1B
+	bne doLevelTransition
+	ldy bankIndex_15
+	bne dontLevelTransition
 
-	doLevelTransition:       
-	jsr ReadControl_1        
-	jmp doUpdateSoundOnly    
+	doLevelTransition:
+	jsr ReadControl_1
+	jmp doUpdateSoundOnly
 
-	dontLevelTransition:     
-	lda flagPause_1C         
+	dontLevelTransition:
+	lda flagPause_1C
 
-	gameIsPaused:            
-	beq gameNotPaused        
+	gameIsPaused:
+	beq gameNotPaused
 	jsr HandleControllerInputs
 
-	jmp doUpdateSoundOnly    
+	jmp doUpdateSoundOnly
 
-	gameNotPaused:           
-	jsr HandleScrolling      
-	lda screenScrollX_29     
-	sta PpuScroll_2005       
-	lda #$00                 
-	sta PpuScroll_2005       
-	lda flagPPUControl_19   
-	sta PpuControl_2000      
-	lda frameCounter_12      
-	and #$01                 
-	bne :+                
-	dec var_5C                  
+	gameNotPaused:
+	jsr HandleScrolling
+	lda screenScrollX_29
+	sta PpuScroll_2005
+	lda #$00
+	sta PpuScroll_2005
+	lda flagPPUControl_19
+	sta PpuControl_2000
+	lda frameCounter_12
+	and #$01
+	bne :+
+	dec var_5C
 	
 	:
-	lda var_5E                  
-	beq :+                
+	lda var_5E
+	beq :+
 	jsr HandleControllerInputs
 	jsr HandleObjects
 	
 	:
 	jsr PowerUpCheat
 
-	doUpdateSoundOnly:       
-	nop  ;
-	nop  ;
-	nop  ; jsr UpdateSoundAtVBlank  
+	doUpdateSoundOnly:
+	nop;
+	nop;
+	nop; jsr UpdateSoundAtVBlank
 
-	pla                      
-	tay                      
-	pla                      
-	tax                      
-	pla                      
-	RTI                      
+	pla
+	tay
+	pla
+	tax
+	pla
+	RTI
 .endproc
 ;
 ; $A424
 .proc ReadControl_1
-	lda #$00                 
-	jsr ReadControl_A        
-	rts                       
+	lda #$00
+	jsr ReadControl_A
+	rts
 .endproc
 ;
 ; $A42A
 .proc HandleScrolling
-	ldx flagGameMode_26      
+	ldx flagGameMode_26
 	bne doneWithScrollHandling
 	inc frameScrollCtr_28
 	lda frameScrollCtr_28
-	cmp frameScrollAt_27     
+	cmp frameScrollAt_27
 	bcc doneWithScrollHandling
 	
-	doScrollBackground:      
-	lda #$00                 
+	doScrollBackground:
+	lda #$00
 	sta frameScrollCtr_28
 	jsr HandleStageScrolling 
 	
-	doneWithScrollHandling:  
-	rts                       
+	doneWithScrollHandling:
+	rts
 .endproc
 ;
 ; $A43E
 .proc HandleStageScrolling
-	inc screenScrollX_29     
-	lda screenScrollX_29     
-	bne doneWithScrolling    
-	ldx levelProgression_16  
+	inc screenScrollX_29
+	lda screenScrollX_29
+	bne doneWithScrolling
+	ldx levelProgression_16
 	
 	testIfScrolled_14_Screens:
-	cpx #$0E                 
+	cpx #$0E
 	bcc doKeepScrollingStage 
-	lda #$02                 
-	sta flagGameMode_26      
+	lda #$02
+	sta flagGameMode_26
 	
-	doKeepScrollingStage:    
-	clc                      
-	inc levelProgression_16  
-	lda flagPPUControl_19   
-	eor #$01                 
-	sta flagPPUControl_19   
+	doKeepScrollingStage:
+	clc
+	inc levelProgression_16
+	lda flagPPUControl_19
+	eor #$01
+	sta flagPPUControl_19
 	
-	doneWithScrolling:       
-	rts                       
+	doneWithScrolling:
+	rts
 .endproc
 ;
 ; $A458
@@ -2893,46 +2893,46 @@ Data_at9D22:
 	
 	:
 	jsr UnknownSub11
-	bit someObjProperty_0100                
-	dex                      
-	bne :-                
-	rts                       
+	bit someObjProperty_0100
+	dex
+	bne :-
+	rts
 .endproc
 ;
 ; $A462
 .proc UnknownSub11
-	txa                      
-	pha                      
-	ldx #$00                 
+	txa
+	pha
+	ldx #$00
 	:
-	inx                      
-	cpx #$0F                 
+	inx
+	cpx #$0F
 	bne :-
-	pla                      
-	tax                      
-	tax                      
-	rts                       
+	pla
+	tax
+	tax
+	rts
 .endproc
 ;
 ; $A46F
 .proc HandleObjects
-	lda #$04                 
-	sta oamAddressPtr_3E                  
-	lda var_5F                  
-	sta var_3D                  
+	lda #$04
+	sta oamAddressPtr_3E
+	lda var_5F
+	sta var_3D
 	
 	BeginHere:
-	ldx var_5F                  
+	ldx var_5F
 	lda someObjProperty_0404,x
 	bmi :+
-	jmp SecondPart                
+	jmp SecondPart
 	
 	:
 	ldy someObjProperty_0504,x
 	beq :+
 	dec someObjProperty_0504,x
 	dec someObjProperty_0503,x
-	jmp ReplaceMeLabel_2                
+	jmp ReplaceMeLabel_2
 	
 	:
 	lda someObjProperty_0501,x
@@ -2944,530 +2944,530 @@ Data_at9D22:
 	ReplaceMeLabel_7:
 	lda (objectPtr_36),y
 	bmi :+
-	jmp ReplaceMeLabel_3                
+	jmp ReplaceMeLabel_3
 	
 	:
-	asl A                    
-	bmi ReplaceMeLabel_1                
-	lsr  A                    
-	sbc #$00                 
+	asl A
+	bmi ReplaceMeLabel_1
+	lsrA
+	sbc #$00
 	sta someObjProperty_0504,x
 	
 	ReplaceMeLabel_2:
 	lda someObjProperty_0405,x
-	bpl ReplaceMeLabel_4                
-	lda var_0C                  
+	bpl ReplaceMeLabel_4
+	lda var_0C
 	bpl :+
-	lda #$FF                 
+	lda #$FF
 	bne :++
 	
 	:
-	lda #$00                 
+	lda #$00
 	
 	:
-	sta var_47                  
-	lda var_0C                  
-	clc                      
+	sta var_47
+	lda var_0C
+	clc
 	adc someObjProperty_0400,x
 	sta someObjProperty_0400,x
-	sta var_40                  
-	lda var_47                  
+	sta var_40
+	lda var_47
 	adc someObjProperty_0401,x
 	sta someObjProperty_0401,x
-	sta var_41                  
-	lda var_0D                  
+	sta var_41
+	lda var_0D
 	bpl :+
-	lda #$FF                 
+	lda #$FF
 	bne :++
 	
 	:
-	lda #$00                 
+	lda #$00
 	
 	:
-	sta var_49                  
-	lda var_0D                  
-	clc                      
+	sta var_49
+	lda var_0D
+	clc
 	adc someObjProperty_0402,x
 	sta someObjProperty_0402,x
-	sta spriteY_42                  
-	lda var_49                  
+	sta spriteY_42
+	lda var_49
 	adc someObjProperty_0403,x
 	sta someObjProperty_0403,x
-	sta var_43                  
+	sta var_43
 	jmp ReplaceMeLabel_5
 	
 	ReplaceMeLabel_4:
 	lda someObjProperty_0400,x
-	sta var_40                  
+	sta var_40
 	lda someObjProperty_0401,x
-	sta var_41                  
+	sta var_41
 	lda someObjProperty_0402,x
-	sta spriteY_42                  
+	sta spriteY_42
 	lda someObjProperty_0403,x
-	sta var_43                  
+	sta var_43
 	
 	ReplaceMeLabel_5:
 	inc someObjProperty_0503,x
 	lda someObjProperty_0701,x
-	tax                      
-	lda Data_atA895+0,x
-	sta addressPtr_32+0    
-	lda Data_atA895+1,x
-	sta addressPtr_32+1         
-	ldx var_5F                  
-	jmp ReplaceMeLabel_6
-	
-	ReplaceMeLabel_1:
-	asl A                    
-	bmi loopTest
-	dec someObjProperty_0505,x
-	lda someObjProperty_0505,x
-	bne :+
-	iny                      
-	iny                      
-	jmp ReplaceMeLabel_7                
-	
-	:
-	bpl loop          
-	lda (objectPtr_36),y              
-	and #$1F                 
-	sta someObjProperty_0505,x
-	
-	loop:
-		iny                      
-		lda (objectPtr_36),y              
-		tay                      
-		lda (objectPtr_36),y              
-		jmp ReplaceMeLabel_3                
-		
-		loopTest:
-		cmp #$F8                 
-		beq loop
-		asl A                    
-		bmi :+
-	
-	lsr  A                    
-	lsr  A                    
-	lsr  A                    
-	and #$0F                 
-	lda someObjProperty_0404,x
-	ora #$08                 
-	sta someObjProperty_0404,x
-	jmp SecondPart                
-	
-	:
-	lda someObjProperty_0303,x
-	cmp #$03                 
-	bne :+                
-	beq :++
-	
-	:
-	cmp #$04                 
-	bne :++
-	lda #$01                 
-	sta flagNextLevel_1B     
-	
-	:
-	lda #$00                 
-	sta someObjProperty_0302,x
-	sta someObjProperty_0303,x
-	
-	:
-	cmp #$05                 
-	bne :+ 
-	jsr Copy_5BytesPage05_FromEnd_ToBeginning                
-	jmp :++
-	
-	:
-	lda #$10                 
-	sta someObjProperty_0404,x
-	
-	:
-	jmp SecondPart                
-	
-	ReplaceMeLabel_3:
-	asl A                    
-	sta someObjProperty_0701,x
-	tax                      
+	tax
 	lda Data_atA895+0,x
 	sta addressPtr_32+0
 	lda Data_atA895+1,x
 	sta addressPtr_32+1
-	iny                      
-	ldx var_5F                  
-	lda someObjProperty_0405,x
-	bpl :+
-	lda (objectPtr_36),y              
-	clc                      
-	adc var_0C                  
+	ldx var_5F
+	jmp ReplaceMeLabel_6
+	
+	ReplaceMeLabel_1:
+	asl A
+	bmi loopTest
+	dec someObjProperty_0505,x
+	lda someObjProperty_0505,x
+	bne :+
+	iny
+	iny
+	jmp ReplaceMeLabel_7
+	
+	:
+	bpl loop
+	lda (objectPtr_36),y
+	and #$1F
+	sta someObjProperty_0505,x
+	
+	loop:
+		iny
+		lda (objectPtr_36),y
+		tay
+		lda (objectPtr_36),y
+		jmp ReplaceMeLabel_3
+		
+		loopTest:
+		cmp #$F8
+		beq loop
+		asl A
+		bmi :+
+	
+	lsrA
+	lsrA
+	lsrA
+	and #$0F
+	lda someObjProperty_0404,x
+	ora #$08
+	sta someObjProperty_0404,x
+	jmp SecondPart
+	
+	:
+	lda someObjProperty_0303,x
+	cmp #$03
+	bne :+
+	beq :++
+	
+	:
+	cmp #$04
+	bne :++
+	lda #$01
+	sta flagNextLevel_1B
+	
+	:
+	lda #$00
+	sta someObjProperty_0302,x
+	sta someObjProperty_0303,x
+	
+	:
+	cmp #$05
+	bne :+ 
+	jsr Copy_5BytesPage05_FromEnd_ToBeginning
 	jmp :++
 	
 	:
-	lda (objectPtr_36),y              
+	lda #$10
+	sta someObjProperty_0404,x
 	
 	:
-	sta spriteX_46                  
+	jmp SecondPart
+	
+	ReplaceMeLabel_3:
+	asl A
+	sta someObjProperty_0701,x
+	tax
+	lda Data_atA895+0,x
+	sta addressPtr_32+0
+	lda Data_atA895+1,x
+	sta addressPtr_32+1
+	iny
+	ldx var_5F
+	lda someObjProperty_0405,x
 	bpl :+
-	lda #$FF                 
+	lda (objectPtr_36),y
+	clc
+	adc var_0C
+	jmp :++
+	
+	:
+	lda (objectPtr_36),y
+	
+	:
+	sta spriteX_46
+	bpl :+
+	lda #$FF
 	bne :++
 	
 	:
-	lda #$00                 
+	lda #$00
 	
 	:
-	sta var_47                  
-	lda spriteX_46                  
-	clc                      
+	sta var_47
+	lda spriteX_46
+	clc
 	adc someObjProperty_0400,x
 	sta someObjProperty_0400,x
-	sta var_40                  
-	lda var_47                  
+	sta var_40
+	lda var_47
 	adc someObjProperty_0401,x
 	sta someObjProperty_0401,x
-	sta var_41                  
-	iny                      
+	sta var_41
+	iny
 	lda someObjProperty_0405,x
 	bpl :+
-	lda (objectPtr_36),y              
-	clc                      
-	adc var_0D                  
+	lda (objectPtr_36),y
+	clc
+	adc var_0D
 	jmp :++
 	
 	:
-	lda (objectPtr_36),y              
+	lda (objectPtr_36),y
 	
 	:
-	sta var_48                  
+	sta var_48
 	bpl :+
-	lda #$FF                 
+	lda #$FF
 	bne :++
 	
 	:
-	lda #$00                 
+	lda #$00
 	
 	:
-	sta var_49                  
-	lda var_48                  
-	clc                      
+	sta var_49
+	lda var_48
+	clc
 	adc someObjProperty_0402,x
 	sta someObjProperty_0402,x
-	sta spriteY_42                  
-	lda var_49                  
+	sta spriteY_42
+	lda var_49
 	adc someObjProperty_0403,x
 	sta someObjProperty_0403,x
-	sta var_43                  
-	iny                      
-	tya                      
+	sta var_43
+	iny
+	tya
 	sta someObjProperty_0503,x
 	
 	ReplaceMeLabel_6:
 	lda someObjProperty_0404,x
-	and #$20                 
+	and #$20
 	bne :+
-	jmp SecondPart                
+	jmp SecondPart
 	
 	:
 	lda someObjProperty_0405,x
-	and #$18                 
+	and #$18
 	beq :+
-	lda frameCounter_12      
-	and #$03                 
+	lda frameCounter_12
+	and #$03
 	bne :+
 	dec someObjProperty_0300,x
 	lda someObjProperty_0300,x
 	bne :+
 	lda someObjProperty_0404,x
-	ora #$08                 
+	ora #$08
 	sta someObjProperty_0404,x
 	
 	:
-	ldy #$00                 
+	ldy #$00
 	lda (addressPtr_32),y
 	bpl :+
 	jmp ReplaceMeLabel_8
 	
 	:
 	sta someObjProperty_0600,x
-	lsr  A                    
-	lsr  A                    
-	lsr  A                    
-	clc                      
-	adc #$01                 
-	sta var_44                  
-	iny                      
+	lsrA
+	lsrA
+	lsrA
+	clc
+	adc #$01
+	sta var_44
+	iny
 	lda (addressPtr_32),y
 	sta someObjProperty_0601,x
-	lsr  A                    
-	lsr  A                    
-	lsr  A                    
-	clc                      
-	adc #$01                 
-	sta var_45                  
-	iny                      
-	ldx oamAddressPtr_3E                  
+	lsrA
+	lsrA
+	lsrA
+	clc
+	adc #$01
+	sta var_45
+	iny
+	ldx oamAddressPtr_3E
 	
 	ReplaceMeLabel_11:
-	lda var_44                  
-	sta var_3C                  
-	lda var_40                  
-	sta spriteX_46                  
-	lda var_41                  
-	sta var_47                  
+	lda var_44
+	sta var_3C
+	lda var_40
+	sta spriteX_46
+	lda var_41
+	sta var_47
 	
 	ReplaceMeLabel_10:
 	lda (addressPtr_32),y
 	beq :+
-	lda var_47                  
+	lda var_47
 	bne :++
-	lda var_43                  
+	lda var_43
 	bne :++
 	lda (addressPtr_32),y ; XXX
 	sta OAM_0200+1,X	; tile #
 	lda spriteY_42				
-	sta OAM_0200+0,X    ; y - 1       
-	iny                      
+	sta OAM_0200+0,X; y - 1
+	iny
 	lda (addressPtr_32),y
 	sta OAM_0200+2,X	; attributes
-	lda spriteX_46                  
+	lda spriteX_46
 	sta OAM_0200+3,X	; x
-	txa                      
-	clc                      
-	adc #$04                 
-	beq ReplaceMeLabel_9                
-	tax                      
+	txa
+	clc
+	adc #$04
+	beq ReplaceMeLabel_9
+	tax
 	
 	:
-	iny                      
-	dec var_3C                  
+	iny
+	dec var_3C
 	beq :++
-	lda spriteX_46                  
-	adc #$08                 
-	sta spriteX_46                  
+	lda spriteX_46
+	adc #$08
+	sta spriteX_46
 	bcc ReplaceMeLabel_10
-	inc var_47                  
+	inc var_47
 	jmp ReplaceMeLabel_10
 	
 	:
-	iny                      
+	iny
 	jmp :--
 	
 	:
-	dec var_45                  
+	dec var_45
 	beq :+
-	lda spriteY_42                  
-	clc                      
-	adc #$08                 
-	sta spriteY_42                  
+	lda spriteY_42
+	clc
+	adc #$08
+	sta spriteY_42
 	bcc ReplaceMeLabel_11
-	inc var_43                  
+	inc var_43
 	jmp ReplaceMeLabel_11
 	
 	:
-	stx oamAddressPtr_3E                  
+	stx oamAddressPtr_3E
 	
 	SecondPart:
-	lda var_5F                  
-	clc                      
-	adc var_59               
-	cmp #$F0                 
+	lda var_5F
+	clc
+	adc var_59
+	cmp #$F0
 	bcc :++
 	beq :+
-	lda #$EA                 
+	lda #$EA
 	bne :++
 	
 	:
-	lda #$00                 
+	lda #$00
 	
 	:
-	sta var_5F                  
-	cmp var_3D                  
+	sta var_5F
+	cmp var_3D
 	beq ReplaceMeLabel_12
 	jmp BeginHere
 	
 	ReplaceMeLabel_8:
-	ldx oamAddressPtr_3E                  
-	lda var_41                  
-	bne SecondPart                
-	lda var_43                  
-	bne SecondPart                
-	lda spriteY_42                  
-	sta OAM_0200,x      
-	iny                      
+	ldx oamAddressPtr_3E
+	lda var_41
+	bne SecondPart
+	lda var_43
+	bne SecondPart
+	lda spriteY_42
+	sta OAM_0200,x
+	iny
 	lda (addressPtr_32),y
 	sta someObjProperty_0201,x
-	iny                      
+	iny
 	lda (addressPtr_32),y
 	sta someObjProperty_0202,x
-	lda var_40                  
+	lda var_40
 	sta someObjProperty_0203,x
-	txa                      
-	clc                      
-	adc #$04                 
-	beq ReplaceMeLabel_9                
-	sta oamAddressPtr_3E                  
-	jmp SecondPart                
+	txa
+	clc
+	adc #$04
+	beq ReplaceMeLabel_9
+	sta oamAddressPtr_3E
+	jmp SecondPart
 	
 	ReplaceMeLabel_12:
-	ldx oamAddressPtr_3E                  
-	cpx #$00                 
-	beq ReplaceMeLabel_9                
-	lda #$00                 
+	ldx oamAddressPtr_3E
+	cpx #$00
+	beq ReplaceMeLabel_9
+	lda #$00
 	
 	:
-	sta OAM_0200,x      
-	inx                      
+	sta OAM_0200,x
+	inx
 	bne :-
 	
 	ReplaceMeLabel_9:
-	lda var_5F                  
-	cmp var_3D                  
+	lda var_5F
+	cmp var_3D
 	bne :+
-	lda #$00                 
-	sta var_5F                  
-	sec                       
-	sbc var_59               
-	sta var_59               
+	lda #$00
+	sta var_5F
+	sec
+	sbc var_59
+	sta var_59
 
 	:
-	rts                       
+	rts
 .endproc
 ;
 ; $A709
 .proc Copy_5BytesPage05_FromEnd_ToBeginning
-	lda someObjProperty_05FB                
-	sta someObjProperty_0531                
-	lda someObjProperty_05FC                
-	sta someObjProperty_0532                
-	lda someObjProperty_05FD                
-	sta someObjProperty_0533                
-	lda someObjProperty_05FE                
-	sta someObjProperty_0534                
-	lda someObjProperty_05FF                
-	sta someObjProperty_0535                
-	rts                       
+	lda someObjProperty_05FB
+	sta someObjProperty_0531
+	lda someObjProperty_05FC
+	sta someObjProperty_0532
+	lda someObjProperty_05FD
+	sta someObjProperty_0533
+	lda someObjProperty_05FE
+	sta someObjProperty_0534
+	lda someObjProperty_05FF
+	sta someObjProperty_0535
+	rts
 .endproc
 ;
 ; $A728
 .proc PowerUpCheat
-	lda input1_20            
-	cmp #$60                 
+	lda input1_20
+	cmp #$60
 	bne :+
-	cmp flagUnknown_1F                  
+	cmp flagUnknown_1F
 	beq :+
-	inc powerUp_P_64         
-	lda powerUp_P_64         
-	cmp #$05                 
+	inc powerUp_P_64
+	lda powerUp_P_64
+	cmp #$05
 	bcc :+
-	lda #$00                 
-	sta powerUp_P_64         
+	lda #$00
+	sta powerUp_P_64
 	
 	:
-	lda input1_20            
-	sta flagUnknown_1F                  
-	rts                       
+	lda input1_20
+	sta flagUnknown_1F
+	rts
 .endproc
 ;
 ; $A743
 .proc HandleControllerInputs
-	lda #$00                 
-	jsr ReadControl_A        
-	lda flagPause_1C         
-	bne doGameIsPaused       
-	lda someObjProperty_0401                
-	bne doGameIsPaused       
-	lda aliveTimer_14        
-	cmp #$02                 
-	bcc HandlePlayerActions  
-	lda #$50                 
-	sta someObjProperty_0405                
-	bne HandlePlayerActions  
+	lda #$00
+	jsr ReadControl_A
+	lda flagPause_1C
+	bne doGameIsPaused
+	lda someObjProperty_0401
+	bne doGameIsPaused
+	lda aliveTimer_14
+	cmp #$02
+	bcc HandlePlayerActions
+	lda #$50
+	sta someObjProperty_0405
+	bne HandlePlayerActions
 	
-	doGameIsPaused:          
-	jsr CheckForPause        
-	lda input1_20            
-	sta inputPrev_22         
-	rts                       
+	doGameIsPaused:
+	jsr CheckForPause
+	lda input1_20
+	sta inputPrev_22
+	rts
 .endproc
 ;
 ; $A766
 .proc HandlePlayerActions
 
-	lda input1_20            
+	lda input1_20
 	
-checkInputRight:         
+checkInputRight:
 	bit BUTTON_RIGHT
-	beq checkInputLeft       
+	beq checkInputLeft
 
-	lda someObjProperty_0400                
-	cmp #$DC                 
-	bcs checkInputDown       
-	adc speed_66             
+	lda someObjProperty_0400
+	cmp #$DC
+	bcs checkInputDown
+	adc speed_66
 	bcc :+
 	
-checkInputLeft:          
+checkInputLeft:
 	bit BUTTON_LEFT
-	beq checkInputDown       
-	lda someObjProperty_0400                
-	cmp #$12                 
-	bcc checkInputDown       
-	sbc speed_66             
+	beq checkInputDown
+	lda someObjProperty_0400
+	cmp #$12
+	bcc checkInputDown
+	sbc speed_66
 
 	:
-	sta someObjProperty_0400                
+	sta someObjProperty_0400
 	
-	checkInputDown:          
-	lda input1_20            
-	bit BUTTON_DOWN                
-	beq checkInputUp         
-	lda someObjProperty_0402                
-	cmp #$B8                 
-	bcs checkInputA          
-	adc speed_66             
-	bcc :+                
+	checkInputDown:
+	lda input1_20
+	bit BUTTON_DOWN
+	beq checkInputUp
+	lda someObjProperty_0402
+	cmp #$B8
+	bcs checkInputA
+	adc speed_66
+	bcc :+
 	
-	checkInputUp:            
+	checkInputUp:
 	bit BUTTON_UP
-	beq checkInputA          
-	lda someObjProperty_0402                
-	cmp #$14                 
-	bcc checkInputA          
-	sbc speed_66             
+	beq checkInputA
+	lda someObjProperty_0402
+	cmp #$14
+	bcc checkInputA
+	sbc speed_66
 	:
-	sta someObjProperty_0402                
+	sta someObjProperty_0402
 	
-	checkInputA:             
-	lda input1_20            
+	checkInputA:
+	lda input1_20
 	bit BUTTON_A
-	beq OnlyCheckForPause                
-	lda inputPrev_22         
+	beq OnlyCheckForPause
+	lda inputPrev_22
 	bit BUTTON_A
-	bne OnlyCheckForPause                
-	lda #$02                 
+	bne OnlyCheckForPause
+	lda #$02
 	jsr UnknownSub6
-	sta var_62                  
-	lda hitPoints_0603       
-	cmp #$14                 
+	sta var_62
+	lda hitPoints_0603
+	cmp #$14
 	bcc :+
 	lda #<Data_atA80A
-	sta someObjProperty_0501                
+	sta someObjProperty_0501
 	lda #>Data_atA80A
-	sta someObjProperty_0502                
-	lda #$00                 
-	sta someObjProperty_0503                
+	sta someObjProperty_0502
+	lda #$00
+	sta someObjProperty_0503
 	beq OnlyCheckForPause
-	:                
+	:
 	lda #<Data_atA7F0
-	sta someObjProperty_0501                
+	sta someObjProperty_0501
 	lda #>Data_atA7F0
-	sta someObjProperty_0502                
-	lda #$00                 
-	sta someObjProperty_0503                
+	sta someObjProperty_0502
+	lda #$00
+	sta someObjProperty_0503
 	
 	OnlyCheckForPause:
-	jsr CheckForPause        
-	lda input1_20            
-	sta inputPrev_22         
-	rts                       
+	jsr CheckForPause
+	lda input1_20
+	sta inputPrev_22
+	rts
 .endproc
 ;
 ; $A7F0
@@ -3479,69 +3479,69 @@ Data_atA80A:
 ;
 ; $A83C
 .proc UnknownSub6
-	pha                      
-	lda someObjProperty_0404                
-	bit BIT_5                
-	beq :+                
-	pla                      
-	rts                       
+	pha
+	lda someObjProperty_0404
+	bit BIT_5
+	beq :+
+	pla
+	rts
 	:
-	pla                      
-	lda #$00                 
-	rts                       
+	pla
+	lda #$00
+	rts
 .endproc
 ;
 ; $A84B
 .proc CheckForPause
-	lda input1_20            
+	lda input1_20
 
-	checkInputPressStart:    
+	checkInputPressStart:
 	bit BUTTON_START
-	beq dontPause            
-	lda inputPrev_22         
+	beq dontPause
+	lda inputPrev_22
 	bit BUTTON_START
-	bne dontPause            
-	lda flagPause_1C         
-	eor #$01                 
-	sta flagPause_1C         
-	beq :+                
-	
-	nop  ;
-	nop  ;
-	nop  ;	jsr Sound_DontKnowWhatItDoes
-
-	lda #$08                 
-	sta soundAddress_8D      
-	
-	nop  ;
-	nop  ;
-	nop  ;jsr PlaySFX              
-
-	jmp dontPause            
-	:
-
-	nop  ;
-	nop  ;
-	nop  ; jsr DoSomethingWithSound 
-
-	lda flagUnknown_1A                  
+	bne dontPause
+	lda flagPause_1C
+	eor #$01
+	sta flagPause_1C
 	beq :+
-	lda #$02                 
-	sta soundAddress_8D      
-	nop  ;
-	nop  ;
-	nop  ; jsr InitializeSound      
-	rts                       
+	
+	nop;
+	nop;
+	nop;	jsr Sound_DontKnowWhatItDoes
+
+	lda #$08
+	sta soundAddress_8D
+	
+	nop;
+	nop;
+	nop;jsr PlaySFX
+
+	jmp dontPause
+	:
+
+	nop;
+	nop;
+	nop; jsr DoSomethingWithSound 
+
+	lda flagUnknown_1A
+	beq :+
+	lda #$02
+	sta soundAddress_8D
+	nop;
+	nop;
+	nop; jsr InitializeSound
+	rts
 
 	:
-	lda #$01                 
-	sta soundAddress_8D      
-	nop  ;
-	nop  ;
-	nop  ; jsr InitializeSound      
+	lda #$01
+	sta soundAddress_8D
+	nop;
+	nop;
+	nop; jsr InitializeSound
 	
-	dontPause:               
-	rts                       
+	dontPause:
+	rts
 .endproc
 ;
 ; $A885
