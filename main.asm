@@ -1373,21 +1373,21 @@ leaveThisRountine:
 	asl A                    
 	asl A                    
 	tay                      
-	lda DATA_BLOCK_8715+0,y              
+	lda Data_at8715+0,y              
 	sta someObjProperty_0501,x
-	lda DATA_BLOCK_8715+1,y              
+	lda Data_at8715+1,y              
 	sta someObjProperty_0502,x
-	lda DATA_BLOCK_8715+2,y              
+	lda Data_at8715+2,y              
 	sta someObjProperty_0602,x
-	lda DATA_BLOCK_8715+3,y              
+	lda Data_at8715+3,y              
 	sta someObjProperty_0405,x
-	lda DATA_BLOCK_8715+4,y              
+	lda Data_at8715+4,y              
 	sta someObjProperty_0600,x
-	lda DATA_BLOCK_8715+5,y              
+	lda Data_at8715+5,y              
 	sta someObjProperty_0601,x
-	lda DATA_BLOCK_8715+6,y              
+	lda Data_at8715+6,y              
 	sta someObjProperty_0302,x
-	lda DATA_BLOCK_8715+7,y              
+	lda Data_at8715+7,y              
 	sta someObjProperty_0303,x
 	lda var_54                  
 	sta someObjProperty_0400,x
@@ -1410,7 +1410,7 @@ leaveThisRountine:
 .endproc
 ;
 ; $8715
-DATA_BLOCK_8715:
+Data_at8715:
 .incbin "rom-prg/objects/data-block-at8715.bin"
 ;
 ; $8AEA
@@ -1497,7 +1497,7 @@ DATA_BLOCK_8715:
 .endproc
 ;
 ; $8B7D ;;;;;;; objects?
-DATA_BLOCK_8B7A:
+Data_at8B7A:
 .incbin "rom-prg/objects/data-block-at8B7A.bin"
 ;
 ; $8BE5
@@ -1653,11 +1653,11 @@ DATA_BLOCK_8B7A:
 	asl A                    
 	asl A                    
 	tay                      
-	lda DATA_BLOCK_8D1D+0,y              
+	lda Data_at8D1D+0,y              
 	sta someObjProperty_0501,x
-	lda DATA_BLOCK_8D1D+1,y              
+	lda Data_at8D1D+1,y              
 	sta someObjProperty_0502,x
-	lda DATA_BLOCK_8D1D+2,y              
+	lda Data_at8D1D+2,y              
 	cpy #$00                 
 	beq :+
 	clc                      
@@ -1665,19 +1665,19 @@ DATA_BLOCK_8B7A:
 	
 	:
 	sta someObjProperty_0602,x
-	lda DATA_BLOCK_8D1D+3,y              
+	lda Data_at8D1D+3,y              
 	sta someObjProperty_0302,x
-	lda DATA_BLOCK_8D1D+4,y              
+	lda Data_at8D1D+4,y              
 	sta someObjProperty_0600,x
-	lda DATA_BLOCK_8D1D+5,y              
+	lda Data_at8D1D+5,y              
 	sta someObjProperty_0601,x
 	lda someObjProperty_0400                
 	clc                      
-	adc DATA_BLOCK_8D1D+6,y              
+	adc Data_at8D1D+6,y              
 	sta someObjProperty_0400,x
 	lda someObjProperty_0402                
 	clc                      
-	adc DATA_BLOCK_8D1D+7,y              
+	adc Data_at8D1D+7,y              
 	sta someObjProperty_0402,x
 	lda #$00                 
 	sta someObjProperty_0503,x
@@ -1695,7 +1695,7 @@ DATA_BLOCK_8B7A:
 .endproc
 ;
 ; $8D1D
-DATA_BLOCK_8D1D:
+Data_at8D1D:
 .incbin "rom-prg/objects/data-block-at8D1D.bin"
 ;
 ; $8D4D
@@ -1844,7 +1844,7 @@ DATA_BLOCK_8D1D:
 	tya                      
 	ldy var_4B                  
 	clc                      
-	adc DATA_BLOCK_8E25,y    
+	adc Data_at8E25,y    
 	asl A                    
 	sta var_4A                  
 	txa                      
@@ -1854,7 +1854,7 @@ DATA_BLOCK_8D1D:
 .endproc
 ;
 ; $8E25
-DATA_BLOCK_8E25:
+Data_at8E25:
 .byte $0f, $23, $0a, $19, $05, $1e, $00, $1e
 ;
 ; $8E2D
@@ -1864,7 +1864,7 @@ DATA_BLOCK_8E25:
 	ldx #$00                 
 	
 	:
-	lda DATA_BLOCK_8E3F,x
+	lda Data_at8E3F,x
 	sta var_4A                  
 	jsr UnknownSub17 ; ==========================
 	inx                      
@@ -1874,7 +1874,7 @@ DATA_BLOCK_8E25:
 .endproc
 ;
 ; $8E3F
-DATA_BLOCK_8E3F:
+Data_at8E3F:
 .byte $00, $08, $0a, $44, $46, $1c, $14, $30
 ;
 ; $8E47
@@ -1933,9 +1933,9 @@ DATA_BLOCK_8E3F:
 ;
 ; $8EA6
 .proc UnknownSub19
-	lda DATA_BLOCK_8EBE+0,y              
+	lda Data_at8EBE+0,y              
 	sta someObjProperty_0501,x
-	lda DATA_BLOCK_8EBE+1,y              
+	lda Data_at8EBE+1,y              
 	sta someObjProperty_0502,x
 	lda #$00                 
 	sta someObjProperty_0505,x
@@ -1945,7 +1945,7 @@ DATA_BLOCK_8E3F:
 .endproc
 ;
 ; $8EBE
-DATA_BLOCK_8EBE:
+Data_at8EBE:
 .incbin "rom-prg/objects/data-block-at8EBE.bin"
 ;
 ; $927F
@@ -1955,7 +1955,7 @@ DATA_BLOCK_8EBE:
 	ldx #$00                 
 	
 	:
-	lda DATA_BLOCK_9291,x
+	lda Data_at9291,x
 	sta var_4A                  
 	jsr UnknownSub17                
 	inx                      
@@ -1965,7 +1965,7 @@ DATA_BLOCK_8EBE:
 .endproc
 ;
 ; $9291
-DATA_BLOCK_9291:
+Data_at9291:
 .byte $52, $54, $56, $58, $5a
 ;
 ; $9296
@@ -1975,7 +1975,7 @@ DATA_BLOCK_9291:
 	ldx #$00                 
 	
 	:
-	lda DATA_BLOCK_92A8,x
+	lda Data_at92A8,x
 	sta var_4A                  
 	jsr UnknownSub17                
 	inx                      
@@ -1985,7 +1985,7 @@ DATA_BLOCK_9291:
 .endproc
 ;
 ; $92A8
-DATA_BLOCK_92A8:
+Data_at92A8:
 .byte $5E, $60, $62
 ;
 ; $92AB
@@ -1995,7 +1995,7 @@ DATA_BLOCK_92A8:
 	ldx #$00                 
 	
 	:
-	lda DATA_BLOCK_92BD,x
+	lda Data_at92BD,x
 	sta var_4A                  
 	jsr UnknownSub17                
 	inx                      
@@ -2005,7 +2005,7 @@ DATA_BLOCK_92A8:
 .endproc
 ;
 ; $92BD
-DATA_BLOCK_92BD:
+Data_at92BD:
 .byte $64, $66, $68, $6A, $6C
 ;
 ; $92C2
@@ -2014,7 +2014,7 @@ DATA_BLOCK_92BD:
 	tay                      
 	ldx #$00                 
 	:
-	lda DATA_BLOCK_92D4,x
+	lda Data_at92D4,x
 	sta var_4A                  
 	jsr UnknownSub17                
 	inx                      
@@ -2024,7 +2024,7 @@ DATA_BLOCK_92BD:
 .endproc
 ;
 ; $92D4
-DATA_BLOCK_92D4:
+Data_at92D4:
 .byte $66, $68, $6A, $6E, $70, $72, $74, $76
 ;
 ; $92DC
@@ -2072,19 +2072,19 @@ DATA_BLOCK_92D4:
 ; $932D
 Data_at932D:
 ;.incbin "rom-prg/objects/data-block-at932D.bin"
-.word DATA_BLOCK_9335, DATA_BLOCK_933D
-.word DATA_BLOCK_9345, DATA_BLOCK_934D
+.word Data_at9335, Data_at933D
+.word Data_at9345, Data_at934D
 
-DATA_BLOCK_9335: ; Boss 1 shoot animation (one frame)
+Data_at9335: ; Boss 1 shoot animation (one frame)
 .byte $29, $00, $00, $86, $29, $00, $00, $FF 
 
-DATA_BLOCK_933D: ; Boss 2 shoot animation (one frame)
+Data_at933D: ; Boss 2 shoot animation (one frame)
 .byte $2B, $00, $00, $86, $2B, $00, $00, $FF 
 
-DATA_BLOCK_9345: ; Boss 3 shoot animation (one frame)
+Data_at9345: ; Boss 3 shoot animation (one frame)
 .byte $23, $00, $00, $87, $23, $00, $00, $FF 
 
-DATA_BLOCK_934D: ; Boss 4 shoot animation (five frames)
+Data_at934D: ; Boss 4 shoot animation (five frames)
 .byte $37, $00, $00, $83, $38, $00, $00, $84, $39, $00, $00, $8C, $38, $00, $00, $85, $37, $00, $00, $86, $FF
 
 ;
@@ -2707,7 +2707,7 @@ EndCreditsData:
 	jsr ClearMemoryPage0200_OAM
 	ldy #$00                 
 	:
-		lda StillUnkownData,y              
+		lda Data_at97F5,y              
 		sta OAM_0200,y           
 		iny                      
 		cpy #$20                 
@@ -2737,7 +2737,7 @@ EndCreditsData:
 .endproc
 ;
 ; $97F5 32 bytes of data
-StillUnkownData:
+Data_at97F5:
 .incbin "rom-prg/objects/data-block-at97F5.bin"
 ;
 ; =====================================================
@@ -2749,6 +2749,7 @@ StillUnkownData:
 .res 1293
 
 ; $9D22 data
+Data_at9D22:
 .incbin "rom-prg/sound/sound-data-at9D32.bin"
 
 ;
@@ -3447,17 +3448,17 @@ checkInputLeft:
 	lda hitPoints_0603       
 	cmp #$14                 
 	bcc :+
-	lda #$0A                 
+	lda #<Data_atA80A
 	sta someObjProperty_0501                
-	lda #$A8                 
+	lda #>Data_atA80A
 	sta someObjProperty_0502                
 	lda #$00                 
 	sta someObjProperty_0503                
 	beq OnlyCheckForPause
 	:                
-	lda #$F0                 
+	lda #<Data_atA7F0
 	sta someObjProperty_0501                
-	lda #$A7                 
+	lda #>Data_atA7F0
 	sta someObjProperty_0502                
 	lda #$00                 
 	sta someObjProperty_0503                
@@ -3470,7 +3471,11 @@ checkInputLeft:
 .endproc
 ;
 ; $A7F0
+Data_atA7F0:
 .incbin "rom-prg/objects/data-block-atA7F0.bin"
+; $A80A
+Data_atA80A:
+.incbin "rom-prg/objects/data-block-atA80A.bin"
 ;
 ; $A83C
 .proc UnknownSub6
