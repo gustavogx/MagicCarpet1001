@@ -1,6 +1,10 @@
 ; Configurarion
+.define STARTING_LIVES	$16
+.define STARTING_POWER	$04
 
 ; Constants
+.define HEART_HUD_Y		$D8
+.define HEART_OFFSCREEN $F8
 
 ; using MESEN naming convention
 .define PpuControl_2000		$2000
@@ -18,8 +22,10 @@
 .define ApuStatus_4015		$4015
 .define Ctrl1_4016			$4016
 .define Ctrl2_FrameCtr_4017 $4017
-.define BankSwitching_FFF0 			$FFF0
+.define BankSwitching_FFF0 	$FFF0
 .define UpdateDuringVBlank_Flag2	$75
+
+.define VRAM_PALETTES_PAGE $3F
 
 .segment "HEADER"
 .include "inesheader.inc"
@@ -96,11 +102,11 @@
 
 .define var_40				$40	; 5
 .define var_41				$41 ; 5
-.define spriteY_42			$42	; 7
+.define objects_Y_42		$42	; 7 ; used for Lives HUD and enemy shots
 .define var_43				$43 ; 6
 .define var_44				$44 ; 2
 .define var_45				$45 ; 2
-.define spriteX_46			$46 ; 6
+.define objects_X_46		$46 ; 6 ; used for Lives HUD and enemy shots
 .define var_47				$47	; 7
 .define var_48				$48 ; 2
 .define var_49				$49 ; 4
@@ -115,10 +121,10 @@
 .define var_51				$51 ; 4
 .define var_52				$52 ; 4
 ; $53
-.define var_54				$54 ; 6
-.define var_55				$55 ; 5
-.define var_56				$56 ; 5
-.define var_57				$57 ; 5
+.define var_54				$54 ; 6 ; object loading property
+.define var_55				$55 ; 5 ; object loading property
+.define var_56				$56 ; 5 ; object loading property
+.define var_57				$57 ; 5 ; object loading property
 .define var_58				$58 ; 5
 .define var_59				$59 ; 5 ; flag that is either #$06 or #$FA (250)
 .define var_5A				$5A ; 3
@@ -180,20 +186,26 @@
 
 .segment "SPRITES" ; LSB 0 - FF
 
-.segment "RAM" ; LSB 0 - FF
+.segment "RAM" ; LSB 0100 - 07FF
 
 .define someObjProperty_0100 $0100 ; 1 only used once
 
 ; page 02 - OAM
-.define OAM_0200	$0200
-.define someObjProperty_0201 $0201
-.define someObjProperty_0202 $0202
-.define someObjProperty_0203 $0203
+.define OBJ_Y 		0
+.define OBJ_TILE 	1
+.define OBJ_ATT 	2
+.define OBJ_X 		3
+
+.define OAM_0200	$0200 ; Y
+
+;.define someObjProperty_0201 	$0201 ; Tile
+;.define someObjProperty_0202 	$0202 ; Attribute
+;.define someObjProperty_0203 	$0203 ; X
 
 ; page 03
-.define someObjProperty_0300 $0300
-.define someObjProperty_0301 $0301
-.define someObjProperty_0302 $0302
+.define someObjProperty_0300 $0300 ; #10 of 12-byte file (also $0700)
+.define someObjProperty_0301 $0301 ; #7 of 12-byte file
+.define someObjProperty_0302 $0302 ; #6 of 12-byte file
 .define someObjProperty_0303 $0303
 
 .define someObjProperty_0333 $0333 ; 1 used once!
@@ -204,12 +216,12 @@
 .define someObjProperty_0402 $0402 ; playerY_0402
 .define someObjProperty_0403 $0403
 .define someObjProperty_0404 $0404
-.define someObjProperty_0405 $0405
+.define someObjProperty_0405 $0405 ; #2 of 12-byte file (flags)
 
 ; page 05
 .define someObjProperty_0500 $0500
-.define someObjProperty_0501 $0501
-.define someObjProperty_0502 $0502
+.define someObjProperty_0501 $0501 ; low byte of object AI??? address
+.define someObjProperty_0502 $0502 ; high byte of object AI??? address
 .define someObjProperty_0503 $0503
 .define someObjProperty_0504 $0504
 .define someObjProperty_0505 $0505
@@ -227,15 +239,15 @@
 .define someObjProperty_05FF $05FF ;$0535
 
 ; page 06
-.define someObjProperty_0600 $0600
-.define someObjProperty_0601 $0601
-.define someObjProperty_0602 $0602
-.define hitPoints_0603 		 $0603
-.define someObjProperty_0604 $0604
-.define someObjProperty_0605 $0605
+.define someObjProperty_0600 $0600 ; #3 of 12-byte file
+.define someObjProperty_0601 $0601 ; #4 of 12-byte file
+.define someObjProperty_0602 $0602 ; #1 of 12-byte file
+.define hitPoints_0603 		 $0603 ; #5 of 12-byte file
+.define someObjProperty_0604 $0604 ; #8 of 12-byte file
+.define someObjProperty_0605 $0605 ; #9 of 12-byte file
 
 ; page 07
-.define someObjProperty_0700 $0700
+.define someObjProperty_0700 $0700 ; #10 of 12-byte file (also $0300)
 .define someObjProperty_0701 $0701
 .define someObjProperty_0702 $0702
 .define someObjProperty_0703 $0703
@@ -277,6 +289,9 @@ BIT_7:	.byte BIT7
 ; $8008
 HeartHUDData:
 .byte $D8, $81, $01, $38; 8008 - 800B
+
+; Heart is object zero
+.define FIRST_OBJECT_SLOT $04
 
 BankSequenceArray:
 .byte $01, $01, $01, $02; 800C - 800F
@@ -323,9 +338,9 @@ HandleReset:
 	sta flagPPUMask_18
 	lda #$00
 	sta bankIndex_15
-	lda #$00
+	lda #STARTING_POWER
 	sta powerUp_P_64
-	lda #$10
+	lda #STARTING_LIVES
 	sta livesCounter_11
 	lda #$00
 	sta soundAddress_8F
@@ -385,7 +400,7 @@ MaybeStartingNewGame:
 	ldy bankIndex_15
 	lda BankSequenceArray,y
 	tax
-	sta BankSwitching_FFF0+0,X
+	sta BankSwitching_FFF0+0,x
 	inc bankIndex_15
 	clc
 	lda bankIndex_15
@@ -446,7 +461,7 @@ MaybeStartingNewGame:
 		bne :-
 		
 	SetupNewLevel:
-		lda #$F8
+		lda #HEART_OFFSCREEN
 		sta OAM_0200
 
 		jsr InitializeGameVariables
@@ -513,7 +528,7 @@ MaybeStartingNewGame:
 ; $8175
 ; Loads objects (enemies?)
 ; Checks variable var_5C for a value grater than #$FA (250). If not, skip
-
+; Inputs: var_5C, var_5B
 .proc LoadEnemies
 	lda var_5C
 	cmp #$FA
@@ -551,8 +566,8 @@ MaybeStartingNewGame:
 	sta objectPtr_3A+1
 	ldy #$00
 	loopY:
-		jsr CheckSomethingUnknown1
-		cpx #$F0
+		jsr FindFreeObjSlot
+		cpx #$F0 ; No slot available to load object
 		bcs doneLooping
 		lda (objectPtr_3A),y
 		cmp #$F8
@@ -667,8 +682,8 @@ leaveThisRountine:
 	sta someObjProperty_0602,x
 	iny
 	lda (objectPtr_38),y
-	ora #$60
-	ora var_2D
+	ora #(BIT5+BIT6)
+	ora var_2D					; hold an extra flag?
 	sta someObjProperty_0405,x
 	iny
 	lda (objectPtr_38),y
@@ -988,7 +1003,7 @@ leaveThisRountine:
 	cmp #$01
 	bne doStoreHitPointsAndLeave
 	pha
-	lda #$F8
+	lda #HEART_OFFSCREEN
 	sta OAM_0200
 	pla
 	
@@ -1355,14 +1370,14 @@ leaveThisRountine:
 	didNotExceedFF:
 	sta hitPoints_0603
 	updateHeartDisplay:
-	lda #$D8
+	lda #HEART_HUD_Y
 	sta OAM_0200
 	rts
 .endproc
 ;
 ; $86A9
 .proc UnknownSub7
-	jsr CheckSomethingUnknown1
+	jsr FindFreeObjSlot
 	cpx #$F0
 	bcc :+
 	rts
@@ -1718,12 +1733,17 @@ Data_at8D1D:
 .endproc
 ;
 ; $8D60
-.proc CheckSomethingUnknown1
+; FindFreeObjSlot (return x)
+; Check if flags 7 and 4 are set in $0434
+; Starting at $0434 go over 32 slots stopping at
+; the first FREE slot.
+; Return the slot position in X
+.proc FindFreeObjSlot
 	clc
 	ldx #$30
 	:
 		lda someObjProperty_0404,x
-		and #%10010000 ; #$90
+		and #(BIT7+BIT4) ;%10010000 ; #$90
 		beq :+
 		txa
 		adc #$06
@@ -1883,7 +1903,7 @@ Data_at8E3F:
 	pha
 	tya
 	pha
-	jsr CheckSomethingUnknown1
+	jsr FindFreeObjSlot
 	cpx #$F0
 	bcs doneWithThis
 	jsr UnknownSub18
@@ -2247,13 +2267,14 @@ LivesGraphicData:
 .endproc
 ;
 ; $9489
-; LoadPaletteIntoPPU(A,y)
-; Loads 16 colors from addressPtr_32, offset Y
+; LoadPaletteIntoVRAM_A_Y
+; Loads 16 colors from addressPtr_32, with offset Y
+; Stores into VRAM
 ; 	A : 	$00 Background
-;		$10 Sprites
-;Y : 	offset from addressPtr_32
-.proc LoadPaletteIntoPPU
-	ldx #$3F
+;			$10 Sprites
+;	Y : 	offset from addressPtr_32
+.proc LoadPaletteIntoVRAM_A_Y
+	ldx #VRAM_PALETTES_PAGE
 	stx PpuAddr_2006
 	sta PpuAddr_2006
 	ldx #$10
@@ -2267,16 +2288,19 @@ LivesGraphicData:
 .endproc
 ;
 ; $949D
-; LoadPaletteIntoRAM(A,y)
-;
-.proc LoadPaletteIntoRAM
+; LoadPaletteIntoRAM_A_Y
+; Loads 16 colors from addressPtr_32, with offset Y
+; Stores into RAM address bgPalette_E0, with offset A
+; 	A : 	offset from bgPalette_E0  (address high byte)
+;	Y : 	offset from addressPtr_32 (address word)
+.proc LoadPaletteIntoRAM_A_Y
 	tax
 	clc
 	adc #$10
 	sta var_4D
 	:
 		lda (addressPtr_32),y
-		sta bgPalette_E0,X 
+		sta bgPalette_E0,x 
 		iny
 		inx
 		cpx var_4D
@@ -2341,7 +2365,7 @@ RepeatedTitles:
 .endproc
 ;
 ; $94F6
-; LoadStage(A,X)
+; LoadStage(A,x)
 ; A : Name
 .proc LoadStage
 	jsr WaitVBlank
@@ -2358,20 +2382,20 @@ RepeatedTitles:
 	sta addressPtr_32+1
 	lda #$00
 	ldy #$03
-	jsr LoadPaletteIntoPPU
+	jsr LoadPaletteIntoVRAM_A_Y
 	lda #$00
 	ldy #$03
-	jsr LoadPaletteIntoRAM
+	jsr LoadPaletteIntoRAM_A_Y
 	ldy #$02
 	lda (addressPtr_32),y
 	tay
 	lda #$10
-	jsr LoadPaletteIntoPPU
+	jsr LoadPaletteIntoVRAM_A_Y
 	ldy #$02
 	lda (addressPtr_32),y
 	tay
 	lda #$10
-	jsr LoadPaletteIntoRAM
+	jsr LoadPaletteIntoRAM_A_Y
 	ldy #$00
 	lda (addressPtr_32),y
 	pha
@@ -2478,9 +2502,9 @@ RepeatedTitles:
 .proc StrobeControl_X
 	asl input1_20
 	lda Ctrl1_4016,x
-	lsrA
+	lsr A
 	bcs RegisterInput
-	lsrA
+	lsr A
 	bcs RegisterInput
 	rts
 .endproc
@@ -2548,7 +2572,7 @@ RepeatedTitles:
 	jsr ClearNametablePattern
 	lda #$00
 	tax
-	sta BankSwitching_FFF0+0,X
+	sta BankSwitching_FFF0+0,x
 	inc bankIndex_15
 	lda #$0A
 	ldx #$00
@@ -2594,7 +2618,7 @@ RepeatedTitles:
 	jsr ClearNametablePattern
 	lda #$02
 	tax
-	sta BankSwitching_FFF0+0,X
+	sta BankSwitching_FFF0+0,x
 	lda flagPPUControl_17
 	and #$EF
 	sta flagPPUControl_17
@@ -2916,7 +2940,7 @@ Data_at9D22:
 ;
 ; $A46F
 .proc HandleObjects
-	lda #$04
+	lda #FIRST_OBJECT_SLOT
 	sta oamAddressPtr_3E
 	lda var_5F
 	sta var_3D
@@ -2949,7 +2973,7 @@ Data_at9D22:
 	:
 	asl A
 	bmi ReplaceMeLabel_1
-	lsrA
+	lsr A
 	sbc #$00
 	sta someObjProperty_0504,x
 	
@@ -2989,7 +3013,7 @@ Data_at9D22:
 	clc
 	adc someObjProperty_0402,x
 	sta someObjProperty_0402,x
-	sta spriteY_42
+	sta objects_Y_42
 	lda var_49
 	adc someObjProperty_0403,x
 	sta someObjProperty_0403,x
@@ -3002,7 +3026,7 @@ Data_at9D22:
 	lda someObjProperty_0401,x
 	sta var_41
 	lda someObjProperty_0402,x
-	sta spriteY_42
+	sta objects_Y_42
 	lda someObjProperty_0403,x
 	sta var_43
 	
@@ -3046,9 +3070,9 @@ Data_at9D22:
 		asl A
 		bmi :+
 	
-	lsrA
-	lsrA
-	lsrA
+	lsr A
+	lsr A
+	lsr A
 	and #$0F
 	lda someObjProperty_0404,x
 	ora #$08
@@ -3106,7 +3130,7 @@ Data_at9D22:
 	lda (objectPtr_36),y
 	
 	:
-	sta spriteX_46
+	sta objects_X_46
 	bpl :+
 	lda #$FF
 	bne :++
@@ -3116,7 +3140,7 @@ Data_at9D22:
 	
 	:
 	sta var_47
-	lda spriteX_46
+	lda objects_X_46
 	clc
 	adc someObjProperty_0400,x
 	sta someObjProperty_0400,x
@@ -3151,7 +3175,7 @@ Data_at9D22:
 	clc
 	adc someObjProperty_0402,x
 	sta someObjProperty_0402,x
-	sta spriteY_42
+	sta objects_Y_42
 	lda var_49
 	adc someObjProperty_0403,x
 	sta someObjProperty_0403,x
@@ -3188,18 +3212,18 @@ Data_at9D22:
 	
 	:
 	sta someObjProperty_0600,x
-	lsrA
-	lsrA
-	lsrA
+	lsr A
+	lsr A
+	lsr A
 	clc
 	adc #$01
 	sta var_44
 	iny
 	lda (addressPtr_32),y
 	sta someObjProperty_0601,x
-	lsrA
-	lsrA
-	lsrA
+	lsr A
+	lsr A
+	lsr A
 	clc
 	adc #$01
 	sta var_45
@@ -3210,7 +3234,7 @@ Data_at9D22:
 	lda var_44
 	sta var_3C
 	lda var_40
-	sta spriteX_46
+	sta objects_X_46
 	lda var_41
 	sta var_47
 	
@@ -3222,14 +3246,14 @@ Data_at9D22:
 	lda var_43
 	bne :++
 	lda (addressPtr_32),y ; XXX
-	sta OAM_0200+1,X	; tile #
-	lda spriteY_42				
-	sta OAM_0200+0,X; y - 1
+	sta OAM_0200+OBJ_TILE,x	; tile #
+	lda objects_Y_42				
+	sta OAM_0200+OBJ_Y,x	; y 
 	iny
 	lda (addressPtr_32),y
-	sta OAM_0200+2,X	; attributes
-	lda spriteX_46
-	sta OAM_0200+3,X	; x
+	sta OAM_0200+OBJ_ATT,x	; attributes
+	lda objects_X_46
+	sta OAM_0200+OBJ_X,x	; x
 	txa
 	clc
 	adc #$04
@@ -3240,9 +3264,9 @@ Data_at9D22:
 	iny
 	dec var_3C
 	beq :++
-	lda spriteX_46
+	lda objects_X_46
 	adc #$08
-	sta spriteX_46
+	sta objects_X_46
 	bcc ReplaceMeLabel_10
 	inc var_47
 	jmp ReplaceMeLabel_10
@@ -3254,10 +3278,10 @@ Data_at9D22:
 	:
 	dec var_45
 	beq :+
-	lda spriteY_42
+	lda objects_Y_42
 	clc
 	adc #$08
-	sta spriteY_42
+	sta objects_Y_42
 	bcc ReplaceMeLabel_11
 	inc var_43
 	jmp ReplaceMeLabel_11
@@ -3290,16 +3314,16 @@ Data_at9D22:
 	bne SecondPart
 	lda var_43
 	bne SecondPart
-	lda spriteY_42
-	sta OAM_0200,x
+	lda objects_Y_42
+	sta OAM_0200+OBJ_Y,x
 	iny
 	lda (addressPtr_32),y
-	sta someObjProperty_0201,x
+	sta OAM_0200+OBJ_TILE,x
 	iny
 	lda (addressPtr_32),y
-	sta someObjProperty_0202,x
+	sta OAM_0200+OBJ_ATT,x
 	lda var_40
-	sta someObjProperty_0203,x
+	sta OAM_0200+OBJ_X,x
 	txa
 	clc
 	adc #$04
