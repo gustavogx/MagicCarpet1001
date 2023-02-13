@@ -1,10 +1,20 @@
-; Configurarion
+; Game Config.
 .define STARTING_LIVES	$16
 .define STARTING_POWER	$04
 
-; Constants
+; Engine Config.
 .define HEART_HUD_Y		$D8
 .define HEART_OFFSCREEN $F8
+
+.define BG_SCROLL_RATE	$02
+	; $01 every frame 		(60fps)
+	; $02 every other frame	(30fps) (original)
+	; $03 every two frames 	(15fps)
+
+.define BG_SCROLL_LIMIT	 14
+	; 9  if BG_SCROLL_RATE = 3
+	; 14 if BG_SCROLL_RATE = 2 (original)
+	; 27 if BG_SCROLL_RATE = 1
 
 ; using MESEN naming convention
 .define PpuControl_2000		$2000
@@ -26,6 +36,20 @@
 .define UpdateDuringVBlank_Flag2	$75
 
 .define VRAM_PALETTES_PAGE $3F
+
+; Y_GetObjectIndexFromStage
+; Read the current stage index from currentStage_15
+; Calculates the correct index on the object data file:
+; Y(index) = (stage-1)*4
+; Destroys A and Y
+.macro Y_GetObjectIndexFromStage
+	ldy currentStage_15
+	dey
+	tya
+	asl A
+	asl A
+	tay
+.endmacro
 
 .segment "HEADER"
 .include "inesheader.inc"
@@ -54,7 +78,7 @@
 .define frameCounter_12		$12 ; 8
 .define frameCounter64_13	$13 ; 4
 .define aliveTimer_14		$14 ; 6
-.define bankIndex_15		$15 ; 14
+.define currentStage_15		$15 ; 14 ; Stage Index 0(opening), 1, 2, 3, 4, and 5(ending)
 .define levelProgression_16	$16 ; 3
 .define flagPPUControl_17	$17 ; 8
 .define flagPPUMask_18		$18 ; 6
@@ -128,8 +152,8 @@
 .define var_58				$58 ; 5
 .define var_59				$59 ; 5 ; flag that is either #$06 or #$FA (250)
 .define var_5A				$5A ; 3
-.define var_5B				$5B ; 3
-.define var_5C				$5C ; 5
+.define currentEnemyBatch_5B	$5B ; 3
+.define nextEnemyBatch_5C		$5C ; 5
 ; $5D
 .define var_5E				$5E ; 2
 .define var_5F				$5F ; 9
@@ -181,7 +205,6 @@
 
 .define apuStatusFlag_C9	$C9
 .define bgPalette_E0		$E0 ; 4
-
 
 
 .segment "SPRITES" ; LSB 0 - FF
@@ -262,7 +285,8 @@
 .define BIT5	%00100000
 .define BIT6	%01000000
 .define BIT7	%10000000
-
+.define ZERO    $00
+.define ALL1	$FF
 
 .segment "STARTUP"
 
@@ -299,7 +323,7 @@ BankSequenceArray:
 ; $8010
 ; Reset handler, called by reset interrupt
 HandleReset:
-	lda #$C0
+	lda #(BIT7+BIT6)	; flags %1100 0000
 	sta Ctrl2_FrameCtr_4017
 	
 	ldx #$10 ; Wait 16 cycles for PPU to reach its stable state
@@ -308,8 +332,8 @@ HandleReset:
 		DEX
 		bne :-
 
-	lda BankSwitching_FFF0	; Loads a $00 from ROM filling (dangerous!)
-	sta BankSwitching_FFF0; Set mapper to Bank0
+	lda BankSwitching_FFF0	; Loads #$00 from ROM filling (dangerous!)
+	sta BankSwitching_FFF0  ; Set mapper to Bank0
 	
 	ldx #$00
 	jsr SetupAfterReset	
@@ -330,30 +354,39 @@ HandleReset:
 	ldx #$01
 	jsr LoadStage
 
-	lda #$88
-	and #$F7
+	lda #(BIT7+BIT3) ; flags %1000 1000
+	and #(ALL1-BIT3) ; flags %1111 0111
 	sta flagPPUControl_17
 	sta flagPPUControl_19
-	lda #$1C
+
+	lda #(BIT4+BIT3+BIT2)
 	sta flagPPUMask_18
-	lda #$00
-	sta bankIndex_15
+
+	lda #$00 ; Start at the opening screen
+	sta currentStage_15
+	
 	lda #STARTING_POWER
 	sta powerUp_P_64
+	
 	lda #STARTING_LIVES
 	sta livesCounter_11
+	
 	lda #$00
 	sta soundAddress_8F
 	sta PpuScroll_2005
 	sta PpuScroll_2005
+	
 	jsr RenderON
+	
 	lda #$00
 	sta soundAddress_8D
+	
 	nop;
 	nop;
 	nop; jsr InitializeSound ; see sound engine
 
 WaitForPressStart:
+	
 	lda #$00
 	jsr ReadControl_A
 	lda input1_20
@@ -362,8 +395,8 @@ WaitForPressStart:
 	cmp #BIT4 ; not cmp BUTTON_START for some reason
 	beq :+
 	jmp WaitForPressStart
-	:
 
+:
 	sta inputPrev_22
 	:
 		lda input1_20
@@ -382,10 +415,11 @@ WaitForPressStart:
 	nop; jsr PlaySFX
 	
 	lda #$00
-	sta bankIndex_15
+	sta currentStage_15
 	jmp MaybeStartGame ; Check what this one does
 
 MaybeStartingNewGame:
+
 	jsr RenderingOFF
 
 	nop;
@@ -397,49 +431,63 @@ MaybeStartingNewGame:
 	jsr ClearNametablePattern
 	lda #$01
 	jsr ClearNametablePattern
-	ldy bankIndex_15
-	lda BankSequenceArray,y
+	
+	ldy currentStage_15
+	lda BankSequenceArray,Y
 	tax
-	sta BankSwitching_FFF0+0,x
-	inc bankIndex_15
+	sta BankSwitching_FFF0,X
+	inc currentStage_15
+	
 	clc
-	lda bankIndex_15
+	lda currentStage_15
 	asl A
 	pha
 	ldx #$00
 	jsr LoadStage
+	
 	pla
 	clc
 	adc #$01
 	ldx #$01
 	jsr LoadStage
+	
 	lda #$FF
 	sta var_0C
-	lda #$00
+	
+	lda #ZERO	;	no flags %0000 0000
 	sta flagGameMode_26
-	ldx #$02
+	
+	ldx #BG_SCROLL_RATE	;	how fast to update backgrounds
 	stx frameScrollAt_27
-	ldx #$01
+	
+	ldx #$01	;   counts how many screen have scrolled
 	stx levelProgression_16
-	lda #%00011100
+	
+	lda #(BIT4+BIT3+BIT2) 	; flags %0001 1100
 	sta flagPPUMask_18
-	lda #%10001000
+	
+	lda #(BIT7+BIT3)		; flags %1000 1000
 	sta flagPPUControl_17
 	sta flagPPUControl_19
+	
 	lda #$0A
-	sta var_5C
+	sta nextEnemyBatch_5C
+	
 	lda #$00
 	sta input1_20
 	sta inputPrev_22
-	sta var_5B
+	sta currentEnemyBatch_5B
 	sta aliveTimer_14
 	sta frameCounter64_13
+	
 	jsr InitializeGameVariables
 	jsr InitializeGameVariables2
 	jsr MaybeTriggerNextLevel
+	
 	lda #$00
 	sta flagNextLevel_1B
 	sta flagUnknown_1A
+	
 	jsr RenderON
 
 	lda #$01
@@ -447,15 +495,17 @@ MaybeStartingNewGame:
 	nop;
 	nop;
 	nop; jsr InitializeSound
-	lda bankIndex_15
+	
+	lda currentStage_15
 	cmp #$02
 	bcs loopMain
+	
 	ldy #$00
 
 	EnableHeartAsSpriteZero:
 	:
-		lda HeartHUDData,y
-		sta OAM_0200,y
+		lda HeartHUDData,Y
+		sta OAM_0200,Y
 		iny
 		cpy #$04
 		bne :-
@@ -469,7 +519,7 @@ MaybeStartingNewGame:
 
 	loopMain:
 		jsr UnknownSub1
-		jsr LoadEnemies
+		jsr LoadEnemyBatch
 		jsr LivesHUD
 		lda var_62
 		beq :+
@@ -519,6 +569,9 @@ MaybeStartingNewGame:
 ;==================================
 
 ; $8170
+; Why use a JMP call for this?
+; It is used only once during Reset and
+; having these 2 lines there is of no consequence.
 .proc SetFlag_59
 	lda #$06
 	sta var_59
@@ -526,76 +579,86 @@ MaybeStartingNewGame:
 .endproc
 ;
 ; $8175
-; Loads objects (enemies?)
-; Checks variable var_5C for a value grater than #$FA (250). If not, skip
-; Inputs: var_5C, var_5B
-.proc LoadEnemies
-	lda var_5C
+; LoadEnemyBatch
+; Loads Batch of Enemies
+; Inputs: nextEnemyBatch_5C, currentEnemyBatch_5B
+; Variable nextEnemyBatch_5C holds the timer for loading next enemy batch.
+; If timer larger than or equal to $FA, spawn new batch.
+.proc LoadEnemyBatch
+	lda nextEnemyBatch_5C
 	cmp #$FA
 	bcs :+
 	jmp leaveThisRountine
+
 	:
-	ldy bankIndex_15
-	dey
-	tya
-	asl A
-	asl A
-	tay
-	lda ObjectsData_A885+0,y
+	Y_GetObjectIndexFromStage
+	lda ObjectsData_A885+0,Y
 	sta objectPtr_34+0
-	lda ObjectsData_A885+1,y
+	lda ObjectsData_A885+1,Y
 	sta objectPtr_34+1
-	lda var_5B
+
+	lda currentEnemyBatch_5B
 	asl A
 	tay
-	lda (objectPtr_34),y
+	lda (objectPtr_34),Y
 	cmp #$FF
 	bne :++
 	iny
-	lda (objectPtr_34),y
+	lda (objectPtr_34),Y
 	cmp #$FF
 	bne :+
 	jmp leaveThisRountine
+
 	:
 	dey
-	lda (objectPtr_34),y
+	lda (objectPtr_34),Y
+
 	:
-	sta objectPtr_3A+0
+	sta objectPtr_3A+0 		; will load what was found at address objectPtr_34
 	iny
-	lda (objectPtr_34),y
+	lda (objectPtr_34),Y	; read the high byte
 	sta objectPtr_3A+1
+	
 	ldy #$00
 	loopY:
-		jsr FindFreeObjSlot
+		jsr X_FindFreeObjectSlot
 		cpx #$F0 ; No slot available to load object
 		bcs doneLooping
-		lda (objectPtr_3A),y
+		
+		lda (objectPtr_3A),Y
 		cmp #$F8
 		bne :+
 		lda #$01
 		sta flagUnknown_1A
 		ldx #$30
 		jsr Clear54Bytes_Page04
+	
 		nop;
 		nop;
 		nop; jsr Sound_DontKnowWhatItDoes
+	
 		nop;
 		nop;
 		nop; jsr DoSomethingWithSound 
+	
 		lda #$02
 		sta soundAddress_8D
+
 		nop;
 		nop;
 		nop; jsr InitializeSound
+
 		iny
-		lda (objectPtr_3A),y
+		lda (objectPtr_3A),Y
+		
 		:
 		cmp #$F0
 		bne :+
 		and #$00
 		sta var_2D
 		iny
-		lda (objectPtr_3A),y
+		lda (objectPtr_3A),Y
+		
 		:
 		cmp #$FF
 		beq doneLooping
@@ -604,46 +667,49 @@ MaybeStartingNewGame:
 		and #$03
 		sta var_2D
 		iny
-		lda (objectPtr_3A),y
+		lda (objectPtr_3A),Y
 		sta var_2B
 		inc var_2B
 		iny
-		lda (objectPtr_3A),y
+		lda (objectPtr_3A),Y
+		
 		:
 		cmp #$F2
 		bne :+
 		and #$03
 		sta var_2D
 		iny
-		lda (objectPtr_3A),y
+		lda (objectPtr_3A),Y
 		sta var_2C
 		inc var_2C
 		iny
-		lda (objectPtr_3A),y
-		:
-		sta var_58
+		lda (objectPtr_3A),Y
+		
+		: ; no control byte. Loading enemy
+		sta var_58			 	; #1 byte of object file
 		iny
-		lda (objectPtr_3A),y
-		sta var_54
+		lda (objectPtr_3A),Y
+		sta var_54				; #2 byte of object file
 		iny
-		lda (objectPtr_3A),y
-		sta var_55
+		lda (objectPtr_3A),Y
+		sta var_55				; #3 byte of object file
 		iny
-		lda (objectPtr_3A),y
-		sta var_56
+		lda (objectPtr_3A),Y
+		sta var_56				; #4 byte of object file
 		iny
-		lda (objectPtr_3A),y
-		sta var_57
+		lda (objectPtr_3A),Y
+		sta var_57				; #5 byte of object file
 		jsr LoadSomethingImportant
 		iny
 		jmp loopY
 
 doneLooping:
-	inc var_5B
-	lda var_5C
+	inc currentEnemyBatch_5B
+
+	lda nextEnemyBatch_5C
 	clc
 	adc #$F0
-	sta var_5C
+	sta nextEnemyBatch_5C
 
 leaveThisRountine:
 	rts
@@ -653,78 +719,73 @@ leaveThisRountine:
 .proc LoadSomethingImportant
 	tya
 	pha
-	ldy bankIndex_15
-	dey
-	tya
-	asl A
-	asl A
-	tay
-	lda ObjectsData_A885+2,y
+	Y_GetObjectIndexFromStage
+	lda ObjectsData_A885+2,Y
 	sta objectPtr_34+0
-	lda ObjectsData_A885+3,y
+	lda ObjectsData_A885+3,Y
 	sta objectPtr_34+1
 	lda var_58
 	asl A
 	tay
-	lda (objectPtr_34),y
+	lda (objectPtr_34),Y
 	sta objectPtr_38+0
 	iny
-	lda (objectPtr_34),y
+	lda (objectPtr_34),Y
 	sta objectPtr_38+1
 	ldy #$00
-	lda (objectPtr_38),y
-	sta someObjProperty_0501,x
+	lda (objectPtr_38),Y
+	sta someObjProperty_0501,X
 	iny
-	lda (objectPtr_38),y
-	sta someObjProperty_0502,x
+	lda (objectPtr_38),Y
+	sta someObjProperty_0502,X
 	iny
-	lda (objectPtr_38),y
-	sta someObjProperty_0602,x
+	lda (objectPtr_38),Y
+	sta someObjProperty_0602,X
 	iny
-	lda (objectPtr_38),y
+	lda (objectPtr_38),Y
 	ora #(BIT5+BIT6)
 	ora var_2D					; hold an extra flag?
-	sta someObjProperty_0405,x
+	sta someObjProperty_0405,X
 	iny
-	lda (objectPtr_38),y
-	sta someObjProperty_0600,x
+	lda (objectPtr_38),Y
+	sta someObjProperty_0600,X
 	iny
-	lda (objectPtr_38),y
-	sta someObjProperty_0601,x
+	lda (objectPtr_38),Y
+	sta someObjProperty_0601,X
 	iny
-	lda (objectPtr_38),y
-	sta hitPoints_0603,x
+	lda (objectPtr_38),Y
+	sta hitPoints_0603,X
 	iny
-	lda (objectPtr_38),y
-	sta someObjProperty_0302,x
+	lda (objectPtr_38),Y
+	sta someObjProperty_0302,X
 	iny
-	lda (objectPtr_38),y
-	sta someObjProperty_0301,x
+	lda (objectPtr_38),Y
+	sta someObjProperty_0301,X
 	iny
-	lda (objectPtr_38),y
-	sta someObjProperty_0604,x
+	lda (objectPtr_38),Y
+	sta someObjProperty_0604,X
 	iny
-	lda (objectPtr_38),y
-	sta someObjProperty_0605,x
+	lda (objectPtr_38),Y
+	sta someObjProperty_0605,X
 	iny
-	lda (objectPtr_38),y
-	sta someObjProperty_0700,x
-	sta someObjProperty_0300,x
+	lda (objectPtr_38),Y
+	sta someObjProperty_0700,X
+	sta someObjProperty_0300,X
 	lda var_54
-	sta someObjProperty_0400,x
+	sta someObjProperty_0400,X
 	lda var_55
-	sta someObjProperty_0401,x
+	sta someObjProperty_0401,X
 	lda var_56
-	sta someObjProperty_0402,x
+	sta someObjProperty_0402,X
 	lda var_57
-	sta someObjProperty_0403,x
+	sta someObjProperty_0403,X
 	lda #$00
-	sta someObjProperty_0503,x
-	sta someObjProperty_0504,x
-	sta someObjProperty_0505,x
-	sta someObjProperty_0303,x
+	sta someObjProperty_0503,X
+	sta someObjProperty_0504,X
+	sta someObjProperty_0505,X
+	sta someObjProperty_0303,X
 	lda #$80
-	sta someObjProperty_0404,x
+	sta someObjProperty_0404,X
 	pla
 	tay
 	rts
@@ -740,63 +801,63 @@ leaveThisRountine:
 	
 	BeginHere:
 	ldx var_4D
-	lda someObjProperty_0404,x
+	lda someObjProperty_0404,X
 	bit BIT_4
 	beq :++
 	jsr HandleObjectCollision
-	lda someObjProperty_0303,x
+	lda someObjProperty_0303,X
 	cmp #$02
 	bne :+
 	lda #$FF
 	sta flagPlayerHit_1E
 	lda #$00
-	sta someObjProperty_0303,x
+	sta someObjProperty_0303,X
 	:
 	jmp doneWithThis
 	:
-	lda someObjProperty_0404,x
+	lda someObjProperty_0404,X
 	bpl doneWithThis
-	lda someObjProperty_0401,x
+	lda someObjProperty_0401,X
 	beq :+
 	cmp #$FF
 	bne SecondPart
-	lda someObjProperty_0400,x
+	lda someObjProperty_0400,X
 	clc
-	adc someObjProperty_0600,x
+	adc someObjProperty_0600,X
 	bcc SecondPart
 	:
-	lda someObjProperty_0403,x
+	lda someObjProperty_0403,X
 	beq ThirdPart
 	cmp #$FF
 	bne SecondPart
-	lda someObjProperty_0402,x
+	lda someObjProperty_0402,X
 	clc
-	adc someObjProperty_0601,x
+	adc someObjProperty_0601,X
 	bcs ThirdPart
 	
 	SecondPart:
-	lda someObjProperty_0405,x
+	lda someObjProperty_0405,X
 	and #$10
 	beq :+
-	lda someObjProperty_0404,x
+	lda someObjProperty_0404,X
 	and #$20
 	beq :++
 	:
 	lda #$10
-	sta someObjProperty_0404,x
+	sta someObjProperty_0404,X
 	jmp doneWithThis
 	:
-	lda someObjProperty_0404,x
+	lda someObjProperty_0404,X
 	and #$DF
-	sta someObjProperty_0404,x
+	sta someObjProperty_0404,X
 	jmp doneWithThis
 	
 	ThirdPart:
-	lda someObjProperty_0404,x
+	lda someObjProperty_0404,X
 	ora #$20
-	sta someObjProperty_0404,x
+	sta someObjProperty_0404,X
 	jsr UnknownSub3
-	lda someObjProperty_0404,x
+	lda someObjProperty_0404,X
 	and #$08
 	beq doneWithThis
 	lda var_5A
@@ -838,61 +899,61 @@ leaveThisRountine:
 ;
 ; $8391
 .proc UnknownSub3
-	lda someObjProperty_0405,x
+	lda someObjProperty_0405,X
 	and #$10
 	beq SecondPart
 	
-	lda someObjProperty_0401,x
+	lda someObjProperty_0401,X
 	beq :+
 	lda #$00
 	beq :++
 	
 	:
-	lda someObjProperty_0400,x
+	lda someObjProperty_0400,X
 	
 	:
-	sta someObjProperty_0702,x
-	lda someObjProperty_0403,x
+	sta someObjProperty_0702,X
+	lda someObjProperty_0403,X
 	beq :+
 	lda #$00
 	beq :++
 	
 	:
-	lda someObjProperty_0402,x
+	lda someObjProperty_0402,X
 	
 	:
-	sta someObjProperty_0704,x
-	lda someObjProperty_0400,x
+	sta someObjProperty_0704,X
+	lda someObjProperty_0400,X
 	clc
-	adc someObjProperty_0600,x
-	cmp someObjProperty_0702,x
+	adc someObjProperty_0600,X
+	cmp someObjProperty_0702,X
 	bcs :+
 	lda #$FF
 	
 	:
-	sta someObjProperty_0703,x
-	lda someObjProperty_0402,x
+	sta someObjProperty_0703,X
+	lda someObjProperty_0402,X
 	clc
-	adc someObjProperty_0601,x
-	cmp someObjProperty_0704,x
+	adc someObjProperty_0601,X
+	cmp someObjProperty_0704,X
 	bcs :+
 	lda #$FF
 	
 	:
-	sta someObjProperty_0705,x
+	sta someObjProperty_0705,X
 	rts
 
 	SecondPart:
-	lda someObjProperty_0400,x
-	sta someObjProperty_0702,x
+	lda someObjProperty_0400,X
+	sta someObjProperty_0702,X
 	clc
-	adc someObjProperty_0600,x
-	sta someObjProperty_0703,x
-	lda someObjProperty_0402,x
-	sta someObjProperty_0704,x
+	adc someObjProperty_0600,X
+	sta someObjProperty_0703,X
+	lda someObjProperty_0402,X
+	sta someObjProperty_0704,X
 	clc
-	adc someObjProperty_0601,x
-	sta someObjProperty_0705,x
+	adc someObjProperty_0601,X
+	sta someObjProperty_0705,X
 	rts
 
 .endproc
@@ -902,33 +963,33 @@ leaveThisRountine:
 	ldy #$00
 	
 	BeginHere:
-	lda someObjProperty_0404,y
+	lda someObjProperty_0404,Y
 	bmi :+
 	jmp DoneWithThis
 	
 	:
-	lda someObjProperty_0405,y
+	lda someObjProperty_0405,Y
 	bit BIT_6
 	bne :+
 	jmp DoneWithThis
 	
 	:
-	lda someObjProperty_0702,y
+	lda someObjProperty_0702,Y
 	sta var_4F
-	lda someObjProperty_0703,y
+	lda someObjProperty_0703,Y
 	sta var_50
-	lda someObjProperty_0704,y
+	lda someObjProperty_0704,Y
 	sta var_51
-	lda someObjProperty_0705,y
+	lda someObjProperty_0705,Y
 	sta var_52
 	ldx #$30
 	
 	AnotherCheckAndLeave:
-	lda someObjProperty_0404,x
+	lda someObjProperty_0404,X
 	bpl StartLeaving
 	and #$20
 	beq StartLeaving
-	lda someObjProperty_0405,x
+	lda someObjProperty_0405,X
 	bit BIT_6
 	beq StartLeaving
 	
@@ -941,21 +1002,21 @@ leaveThisRountine:
 	jmp dontHandleObjCollision
 	
 	: ; $843B
-	lda someObjProperty_0702,x
+	lda someObjProperty_0702,X
 	cmp var_50
 	bcs StartLeaving
 	lda var_4F
-	cmp someObjProperty_0703,x
+	cmp someObjProperty_0703,X
 	bcs StartLeaving
-	lda someObjProperty_0704,x
+	lda someObjProperty_0704,X
 	cmp var_52
 	bcs StartLeaving
 	lda var_51
-	cmp someObjProperty_0705,x
+	cmp someObjProperty_0705,X
 	bcs StartLeaving
-	lda hitPoints_0603,x
+	lda hitPoints_0603,X
 	sec
-	sbc someObjProperty_0602,y
+	sbc someObjProperty_0602,Y
 	beq :+
 	bcs :++
 	
@@ -964,25 +1025,25 @@ leaveThisRountine:
 	jmp :++
 	
 	:
-	sta hitPoints_0603,x
+	sta hitPoints_0603,X
 	lda flagUnknown_1A
 	bne :+
 	clc
-	lda someObjProperty_0400,x
+	lda someObjProperty_0400,X
 	adc #$07
-	sta someObjProperty_0400,x
-	lda someObjProperty_0401,x
+	sta someObjProperty_0400,X
+	lda someObjProperty_0401,X
 	adc #$00
-	sta someObjProperty_0401,x
+	sta someObjProperty_0401,X
 	
 	:
 	cpy #$00
 	bne :+
 	
 	:
-	lda hitPoints_0603,y
+	lda hitPoints_0603,Y
 	sec
-	sbc someObjProperty_0602,x
+	sbc someObjProperty_0602,X
 	beq doHandleObjCollision
 	bcc doHandleObjCollision
 	
@@ -1008,7 +1069,7 @@ leaveThisRountine:
 	pla
 	
 	doStoreHitPointsAndLeave:
-	sta hitPoints_0603,y
+	sta hitPoints_0603,Y
 	jmp DoneWithThis
 	
 	doHandleObjCollision:
@@ -1050,7 +1111,7 @@ leaveThisRountine:
 	pha
 	tya
 	pha
-	lda someObjProperty_0405,x
+	lda someObjProperty_0405,X
 	bit BIT_4
 	bne :+
 	jmp doHandleObjCollision
@@ -1124,13 +1185,13 @@ leaveThisRountine:
 	pha
 	tya
 	pha
-	lda someObjProperty_0405,x
+	lda someObjProperty_0405,X
 	bit BIT_6
 	bne :+
 	jmp doneWithThisRoutine_X
 	
 	:
-	lda someObjProperty_0302,x
+	lda someObjProperty_0302,X
 	bne :+
 	
 	:
@@ -1235,7 +1296,7 @@ leaveThisRountine:
 	:
 	cmp #$2C
 	bne :++
-	lda someObjProperty_0401,x
+	lda someObjProperty_0401,X
 	beq :+
 	jmp doneWithThisRoutine_X
 	
@@ -1329,24 +1390,24 @@ leaveThisRountine:
 
 	lda #$08
 	clc
-	adc bankIndex_15
+	adc currentStage_15
 	sbc #$00
 	
 	SecondPart:
 	sta var_58
-	lda someObjProperty_0404,x
+	lda someObjProperty_0404,X
 	and #$20
 	beq doneWithThisRoutine_X
 	clc
-	lda someObjProperty_0400,x
+	lda someObjProperty_0400,X
 	sta var_54
-	lda someObjProperty_0401,x
+	lda someObjProperty_0401,X
 	adc #$00
 	sta var_55
 	clc
-	lda someObjProperty_0402,x
+	lda someObjProperty_0402,X
 	sta var_56
-	lda someObjProperty_0403,x
+	lda someObjProperty_0403,X
 	adc #$00
 	sta var_57
 	jsr UnknownSub7
@@ -1356,7 +1417,7 @@ leaveThisRountine:
 	pla
 	tax
 	lda #$00
-	sta someObjProperty_0404,x
+	sta someObjProperty_0404,X
 	rts
 .endproc
 ;
@@ -1377,7 +1438,7 @@ leaveThisRountine:
 ;
 ; $86A9
 .proc UnknownSub7
-	jsr FindFreeObjSlot
+	jsr X_FindFreeObjectSlot
 	cpx #$F0
 	bcc :+
 	rts
@@ -1388,39 +1449,39 @@ leaveThisRountine:
 	asl A
 	asl A
 	tay
-	lda Data_at8715+0,y
-	sta someObjProperty_0501,x
-	lda Data_at8715+1,y
-	sta someObjProperty_0502,x
-	lda Data_at8715+2,y
-	sta someObjProperty_0602,x
-	lda Data_at8715+3,y
-	sta someObjProperty_0405,x
-	lda Data_at8715+4,y
-	sta someObjProperty_0600,x
-	lda Data_at8715+5,y
-	sta someObjProperty_0601,x
-	lda Data_at8715+6,y
-	sta someObjProperty_0302,x
-	lda Data_at8715+7,y
-	sta someObjProperty_0303,x
+	lda Data_at8715+0,Y
+	sta someObjProperty_0501,X
+	lda Data_at8715+1,Y
+	sta someObjProperty_0502,X
+	lda Data_at8715+2,Y
+	sta someObjProperty_0602,X
+	lda Data_at8715+3,Y
+	sta someObjProperty_0405,X
+	lda Data_at8715+4,Y
+	sta someObjProperty_0600,X
+	lda Data_at8715+5,Y
+	sta someObjProperty_0601,X
+	lda Data_at8715+6,Y
+	sta someObjProperty_0302,X
+	lda Data_at8715+7,Y
+	sta someObjProperty_0303,X
 	lda var_54
-	sta someObjProperty_0400,x
+	sta someObjProperty_0400,X
 	lda var_55
-	sta someObjProperty_0401,x
+	sta someObjProperty_0401,X
 	lda var_56
-	sta someObjProperty_0402,x
+	sta someObjProperty_0402,X
 	lda var_57
-	sta someObjProperty_0403,x
+	sta someObjProperty_0403,X
 	lda #$00
-	sta someObjProperty_0503,x
-	sta someObjProperty_0504,x
-	sta someObjProperty_0505,x
-	sta someObjProperty_0700,x
-	sta someObjProperty_0300,x
-	sta someObjProperty_0301,x
+	sta someObjProperty_0503,X
+	sta someObjProperty_0504,X
+	sta someObjProperty_0505,X
+	sta someObjProperty_0700,X
+	sta someObjProperty_0300,X
+	sta someObjProperty_0301,X
 	lda #$80
-	sta someObjProperty_0404,x
+	sta someObjProperty_0404,X
 	rts
 .endproc
 ;
@@ -1458,7 +1519,7 @@ Data_at8715:
 	lda #$00
 	sta var_2E
 	pla
-	sta someObjProperty_0302,x
+	sta someObjProperty_0302,X
 	
 	doneWithThisRoutine:
 	rts
@@ -1519,27 +1580,27 @@ Data_at8B7A:
 .proc InitializeGameVariables2
 	ldy #$06
 	lda #$C0
-	sta someObjProperty_0400,y
+	sta someObjProperty_0400,Y
 	lda #$D8
-	sta someObjProperty_0402,y
+	sta someObjProperty_0402,Y
 	lda #$A0
-	sta someObjProperty_0404,y
+	sta someObjProperty_0404,Y
 	lda #$00
-	sta someObjProperty_0405,y
-	sta someObjProperty_0503,y
-	sta someObjProperty_0504,y
-	sta someObjProperty_0505,y
-	sta someObjProperty_0302,y
-	sta someObjProperty_0303,y
-	sta someObjProperty_0604,y
-	sta someObjProperty_0605,y
-	sta someObjProperty_0602,y
+	sta someObjProperty_0405,Y
+	sta someObjProperty_0503,Y
+	sta someObjProperty_0504,Y
+	sta someObjProperty_0505,Y
+	sta someObjProperty_0302,Y
+	sta someObjProperty_0303,Y
+	sta someObjProperty_0604,Y
+	sta someObjProperty_0605,Y
+	sta someObjProperty_0602,Y
 	lda #$FF
-	sta hitPoints_0603,y
+	sta hitPoints_0603,Y
 	lda #$07
-	sta someObjProperty_0600,y
+	sta someObjProperty_0600,Y
 	lda #$07
-	sta someObjProperty_0601,y
+	sta someObjProperty_0601,Y
 	rts
 .endproc
 ;
@@ -1668,43 +1729,43 @@ Data_at8B7A:
 	asl A
 	asl A
 	tay
-	lda Data_at8D1D+0,y
-	sta someObjProperty_0501,x
-	lda Data_at8D1D+1,y
-	sta someObjProperty_0502,x
-	lda Data_at8D1D+2,y
+	lda Data_at8D1D+0,Y
+	sta someObjProperty_0501,X
+	lda Data_at8D1D+1,Y
+	sta someObjProperty_0502,X
+	lda Data_at8D1D+2,Y
 	cpy #$00
 	beq :+
 	clc
 	adc #$02
 	
 	:
-	sta someObjProperty_0602,x
-	lda Data_at8D1D+3,y
-	sta someObjProperty_0302,x
-	lda Data_at8D1D+4,y
-	sta someObjProperty_0600,x
-	lda Data_at8D1D+5,y
-	sta someObjProperty_0601,x
+	sta someObjProperty_0602,X
+	lda Data_at8D1D+3,Y
+	sta someObjProperty_0302,X
+	lda Data_at8D1D+4,Y
+	sta someObjProperty_0600,X
+	lda Data_at8D1D+5,Y
+	sta someObjProperty_0601,X
 	lda someObjProperty_0400
 	clc
-	adc Data_at8D1D+6,y
-	sta someObjProperty_0400,x
+	adc Data_at8D1D+6,Y
+	sta someObjProperty_0400,X
 	lda someObjProperty_0402
 	clc
-	adc Data_at8D1D+7,y
-	sta someObjProperty_0402,x
+	adc Data_at8D1D+7,Y
+	sta someObjProperty_0402,X
 	lda #$00
-	sta someObjProperty_0503,x
-	sta someObjProperty_0504,x
-	sta someObjProperty_0505,x
-	sta someObjProperty_0401,x
-	sta someObjProperty_0403,x
-	sta hitPoints_0603,x
+	sta someObjProperty_0503,X
+	sta someObjProperty_0504,X
+	sta someObjProperty_0505,X
+	sta someObjProperty_0401,X
+	sta someObjProperty_0403,X
+	sta hitPoints_0603,X
 	lda #$40
-	sta someObjProperty_0405,x
+	sta someObjProperty_0405,X
 	lda #$80
-	sta someObjProperty_0404,x
+	sta someObjProperty_0404,X
 	rts
 
 .endproc
@@ -1719,7 +1780,7 @@ Data_at8D1D:
 	ldx #$0C
 	
 	:
-	lda someObjProperty_0404,x
+	lda someObjProperty_0404,X
 	and #$90
 	beq :+
 	txa
@@ -1733,16 +1794,16 @@ Data_at8D1D:
 .endproc
 ;
 ; $8D60
-; FindFreeObjSlot (return x)
+; X_FindFreeObjectSlot (return x)
 ; Check if flags 7 and 4 are set in $0434
 ; Starting at $0434 go over 32 slots stopping at
 ; the first FREE slot.
 ; Return the slot position in X
-.proc FindFreeObjSlot
+.proc X_FindFreeObjectSlot
 	clc
 	ldx #$30
 	:
-		lda someObjProperty_0404,x
+		lda someObjProperty_0404,X
 		and #(BIT7+BIT4) ;%10010000 ; #$90
 		beq :+
 		txa
@@ -1756,17 +1817,17 @@ Data_at8D1D:
 ;
 ; $8D73
 .proc UnknownSub24
-	lda someObjProperty_0301,x
+	lda someObjProperty_0301,X
 	bne :+
 	rts
 
 	:
-	lda someObjProperty_0404,x
+	lda someObjProperty_0404,X
 	and #$F7
-	sta someObjProperty_0404,x
-	lda someObjProperty_0700,x
-	sta someObjProperty_0300,x
-	lda someObjProperty_0301,x
+	sta someObjProperty_0404,X
+	lda someObjProperty_0700,X
+	sta someObjProperty_0300,X
+	lda someObjProperty_0301,X
 	cmp #$01
 	bne :+
 	jsr UnknownSub25
@@ -1823,7 +1884,7 @@ Data_at8D1D:
 .proc UnknownSub25
 	lda #$00
 	sta var_4B
-	lda someObjProperty_0400,x
+	lda someObjProperty_0400,X
 	sec
 	sbc someObjProperty_0400
 	bcs :+
@@ -1832,7 +1893,7 @@ Data_at8D1D:
 	:
 	rol var_4B
 	sta var_4C
-	lda someObjProperty_0402,x
+	lda someObjProperty_0402,X
 	sec
 	sbc someObjProperty_0402
 	bcs :+
@@ -1864,7 +1925,7 @@ Data_at8D1D:
 	tya
 	ldy var_4B
 	clc
-	adc Data_at8E25,y
+	adc Data_at8E25,Y
 	asl A
 	sta var_4A
 	txa
@@ -1884,7 +1945,7 @@ Data_at8E25:
 	ldx #$00
 	
 	:
-	lda Data_at8E3F,x
+	lda Data_at8E3F,X
 	sta var_4A
 	jsr UnknownSub17 ; ==========================
 	inx
@@ -1903,25 +1964,25 @@ Data_at8E3F:
 	pha
 	tya
 	pha
-	jsr FindFreeObjSlot
+	jsr X_FindFreeObjectSlot
 	cpx #$F0
 	bcs doneWithThis
 	jsr UnknownSub18
 	ldy var_4A
 	jsr UnknownSub19
 	lda #$01
-	sta someObjProperty_0602,x
+	sta someObjProperty_0602,X
 	lda #$60
-	sta someObjProperty_0405,x
+	sta someObjProperty_0405,X
 	lda #$04
-	sta someObjProperty_0600,x
-	sta someObjProperty_0601,x
+	sta someObjProperty_0600,X
+	sta someObjProperty_0601,X
 	lda #$00
-	sta hitPoints_0603,x
-	sta someObjProperty_0301,x
-	sta someObjProperty_0302,x
+	sta hitPoints_0603,X
+	sta someObjProperty_0301,X
+	sta someObjProperty_0302,X
 	lda #$80
-	sta someObjProperty_0404,x
+	sta someObjProperty_0404,X
 	
 	doneWithThis:
 	pla
@@ -1934,33 +1995,33 @@ Data_at8E3F:
 ; $8E81
 .proc UnknownSub18
 
-	lda someObjProperty_0400,y
+	lda someObjProperty_0400,Y
 	clc
-	adc someObjProperty_0604,y
-	sta someObjProperty_0400,x
-	lda someObjProperty_0401,y
+	adc someObjProperty_0604,Y
+	sta someObjProperty_0400,X
+	lda someObjProperty_0401,Y
 	adc #$00
-	sta someObjProperty_0401,x
-	lda someObjProperty_0402,y
+	sta someObjProperty_0401,X
+	lda someObjProperty_0402,Y
 	clc
-	adc someObjProperty_0605,y
-	sta someObjProperty_0402,x
-	lda someObjProperty_0403,y
+	adc someObjProperty_0605,Y
+	sta someObjProperty_0402,X
+	lda someObjProperty_0403,Y
 	adc #$00
-	sta someObjProperty_0403,x
+	sta someObjProperty_0403,X
 	rts
 .endproc
 ;
 ; $8EA6
 .proc UnknownSub19
-	lda Data_at8EBE+0,y
-	sta someObjProperty_0501,x
-	lda Data_at8EBE+1,y
-	sta someObjProperty_0502,x
+	lda Data_at8EBE+0,Y
+	sta someObjProperty_0501,X
+	lda Data_at8EBE+1,Y
+	sta someObjProperty_0502,X
 	lda #$00
-	sta someObjProperty_0505,x
-	sta someObjProperty_0503,x
-	sta someObjProperty_0504,x
+	sta someObjProperty_0505,X
+	sta someObjProperty_0503,X
+	sta someObjProperty_0504,X
 	rts
 .endproc
 ;
@@ -1975,7 +2036,7 @@ Data_at8EBE:
 	ldx #$00
 	
 	:
-	lda Data_at9291,x
+	lda Data_at9291,X
 	sta var_4A
 	jsr UnknownSub17
 	inx
@@ -1995,7 +2056,7 @@ Data_at9291:
 	ldx #$00
 	
 	:
-	lda Data_at92A8,x
+	lda Data_at92A8,X
 	sta var_4A
 	jsr UnknownSub17
 	inx
@@ -2015,7 +2076,7 @@ Data_at92A8:
 	ldx #$00
 	
 	:
-	lda Data_at92BD,x
+	lda Data_at92BD,X
 	sta var_4A
 	jsr UnknownSub17
 	inx
@@ -2034,7 +2095,7 @@ Data_at92BD:
 	tay
 	ldx #$00
 	:
-	lda Data_at92D4,x
+	lda Data_at92D4,X
 	sta var_4A
 	jsr UnknownSub17
 	inx
@@ -2073,15 +2134,15 @@ Data_at92D4:
 	sta objectPtr_34+0
 	lda #>Data_at932D ;; see data below
 	sta objectPtr_34+1
-	lda bankIndex_15
+	lda currentStage_15
 	sec
 	sbc #$01
 	asl A
 	tay
-	lda (objectPtr_34),y
+	lda (objectPtr_34),Y
 	sta someObjProperty_0531 ; boss AI?
 	iny
-	lda (objectPtr_34),y
+	lda (objectPtr_34),Y
 	sta someObjProperty_0532 ; boss AI?
 	pla
 	tay
@@ -2120,10 +2181,10 @@ Data_at934D: ; Boss 4 shoot animation (five frames)
 	asl A
 	tax
 	ldy #$06
-	lda LivesGraphicData,x
-	sta someObjProperty_0501,y
-	lda LivesGraphicData+1,x
-	sta someObjProperty_0502,y
+	lda LivesGraphicData,X
+	sta someObjProperty_0501,Y
+	lda LivesGraphicData+1,X
+	sta someObjProperty_0502,Y
 	rts
 .endproc
 ;
@@ -2137,11 +2198,11 @@ LivesGraphicData:
 	lda #$00
 	tay
 	:
-		sta someObjProperty_0300,y
-		sta someObjProperty_0400,y
-		sta someObjProperty_0500,y
-		sta someObjProperty_0600,y
-		sta someObjProperty_0700,y
+		sta someObjProperty_0300,Y
+		sta someObjProperty_0400,Y
+		sta someObjProperty_0500,Y
+		sta someObjProperty_0600,Y
+		sta someObjProperty_0700,Y
 		INY
 		cpy #$DF
 		bne :-
@@ -2158,7 +2219,7 @@ LivesGraphicData:
 	ldy #$36
 	lda #$00
 	:
-		sta someObjProperty_0400,y
+		sta someObjProperty_0400,Y
 		iny
 		bne :-
 	pla
@@ -2174,7 +2235,7 @@ LivesGraphicData:
 	jsr PaletteFading
 	lda #$02
 	jsr HandleAliveTimer
-	lda bankIndex_15
+	lda currentStage_15
 	cmp #$04	;; Check if the last stage was completed
 	bne :+
 		jmp EndGame
@@ -2186,8 +2247,8 @@ LivesGraphicData:
 	sta OAM_0200
 	ldy #$01
 	:
-		lda HeartHUDData,y
-		sta OAM_0200,y
+		lda HeartHUDData,Y
+		sta OAM_0200,Y
 		iny
 		cpy #$04
 		bne :-
@@ -2215,7 +2276,7 @@ LivesGraphicData:
 	lda #$00
 	tay
 	loopClearZeroPage:
-		sta $0000,y
+		sta $0000,Y
 		INY
 		bne loopClearZeroPage
 	jsr ClearPages_03_to_07_From_00
@@ -2231,7 +2292,7 @@ LivesGraphicData:
 	lda #$00
 	ldy #$00
 	:
-	sta OAM_0200,y	
+	sta OAM_0200,Y	
 	INY	
 	bne :-
 	rts 	
@@ -2279,7 +2340,7 @@ LivesGraphicData:
 	sta PpuAddr_2006
 	ldx #$10
 	:
-		lda (addressPtr_32),y
+		lda (addressPtr_32),Y
 		sta PpuData_2007
 		iny
 		dex
@@ -2299,8 +2360,8 @@ LivesGraphicData:
 	adc #$10
 	sta var_4D
 	:
-		lda (addressPtr_32),y
-		sta bgPalette_E0,x 
+		lda (addressPtr_32),Y
+		sta bgPalette_E0,X 
 		iny
 		inx
 		cpx var_4D
@@ -2309,8 +2370,8 @@ LivesGraphicData:
 .endproc
 ;
 ; $94AE
-; LoadNametable(A)
-.proc LoadNametable
+; LoadNametable_A
+.proc LoadNametable_A
 	asl A
 	asl A
 	clc
@@ -2321,16 +2382,16 @@ LivesGraphicData:
 	tay
 	tax
 ReadData:
-	lda (addressPtr_32),y
+	lda (addressPtr_32),Y
 	beq doneLoading
 	cmp #$80
 	bcc DistinctTiles
 RepeatedTitles:
 	lda #%01111111
-	and (addressPtr_32),y
+	and (addressPtr_32),Y
 	tax
 	jsr NextBGByte_Y
-	lda (addressPtr_32),y
+	lda (addressPtr_32),Y
 	:
 		sta PpuData_2007
 		dex
@@ -2339,11 +2400,11 @@ RepeatedTitles:
 	jmp :++
 	
 	DistinctTiles:
-	lda (addressPtr_32),y
+	lda (addressPtr_32),Y
 	tax
 	:
 		jsr NextBGByte_Y
-		lda (addressPtr_32),y
+		lda (addressPtr_32),Y
 		sta PpuData_2007
 		dex
 		bne :-
@@ -2365,50 +2426,61 @@ RepeatedTitles:
 .endproc
 ;
 ; $94F6
-; LoadStage(A,x)
+; LoadStage_A_X
 ; A : Name
 .proc LoadStage
 	jsr WaitVBlank
+
 	ldy #$00
 	sty PpuMask_2001
 	sty PpuControl_2000
+	
 	asl A
 	tay
 	txa
 	pha
-	lda BackgroundData_E847+0,y
+	lda BackgroundData_E847+0,Y
 	sta addressPtr_32+0
-	lda BackgroundData_E847+1,y
+	lda BackgroundData_E847+1,Y
 	sta addressPtr_32+1
+	
 	lda #$00
 	ldy #$03
 	jsr LoadPaletteIntoVRAM_A_Y
+	
 	lda #$00
 	ldy #$03
 	jsr LoadPaletteIntoRAM_A_Y
+	
 	ldy #$02
-	lda (addressPtr_32),y
+	lda (addressPtr_32),Y
 	tay
 	lda #$10
 	jsr LoadPaletteIntoVRAM_A_Y
+	
 	ldy #$02
-	lda (addressPtr_32),y
+	lda (addressPtr_32),Y
 	tay
+	
 	lda #$10
 	jsr LoadPaletteIntoRAM_A_Y
 	ldy #$00
-	lda (addressPtr_32),y
+	lda (addressPtr_32),Y
+	
 	pha
 	iny
-	lda (addressPtr_32),y
+	lda (addressPtr_32),Y
 	sta addressPtr_32+1
 	pla
 	sta addressPtr_32+0
 	pla
-	jsr LoadNametable
+	
+	jsr LoadNametable_A
+	
 	lda #$00
 	sta PpuAddr_2006
 	sta PpuAddr_2006
+	
 	rts
 .endproc
 ;
@@ -2501,7 +2573,7 @@ RepeatedTitles:
 ; $95AC
 .proc StrobeControl_X
 	asl input1_20
-	lda Ctrl1_4016,x
+	lda Ctrl1_4016,X
 	lsr A
 	bcs RegisterInput
 	lsr A
@@ -2530,7 +2602,7 @@ RepeatedTitles:
 		sta PpuAddr_2006
 		stx PpuAddr_2006
 		:
-			lda bgPalette_E0,x
+			lda bgPalette_E0,X
 			sta PpuData_2007
 			inx
 			cpx #$20
@@ -2543,14 +2615,14 @@ RepeatedTitles:
 		sta PpuScroll_2005
 		ldx #$00
 		loopDarkenONETone:
-			lda bgPalette_E0,x
+			lda bgPalette_E0,X
 			sec
 			sbc #$10
 			bcs paletteDidNotUnderflow
 			lda #$0F
 			
 			paletteDidNotUnderflow:
-			sta bgPalette_E0,x
+			sta bgPalette_E0,X
 			inx
 			cpx #$20
 			bne loopDarkenONETone
@@ -2572,8 +2644,8 @@ RepeatedTitles:
 	jsr ClearNametablePattern
 	lda #$00
 	tax
-	sta BankSwitching_FFF0+0,x
-	inc bankIndex_15
+	sta BankSwitching_FFF0+0,X
+	inc currentStage_15
 	lda #$0A
 	ldx #$00
 	jsr LoadStage
@@ -2618,7 +2690,7 @@ RepeatedTitles:
 	jsr ClearNametablePattern
 	lda #$02
 	tax
-	sta BankSwitching_FFF0+0,x
+	sta BankSwitching_FFF0+0,X
 	lda flagPPUControl_17
 	and #$EF
 	sta flagPPUControl_17
@@ -2650,15 +2722,15 @@ RepeatedTitles:
 .proc RollEndCredits
 	asl A
 	tay
-	lda EndCreditsData,y
+	lda EndCreditsData,Y
 	sta addressPtr_32+0
-	lda EndCreditsData+1,y
+	lda EndCreditsData+1,Y
 	sta addressPtr_32+1
 	ldy #$00
-	lda (addressPtr_32),y
+	lda (addressPtr_32),Y
 	sta vramAddress_67+0
 	iny
-	lda (addressPtr_32),y
+	lda (addressPtr_32),Y
 	sta vramAddress_67+1
 	iny
 	loopLoadCredits:
@@ -2666,7 +2738,7 @@ RepeatedTitles:
 		sta PpuAddr_2006
 		lda vramAddress_67+1
 		sta PpuAddr_2006
-		lda (addressPtr_32),y
+		lda (addressPtr_32),Y
 		cmp #$FF
 		beq leaveEndCredits
 		cmp #$20
@@ -2719,7 +2791,7 @@ EndCreditsData:
 ; $97AD
 .proc UnknownSub5
 	lda #$00
-	sta bankIndex_15
+	sta currentStage_15
 	sta PpuControl_2000
 	jsr WaitVBlank
 	lda flagPPUMask_18
@@ -2731,8 +2803,8 @@ EndCreditsData:
 	jsr ClearMemoryPage0200_OAM
 	ldy #$00
 	:
-		lda Data_at97F5,y
-		sta OAM_0200,y
+		lda Data_at97F5,Y
+		sta OAM_0200,Y
 		iny
 		cpy #$20
 		bne :-
@@ -2812,7 +2884,7 @@ Data_at9D22:
 	dontINCTimer:
 	lda flagNextLevel_1B
 	bne doLevelTransition
-	ldy bankIndex_15
+	ldy currentStage_15
 	bne dontLevelTransition
 
 	doLevelTransition:
@@ -2829,17 +2901,18 @@ Data_at9D22:
 	jmp doUpdateSoundOnly
 
 	gameNotPaused:
-	jsr HandleScrolling
+	jsr HandleScrollingControl
 	lda screenScrollX_29
 	sta PpuScroll_2005
 	lda #$00
 	sta PpuScroll_2005
 	lda flagPPUControl_19
 	sta PpuControl_2000
+	
 	lda frameCounter_12
-	and #$01
-	bne :+
-	dec var_5C
+	and #$01 	; Checking if this is an ODD frame
+	bne :+		; Skip if ODD
+	dec nextEnemyBatch_5C	; Decrement the counter for next enemy batch on EVEN frames
 	
 	:
 	lda var_5E
@@ -2871,20 +2944,20 @@ Data_at9D22:
 .endproc
 ;
 ; $A42A
-.proc HandleScrolling
+.proc HandleScrollingControl
 	ldx flagGameMode_26
-	bne doneWithScrollHandling
+	bne :+
 	inc frameScrollCtr_28
 	lda frameScrollCtr_28
 	cmp frameScrollAt_27
-	bcc doneWithScrollHandling
+	bcc :+
 	
-	doScrollBackground:
+	; doScrollBackground
 	lda #$00
 	sta frameScrollCtr_28
 	jsr HandleStageScrolling 
 	
-	doneWithScrollHandling:
+	:
 	rts
 .endproc
 ;
@@ -2895,8 +2968,8 @@ Data_at9D22:
 	bne doneWithScrolling
 	ldx levelProgression_16
 	
-	testIfScrolled_14_Screens:
-	cpx #$0E
+	; testIfScrolled_14_Screens:
+	cpx #BG_SCROLL_LIMIT
 	bcc doKeepScrollingStage 
 	lda #$02
 	sta flagGameMode_26
@@ -2947,26 +3020,26 @@ Data_at9D22:
 	
 	BeginHere:
 	ldx var_5F
-	lda someObjProperty_0404,x
+	lda someObjProperty_0404,X
 	bmi :+
 	jmp SecondPart
 	
 	:
-	ldy someObjProperty_0504,x
+	ldy someObjProperty_0504,X
 	beq :+
-	dec someObjProperty_0504,x
-	dec someObjProperty_0503,x
+	dec someObjProperty_0504,X
+	dec someObjProperty_0503,X
 	jmp ReplaceMeLabel_2
 	
 	:
-	lda someObjProperty_0501,x
+	lda someObjProperty_0501,X
 	sta objectPtr_36+0
-	lda someObjProperty_0502,x
+	lda someObjProperty_0502,X
 	sta objectPtr_36+1
-	ldy someObjProperty_0503,x
+	ldy someObjProperty_0503,X
 	
 	ReplaceMeLabel_7:
-	lda (objectPtr_36),y
+	lda (objectPtr_36),Y
 	bmi :+
 	jmp ReplaceMeLabel_3
 	
@@ -2975,10 +3048,10 @@ Data_at9D22:
 	bmi ReplaceMeLabel_1
 	lsr A
 	sbc #$00
-	sta someObjProperty_0504,x
+	sta someObjProperty_0504,X
 	
 	ReplaceMeLabel_2:
-	lda someObjProperty_0405,x
+	lda someObjProperty_0405,X
 	bpl ReplaceMeLabel_4
 	lda var_0C
 	bpl :+
@@ -2992,12 +3065,12 @@ Data_at9D22:
 	sta var_47
 	lda var_0C
 	clc
-	adc someObjProperty_0400,x
-	sta someObjProperty_0400,x
+	adc someObjProperty_0400,X
+	sta someObjProperty_0400,X
 	sta var_40
 	lda var_47
-	adc someObjProperty_0401,x
-	sta someObjProperty_0401,x
+	adc someObjProperty_0401,X
+	sta someObjProperty_0401,X
 	sta var_41
 	lda var_0D
 	bpl :+
@@ -3011,32 +3084,32 @@ Data_at9D22:
 	sta var_49
 	lda var_0D
 	clc
-	adc someObjProperty_0402,x
-	sta someObjProperty_0402,x
+	adc someObjProperty_0402,X
+	sta someObjProperty_0402,X
 	sta objects_Y_42
 	lda var_49
-	adc someObjProperty_0403,x
-	sta someObjProperty_0403,x
+	adc someObjProperty_0403,X
+	sta someObjProperty_0403,X
 	sta var_43
 	jmp ReplaceMeLabel_5
 	
 	ReplaceMeLabel_4:
-	lda someObjProperty_0400,x
+	lda someObjProperty_0400,X
 	sta var_40
-	lda someObjProperty_0401,x
+	lda someObjProperty_0401,X
 	sta var_41
-	lda someObjProperty_0402,x
+	lda someObjProperty_0402,X
 	sta objects_Y_42
-	lda someObjProperty_0403,x
+	lda someObjProperty_0403,X
 	sta var_43
 	
 	ReplaceMeLabel_5:
-	inc someObjProperty_0503,x
-	lda someObjProperty_0701,x
+	inc someObjProperty_0503,X
+	lda someObjProperty_0701,X
 	tax
-	lda Data_atA895+0,x
+	lda Data_atA895+0,X
 	sta addressPtr_32+0
-	lda Data_atA895+1,x
+	lda Data_atA895+1,X
 	sta addressPtr_32+1
 	ldx var_5F
 	jmp ReplaceMeLabel_6
@@ -3044,8 +3117,8 @@ Data_at9D22:
 	ReplaceMeLabel_1:
 	asl A
 	bmi loopTest
-	dec someObjProperty_0505,x
-	lda someObjProperty_0505,x
+	dec someObjProperty_0505,X
+	lda someObjProperty_0505,X
 	bne :+
 	iny
 	iny
@@ -3053,15 +3126,15 @@ Data_at9D22:
 	
 	:
 	bpl loop
-	lda (objectPtr_36),y
+	lda (objectPtr_36),Y
 	and #$1F
-	sta someObjProperty_0505,x
+	sta someObjProperty_0505,X
 	
 	loop:
 		iny
-		lda (objectPtr_36),y
+		lda (objectPtr_36),Y
 		tay
-		lda (objectPtr_36),y
+		lda (objectPtr_36),Y
 		jmp ReplaceMeLabel_3
 		
 		loopTest:
@@ -3074,13 +3147,13 @@ Data_at9D22:
 	lsr A
 	lsr A
 	and #$0F
-	lda someObjProperty_0404,x
+	lda someObjProperty_0404,X
 	ora #$08
-	sta someObjProperty_0404,x
+	sta someObjProperty_0404,X
 	jmp SecondPart
 	
 	:
-	lda someObjProperty_0303,x
+	lda someObjProperty_0303,X
 	cmp #$03
 	bne :+
 	beq :++
@@ -3093,8 +3166,8 @@ Data_at9D22:
 	
 	:
 	lda #$00
-	sta someObjProperty_0302,x
-	sta someObjProperty_0303,x
+	sta someObjProperty_0302,X
+	sta someObjProperty_0303,X
 	
 	:
 	cmp #$05
@@ -3104,30 +3177,30 @@ Data_at9D22:
 	
 	:
 	lda #$10
-	sta someObjProperty_0404,x
+	sta someObjProperty_0404,X
 	
 	:
 	jmp SecondPart
 	
 	ReplaceMeLabel_3:
 	asl A
-	sta someObjProperty_0701,x
+	sta someObjProperty_0701,X
 	tax
-	lda Data_atA895+0,x
+	lda Data_atA895+0,X
 	sta addressPtr_32+0
-	lda Data_atA895+1,x
+	lda Data_atA895+1,X
 	sta addressPtr_32+1
 	iny
 	ldx var_5F
-	lda someObjProperty_0405,x
+	lda someObjProperty_0405,X
 	bpl :+
-	lda (objectPtr_36),y
+	lda (objectPtr_36),Y
 	clc
 	adc var_0C
 	jmp :++
 	
 	:
-	lda (objectPtr_36),y
+	lda (objectPtr_36),Y
 	
 	:
 	sta objects_X_46
@@ -3142,23 +3215,23 @@ Data_at9D22:
 	sta var_47
 	lda objects_X_46
 	clc
-	adc someObjProperty_0400,x
-	sta someObjProperty_0400,x
+	adc someObjProperty_0400,X
+	sta someObjProperty_0400,X
 	sta var_40
 	lda var_47
-	adc someObjProperty_0401,x
-	sta someObjProperty_0401,x
+	adc someObjProperty_0401,X
+	sta someObjProperty_0401,X
 	sta var_41
 	iny
-	lda someObjProperty_0405,x
+	lda someObjProperty_0405,X
 	bpl :+
-	lda (objectPtr_36),y
+	lda (objectPtr_36),Y
 	clc
 	adc var_0D
 	jmp :++
 	
 	:
-	lda (objectPtr_36),y
+	lda (objectPtr_36),Y
 	
 	:
 	sta var_48
@@ -3173,45 +3246,45 @@ Data_at9D22:
 	sta var_49
 	lda var_48
 	clc
-	adc someObjProperty_0402,x
-	sta someObjProperty_0402,x
+	adc someObjProperty_0402,X
+	sta someObjProperty_0402,X
 	sta objects_Y_42
 	lda var_49
-	adc someObjProperty_0403,x
-	sta someObjProperty_0403,x
+	adc someObjProperty_0403,X
+	sta someObjProperty_0403,X
 	sta var_43
 	iny
 	tya
-	sta someObjProperty_0503,x
+	sta someObjProperty_0503,X
 	
 	ReplaceMeLabel_6:
-	lda someObjProperty_0404,x
+	lda someObjProperty_0404,X
 	and #$20
 	bne :+
 	jmp SecondPart
 	
 	:
-	lda someObjProperty_0405,x
+	lda someObjProperty_0405,X
 	and #$18
 	beq :+
 	lda frameCounter_12
 	and #$03
 	bne :+
-	dec someObjProperty_0300,x
-	lda someObjProperty_0300,x
+	dec someObjProperty_0300,X
+	lda someObjProperty_0300,X
 	bne :+
-	lda someObjProperty_0404,x
+	lda someObjProperty_0404,X
 	ora #$08
-	sta someObjProperty_0404,x
+	sta someObjProperty_0404,X
 	
 	:
 	ldy #$00
-	lda (addressPtr_32),y
+	lda (addressPtr_32),Y
 	bpl :+
 	jmp ReplaceMeLabel_8
 	
 	:
-	sta someObjProperty_0600,x
+	sta someObjProperty_0600,X
 	lsr A
 	lsr A
 	lsr A
@@ -3219,8 +3292,8 @@ Data_at9D22:
 	adc #$01
 	sta var_44
 	iny
-	lda (addressPtr_32),y
-	sta someObjProperty_0601,x
+	lda (addressPtr_32),Y
+	sta someObjProperty_0601,X
 	lsr A
 	lsr A
 	lsr A
@@ -3239,21 +3312,21 @@ Data_at9D22:
 	sta var_47
 	
 	ReplaceMeLabel_10:
-	lda (addressPtr_32),y
+	lda (addressPtr_32),Y
 	beq :+
 	lda var_47
 	bne :++
 	lda var_43
 	bne :++
-	lda (addressPtr_32),y ; XXX
-	sta OAM_0200+OBJ_TILE,x	; tile #
+	lda (addressPtr_32),Y ; XXX
+	sta OAM_0200+OBJ_TILE,X	; tile #
 	lda objects_Y_42				
-	sta OAM_0200+OBJ_Y,x	; y 
+	sta OAM_0200+OBJ_Y,X	; y 
 	iny
-	lda (addressPtr_32),y
-	sta OAM_0200+OBJ_ATT,x	; attributes
+	lda (addressPtr_32),Y
+	sta OAM_0200+OBJ_ATT,X	; attributes
 	lda objects_X_46
-	sta OAM_0200+OBJ_X,x	; x
+	sta OAM_0200+OBJ_X,X	; x
 	txa
 	clc
 	adc #$04
@@ -3315,15 +3388,15 @@ Data_at9D22:
 	lda var_43
 	bne SecondPart
 	lda objects_Y_42
-	sta OAM_0200+OBJ_Y,x
+	sta OAM_0200+OBJ_Y,X
 	iny
-	lda (addressPtr_32),y
-	sta OAM_0200+OBJ_TILE,x
+	lda (addressPtr_32),Y
+	sta OAM_0200+OBJ_TILE,X
 	iny
-	lda (addressPtr_32),y
-	sta OAM_0200+OBJ_ATT,x
+	lda (addressPtr_32),Y
+	sta OAM_0200+OBJ_ATT,X
 	lda var_40
-	sta OAM_0200+OBJ_X,x
+	sta OAM_0200+OBJ_X,X
 	txa
 	clc
 	adc #$04
@@ -3338,7 +3411,7 @@ Data_at9D22:
 	lda #$00
 	
 	:
-	sta OAM_0200,x
+	sta OAM_0200,X
 	inx
 	bne :-
 	
