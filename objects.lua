@@ -20,7 +20,7 @@ function printInfo()
   emu.drawString(10,  12, "[S] " .. emu.read(0x66,type), 0xFFFFFF, 0xFF000000, 1)
   emu.drawString(42,  12, "[P] " .. emu.read(0x64,type), 0xFFFFFF, 0xFF000000, 1)
   emu.drawString(74,  12, "[H] " .. emu.read(0x0603,type), 0xFFFFFF, 0xFF000000, 1)
-  emu.drawString(106, 12, "[L] " .. emu.read(0x11,type), 0xFFFFFF, 0xFF000000, 1)
+  emu.drawString(116, 12, "[L] " .. emu.read(0x11,type), 0xFFFFFF, 0xFF000000, 1)
   emu.drawString(175, 12, "Stage " .. emu.read(0x15,type), 0xFFFFFF, 0xFF000000, 1)
   
   nObj=0

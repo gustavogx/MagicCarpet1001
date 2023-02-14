@@ -1,8 +1,14 @@
 ; Game Config.
 .define STARTING_LIVES	$16
 .define STARTING_POWER	$04
+.define HEART_HEALTH_POINTS $50
 
 ; Engine Config.
+
+; Heart is object zero
+; Other objects go after HEART
+.define FIRST_OBJECT_SLOT $04
+
 .define HEART_HUD_Y		$D8
 .define HEART_OFFSCREEN $F8
 
@@ -15,6 +21,12 @@
 	; 9  if BG_SCROLL_RATE = 3
 	; 14 if BG_SCROLL_RATE = 2 (original)
 	; 27 if BG_SCROLL_RATE = 1
+
+.define SHOT_OBJECT_START	$0C
+.define OBJECT_BYTE_SIZE	$06
+.define FREE_SHOT_SLOTS		$06
+.define FREE_OBJECT_SLOTS	$20
+.define ENEMY_OBJECT_START	FREE_SHOT_SLOTS*OBJECT_BYTE_SIZE+SHOT_OBJECT_START
 
 ; using MESEN naming convention
 .define PpuControl_2000		$2000
@@ -226,9 +238,9 @@
 ;.define someObjProperty_0203 	$0203 ; X
 
 ; page 03
-.define someObjProperty_0300 $0300 ; #10 of 12-byte file (also $0700)
-.define someObjProperty_0301 $0301 ; #7 of 12-byte file
-.define someObjProperty_0302 $0302 ; #6 of 12-byte file
+.define someObjProperty_0300 $0300 ; #10 of 10-byte file (also $0700)
+.define someObjProperty_0301 $0301 ; #7 of 10-byte file
+.define someObjProperty_0302 $0302 ; #6 of 10-byte file
 .define someObjProperty_0303 $0303
 
 .define someObjProperty_0333 $0333 ; 1 used once!
@@ -239,12 +251,12 @@
 .define someObjProperty_0402 $0402 ; playerY_0402
 .define someObjProperty_0403 $0403
 .define someObjProperty_0404 $0404
-.define someObjProperty_0405 $0405 ; #2 of 12-byte file (flags)
+.define someObjProperty_0405 $0405 ; #2 of 10-byte file (flags) BIT6 = can collide
 
 ; page 05
 .define someObjProperty_0500 $0500
-.define someObjProperty_0501 $0501 ; low byte of object AI??? address
-.define someObjProperty_0502 $0502 ; high byte of object AI??? address
+.define someObjProperty_0501 $0501 ; lo-byte of object AI??? address
+.define someObjProperty_0502 $0502 ; hi-byte of object AI??? address
 .define someObjProperty_0503 $0503
 .define someObjProperty_0504 $0504
 .define someObjProperty_0505 $0505
@@ -262,15 +274,15 @@
 .define someObjProperty_05FF $05FF ;$0535
 
 ; page 06
-.define someObjProperty_0600 $0600 ; #3 of 12-byte file
-.define someObjProperty_0601 $0601 ; #4 of 12-byte file
-.define someObjProperty_0602 $0602 ; #1 of 12-byte file
-.define hitPoints_0603 		 $0603 ; #5 of 12-byte file
-.define someObjProperty_0604 $0604 ; #8 of 12-byte file
-.define someObjProperty_0605 $0605 ; #9 of 12-byte file
+.define someObjProperty_0600 $0600 ; #3 of 10-byte file
+.define someObjProperty_0601 $0601 ; #4 of 10-byte file
+.define someObjProperty_0602 $0602 ; #1 of 10-byte file
+.define healthPoints_0603 	 $0603 ; #5 of 10-byte file
+.define someObjProperty_0604 $0604 ; #8 of 10-byte file
+.define someObjProperty_0605 $0605 ; #9 of 10-byte file
 
 ; page 07
-.define someObjProperty_0700 $0700 ; #10 of 12-byte file (also $0300)
+.define someObjProperty_0700 $0700 ; #10 of 10-byte file (also $0300)
 .define someObjProperty_0701 $0701
 .define someObjProperty_0702 $0702
 .define someObjProperty_0703 $0703
@@ -313,9 +325,6 @@ BIT_7:	.byte BIT7
 ; $8008
 HeartHUDData:
 .byte $D8, $81, $01, $38; 8008 - 800B
-
-; Heart is object zero
-.define FIRST_OBJECT_SLOT $04
 
 BankSequenceArray:
 .byte $01, $01, $01, $02; 800C - 800F
@@ -592,6 +601,7 @@ MaybeStartingNewGame:
 
 	; MACRO that reads the stage number and returns the index 
 	; (address offset) for this stage's object data.
+	:
 	Y_GetObjectIndexFromStage
 	; now Y contains the index
 
@@ -772,7 +782,7 @@ doneLoadingEnemyBatch:
 	sta someObjProperty_0601,X	; stores #4 byte of 10
 	iny
 	lda (objectPtr_38),Y		; loads #5 byte of 10
-	sta hitPoints_0603,X		; stores #5 byte of 10
+	sta healthPoints_0603,X		; stores #5 byte of 10
 	iny
 	lda (objectPtr_38),Y		; loads #6 byte of 10
 	sta someObjProperty_0302,X	; stores #6 byte of 10
@@ -1035,7 +1045,7 @@ doneLoadingEnemyBatch:
 	lda var_51
 	cmp someObjProperty_0705,X
 	bcs StartLeaving
-	lda hitPoints_0603,X
+	lda healthPoints_0603,X
 	sec
 	sbc someObjProperty_0602,Y
 	beq :+
@@ -1046,7 +1056,7 @@ doneLoadingEnemyBatch:
 	jmp :++
 	
 	:
-	sta hitPoints_0603,X
+	sta healthPoints_0603,X
 	lda flagUnknown_1A
 	bne :+
 	clc
@@ -1062,7 +1072,7 @@ doneLoadingEnemyBatch:
 	bne :+
 	
 	:
-	lda hitPoints_0603,Y
+	lda healthPoints_0603,Y
 	sec
 	sbc someObjProperty_0602,X
 	beq doHandleObjCollision
@@ -1090,7 +1100,7 @@ doneLoadingEnemyBatch:
 	pla
 	
 	doStoreHitPointsAndLeave:
-	sta hitPoints_0603,Y
+	sta healthPoints_0603,Y
 	jmp DoneWithThis
 	
 	doHandleObjCollision:
@@ -1199,25 +1209,26 @@ doneLoadingEnemyBatch:
 .endproc
 ;
 ; $854C
-; Checks is object with index in X hit something important.
+; Checks if object with index in X hit something important.
 ; X = 0 is the player
 .proc HandleObjectCollision
 	txa
 	pha
 	tya
 	pha
-	lda someObjProperty_0405,X
-	bit BIT_6
-	bne :+
-	jmp doneWithObjectCollision
+	lda someObjProperty_0405,X		; object status flags
+	bit BIT_6						; check if the object is tangible (flag 6)
+	bne :+							; if tangile (can collide) continue
+	jmp doneWithObjectCollision		; exit
 	
 	:
-	lda someObjProperty_0302,X
-	bne :+
-	
+	lda someObjProperty_0302,X		; what is this flag? if 
+	bne :+							; this is useless, skips nothing at all
+
 	:
-	cmp #$06
-	bne handlePlayerGotExtraLife
+	cmp #$06 ; maybe? BIT1+BIT2		; what does it checks?
+	bne handlePlayerGotExtraLife	; skip to GotExtraLife
+	
 	lda var_60
 	beq :+
 	dec var_60
@@ -1225,73 +1236,75 @@ doneLoadingEnemyBatch:
 	:
 	lda #$00
 	jmp SecondPart
+
 	handlePlayerGotExtraLife:
-	cmp #$28
-	bne handlePlayerGotPowerUp
-	nop;
-	nop;
-	nop; jsr UnknownSoundSub2
+		cmp #$28
+		bne handlePlayerGotPowerUp
+		nop;
+		nop;
+		nop; jsr UnknownSoundSub2
 
-	nop;
-	nop;
-	nop; jsr DoSomethingWithSound
- 
-	lda #$06
-	sta soundAddress_8D
-	nop;
-	nop;
-	nop; jsr PlaySFX
-	inc livesCounter_11
-	jmp doneWithObjectCollision
-	handlePlayerGotPowerUp:
-	cmp #$29
-	bne handlePlayerGotHeart 
-	nop;
-	nop;
-	nop; jsr UnknownSoundSub2
-
-	nop;
-	nop;
-	nop; jsr DoSomethingWithSound
- 
-	lda #$07
-	sta soundAddress_8D
-	nop;
-	nop;
-	nop; jsr PlaySFX
-
-	lda powerUp_P_64
-	cmp #$04
-	bcc :+
-	nop;
-	nop;
-	nop; jsr DoSomethingWithSound
- 
-	jmp doneWithObjectCollision
+		nop;
+		nop;
+		nop; jsr DoSomethingWithSound
 	
-	:
-	inc powerUp_P_64
-	jmp doneWithObjectCollision
+		lda #$06
+		sta soundAddress_8D
+		nop;
+		nop;
+		nop; jsr PlaySFX
+		inc livesCounter_11
+		jmp doneWithObjectCollision
+
+	handlePlayerGotPowerUp:
+		cmp #$29
+		bne handlePlayerGotHeart 
+		nop;
+		nop;
+		nop; jsr UnknownSoundSub2
+
+		nop;
+		nop;
+		nop; jsr DoSomethingWithSound
+	
+		lda #$07
+		sta soundAddress_8D
+		nop;
+		nop;
+		nop; jsr PlaySFX
+
+		lda powerUp_P_64
+		cmp #$04
+		bcc :+
+		nop;
+		nop;
+		nop; jsr DoSomethingWithSound
+	
+		jmp doneWithObjectCollision
+	
+		:
+		inc powerUp_P_64
+		jmp doneWithObjectCollision
 	
 	handlePlayerGotHeart:
-	cmp #$2A
-	bne skipHeart
-	nop;
-	nop;
-	nop; jsr UnknownSoundSub2
+		cmp #$2A
+		bne skipHeart
+		nop;
+		nop;
+		nop; jsr UnknownSoundSub2
 
-	nop;
-	nop;
-	nop; jsr DoSomethingWithSound
- 
-	lda #$07
-	sta soundAddress_8D
-	nop;
-	nop;
-	nop; jsr PlaySFX
+		nop;
+		nop;
+		nop; jsr DoSomethingWithSound
+	
+		lda #$07
+		sta soundAddress_8D
+		nop;
+		nop;
+		nop; jsr PlaySFX
 
-	jsr AddOneHeart
-	jmp doneWithObjectCollision
+		jsr AddOneHeart
+		jmp doneWithObjectCollision
 	
 	skipHeart:
 	cmp #$2B
@@ -1329,7 +1342,7 @@ doneLoadingEnemyBatch:
 	nop; jsr PlaySFX
 
 	lda #$50
-	sta hitPoints_0603
+	sta healthPoints_0603
 	lda #$BD
 	sta someObjProperty_0501
 	lda #$8B
@@ -1415,23 +1428,24 @@ doneLoadingEnemyBatch:
 	sbc #$00
 	
 	SecondPart:
-	sta var_58
-	lda someObjProperty_0404,X
-	and #$20
-	beq doneWithObjectCollision
-	clc
-	lda someObjProperty_0400,X
-	sta var_54
-	lda someObjProperty_0401,X
-	adc #$00
-	sta var_55
-	clc
-	lda someObjProperty_0402,X
-	sta var_56
-	lda someObjProperty_0403,X
-	adc #$00
-	sta var_57
-	jsr UnknownSub7
+		sta var_58
+		lda someObjProperty_0404,X
+		and #$20
+		beq doneWithObjectCollision
+
+		clc
+		lda someObjProperty_0400,X
+		sta var_54
+		lda someObjProperty_0401,X
+		adc #$00
+		sta var_55
+		clc
+		lda someObjProperty_0402,X
+		sta var_56
+		lda someObjProperty_0403,X
+		adc #$00
+		sta var_57
+		jsr UnknownSub7
 
 	doneWithObjectCollision:
 	pla
@@ -1444,23 +1458,29 @@ doneLoadingEnemyBatch:
 .endproc
 ;
 ; $8696
+; AddOneHeart
+; Adds ONE HEART equivalent in health points to player.
+; 
 .proc AddOneHeart
-	lda hitPoints_0603
+	lda healthPoints_0603
 	clc
-	adc #$04
-	bcc didNotExceedFF
-	lda #$FF
-	didNotExceedFF:
-	sta hitPoints_0603
+	adc #HEART_HEALTH_POINTS
+	
+	bcc :+ 					; did not overflowed
+	lda #$FF				; if overflowed, set it to maximum
+	
+	:			
+	sta healthPoints_0603	; store it into player's health
+	
 	updateHeartDisplay:
-	lda #HEART_HUD_Y
-	sta OAM_0200
+		lda #HEART_HUD_Y
+		sta OAM_0200		; since HEART is always Sprite #0, the first byte is its Y value
+	
 	rts
 .endproc
 ;
 ; $86A9
-; Load object var_58 from ROM to 
-; an empty slot X
+; Load object var_58 from ROM to an empty slot X
 .proc UnknownSub7
 	jsr X_FindFreeObjectSlot
 	cpx #$F0
@@ -1588,7 +1608,7 @@ Data_at8715:
 	lda flagNextLevel_1B
 	bne :+
 	lda #$01
-	sta hitPoints_0603
+	sta healthPoints_0603
 	lda powerUp_P_64
 	beq :+
 	dec powerUp_P_64
@@ -1620,7 +1640,7 @@ Data_at8B7A:
 	sta someObjProperty_0605,Y
 	sta someObjProperty_0602,Y
 	lda #$FF
-	sta hitPoints_0603,Y
+	sta healthPoints_0603,Y
 	lda #$07
 	sta someObjProperty_0600,Y
 	lda #$07
@@ -1741,7 +1761,7 @@ Data_at8B7A:
 .proc UnknownSub13
 
 	pha
-	jsr UnknownSub14
+	jsr X_FindFreeShotSlot
 	cpx #$30
 	bcc :+
 	pla
@@ -1785,7 +1805,7 @@ Data_at8B7A:
 	sta someObjProperty_0505,X
 	sta someObjProperty_0401,X
 	sta someObjProperty_0403,X
-	sta hitPoints_0603,X
+	sta healthPoints_0603,X
 	lda #$40
 	sta someObjProperty_0405,X
 	lda #$80
@@ -1799,20 +1819,24 @@ Data_at8D1D:
 .incbin "rom-prg/objects/data-block-at8D1D.bin"
 ;
 ; $8D4D
-.proc UnknownSub14
+; X_FindFreeShotSlot (return x)
+; Check if flags 7 and 4 are set in $0434
+; Starting at $0434 go over 32 slots stopping at
+; the first FREE slot.
+; Return the slot position in X
+.proc X_FindFreeShotSlot
 	clc
-	ldx #$0C
+	ldx #SHOT_OBJECT_START ; $0C
 	
 	:
-	lda someObjProperty_0404,X
-	and #$90
-	beq :+
-	txa
-	adc #$06
-	tax
-	cpx #$30
-	bcc :-
-	
+		lda someObjProperty_0404,X
+		and #(BIT7+BIT4)
+		beq :+
+		txa
+		adc #OBJECT_BYTE_SIZE ; $06
+		tax
+		cpx #(SHOT_OBJECT_START+FREE_SHOT_SLOTS*OBJECT_BYTE_SIZE) ; $30
+		bcc :-	
 	:
 	rts
 .endproc
@@ -1825,15 +1849,15 @@ Data_at8D1D:
 ; Return the slot position in X
 .proc X_FindFreeObjectSlot
 	clc
-	ldx #$30
+	ldx #ENEMY_OBJECT_START
 	:
 		lda someObjProperty_0404,X
 		and #(BIT7+BIT4) ;%10010000 ; #$90
 		beq :+
 		txa
-		adc #$06
+		adc #OBJECT_BYTE_SIZE; $06
 		tax
-		cpx #$F0
+		cpx #(ENEMY_OBJECT_START+FREE_OBJECT_SLOTS*OBJECT_BYTE_SIZE) ; $F0
 		bcc :-
 	:
 	rts
@@ -2003,7 +2027,7 @@ Data_at8E3F:
 	sta someObjProperty_0600,X
 	sta someObjProperty_0601,X
 	lda #$00
-	sta hitPoints_0603,X
+	sta healthPoints_0603,X
 	sta someObjProperty_0301,X
 	sta someObjProperty_0302,X
 	lda #$80
@@ -2280,11 +2304,11 @@ LivesGraphicData:
 		iny
 		cpy #$04
 		bne :-
-	lda hitPoints_0603
+	lda healthPoints_0603
 	pha
 	jsr ClearPages_03_to_07_From_00
 	pla
-	sta hitPoints_0603
+	sta healthPoints_0603
 	jmp MaybeStartingNewGame
 .endproc
 ;
@@ -3570,7 +3594,7 @@ checkInputLeft:
 	lda #$02
 	jsr UnknownSub6
 	sta var_62
-	lda hitPoints_0603
+	lda healthPoints_0603
 	cmp #$14
 	bcc :+
 	lda #<Data_atA80A
