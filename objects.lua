@@ -27,10 +27,10 @@ function printInfo()
   for i=0,32,1
   do
    
-    hasObj = 0x90 & emu.read(0x0434+i*6,type);
-    
     x=54+i*6
     y=24
+
+    hasObj = 0x90 & emu.read(0x0434+i*6,type);    
     
     emu.drawRectangle(x,y ,4,4, 0x8000FFFF, false, 1)
     
@@ -44,7 +44,6 @@ function printInfo()
       emu.drawString(xo+1, yo-8,i , 0xFFFFFF, 0xFF000000, 1)
     end
     
-
     
   end
 

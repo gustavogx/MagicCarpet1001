@@ -585,53 +585,59 @@ MaybeStartingNewGame:
 ; Variable nextEnemyBatch_5C holds the timer for loading next enemy batch.
 ; If timer larger than or equal to $FA, spawn new batch.
 .proc LoadEnemyBatch
-	lda nextEnemyBatch_5C
-	cmp #$FA
-	bcs :+
-	jmp leaveThisRountine
+	lda nextEnemyBatch_5C 		; count down until next batch load
+	cmp #$FA					; will load next batch if counter >= $FA 
+	bcs :+						; continue if it is time to load
+	jmp doneLoadingEnemyBatch	; exit 
 
-	:
+	; MACRO that reads the stage number and returns the index 
+	; (address offset) for this stage's object data.
 	Y_GetObjectIndexFromStage
-	lda ObjectsData_A885+0,Y
+	; now Y contains the index
+
+	lda ObjectsData_A885+0,Y	; lo-byte of stage's enemy data
 	sta objectPtr_34+0
-	lda ObjectsData_A885+1,Y
+	lda ObjectsData_A885+1,Y	; hi-byte of stage's enemy data
 	sta objectPtr_34+1
 
-	lda currentEnemyBatch_5B
+	lda currentEnemyBatch_5B	; index for current enemy batch
 	asl A
 	tay
-	lda (objectPtr_34),Y
-	cmp #$FF
-	bne :++
-	iny
-	lda (objectPtr_34),Y
-	cmp #$FF
-	bne :+
-	jmp leaveThisRountine
+	lda (objectPtr_34),Y		; lo-byte of current enemy batch
+	cmp #$FF					; check if end-of-line (EOL)
+	bne :++						; if !EOL skip far ahead
+	iny							
+	lda (objectPtr_34),Y		; hi-byte of current enemy batch
+	cmp #$FF					; check if end-of-file (EOF=FFFF)
+	bne :+						; if !EOF skip ahead
+	jmp doneLoadingEnemyBatch	; exit if EOF
+
+	:							; if EOL was found
+	dey							; go back 1 byte
+	lda (objectPtr_34),Y		; read again: ; lo-byte of enemy batch description
 
 	:
-	dey
-	lda (objectPtr_34),Y
-
-	:
-	sta objectPtr_3A+0 		; will load what was found at address objectPtr_34
+	sta objectPtr_3A+0 			; store lo-byte of enemy batch description
 	iny
-	lda (objectPtr_34),Y	; read the high byte
-	sta objectPtr_3A+1
+	lda (objectPtr_34),Y		; hi-byte of enemy batch description
+	sta objectPtr_3A+1			; store hi-byte of enemy batch description
 	
+	; loop over every object of current enemy batch
 	ldy #$00
-	loopY:
-		jsr X_FindFreeObjectSlot
-		cpx #$F0 ; No slot available to load object
-		bcs doneLooping
+	loopYLoadObject:
+
+		jsr X_FindFreeObjectSlot; finds a free object slot and return it on X
+		cpx #$F0 				; no slot available to load object
+		bcs doneLooping			; exit if no free slot found
 		
-		lda (objectPtr_3A),Y
-		cmp #$F8
-		bne :+
-		lda #$01
-		sta flagUnknown_1A
-		ldx #$30
-		jsr Clear54Bytes_Page04
+		lda (objectPtr_3A),Y	; read #1 byte of object descriptor
+		cmp #$F8				; check for control character $F8 = STAGE BOSS
+		bne :+					; if not, skip ahead
+
+		lda #BIT0				; if control $F8 was found
+		sta flagUnknown_1A		; set this flag to %0000 0001
+		ldx #$30				; WHY? 
+		jsr ClearObjectsDescription; Clears page $04 of RAM
 	
 		nop;
 		nop;
@@ -651,59 +657,65 @@ MaybeStartingNewGame:
 		iny
 		lda (objectPtr_3A),Y
 		
-		:
-		cmp #$F0
-		bne :+
-		and #$00
-		sta var_2D
+		:						; if not previous $F8
+		cmp #$F0				; check for control character $F0
+		bne :+					; if not, skip ahead
+		and #ZERO				; WHY? equivalent to LDA #$00
+		sta var_2D				; zeroing var_2D (still unknown?)
 		iny
 		lda (objectPtr_3A),Y
 		
-		:
-		cmp #$FF
-		beq doneLooping
-		cmp #$F1
-		bne :+
-		and #$03
-		sta var_2D
+		:						; if not previous $F0
+		cmp #$FF				; check for control character $FF
+		beq doneLooping			; if so, break loop
+
+		cmp #$F1				; check for control character $F1
+		bne :+					; if not, skip ahead
+
+		and #(BIT1+BIT0)		; $F1 & $03 = $01
+		sta var_2D				; object status flags?
 		iny
-		lda (objectPtr_3A),Y
-		sta var_2B
-		inc var_2B
-		iny
-		lda (objectPtr_3A),Y
+		lda (objectPtr_3A),Y	; read next byte after $F1
+		sta var_2B				; store it
+		inc var_2B				; increment it (is it a counter?)
+		iny			
+		lda (objectPtr_3A),Y	; read next byte
 		
-		:
-		cmp #$F2
-		bne :+
-		and #$03
-		sta var_2D
+		:						; if not previous $F1
+		cmp #$F2				; check for control character $F2
+		bne :+					; if not, skip ahead
+
+		and #(BIT1+BIT0)		; $F2 & $03 = $02
+		sta var_2D				; object status flags?
 		iny
-		lda (objectPtr_3A),Y
-		sta var_2C
-		inc var_2C
+		lda (objectPtr_3A),Y	; read next byte after $F2
+		sta var_2C				; store it
+		inc var_2C				; increment it (is it a counter?)
 		iny
-		lda (objectPtr_3A),Y
+		lda (objectPtr_3A),Y	; read next byte
 		
-		: ; no control byte. Loading enemy
+		; no control character found. 
+		; loading enemy
+		: 
 		sta var_58			 	; #1 byte of object file
 		iny
 		lda (objectPtr_3A),Y
-		sta var_54				; #2 byte of object file
+		sta var_54				; X position, #2 byte of object file
 		iny
 		lda (objectPtr_3A),Y
 		sta var_55				; #3 byte of object file
 		iny
 		lda (objectPtr_3A),Y
-		sta var_56				; #4 byte of object file
+		sta var_56				; Y position, #4 byte of object file
 		iny
 		lda (objectPtr_3A),Y
 		sta var_57				; #5 byte of object file
-		jsr LoadSomethingImportant
+		jsr LoadEnemyType		; Use's var_58 to load the specific enemy type
 		iny
-		jmp loopY
+		jmp loopYLoadObject
 
 doneLooping:
+
 	inc currentEnemyBatch_5B
 
 	lda nextEnemyBatch_5C
@@ -711,81 +723,90 @@ doneLooping:
 	adc #$F0
 	sta nextEnemyBatch_5C
 
-leaveThisRountine:
+doneLoadingEnemyBatch:
 	rts
 .endproc
 ;
 ; $822F
-.proc LoadSomethingImportant
+.proc LoadEnemyType
 	tya
 	pha
-	Y_GetObjectIndexFromStage
-	lda ObjectsData_A885+2,Y
+
+	; MACRO that reads the stage number and returns the index 
+	Y_GetObjectIndexFromStage	
+	
+	lda ObjectsData_A885+2,Y	; lo-byte of stage's enemies AI/Animation data(?)
 	sta objectPtr_34+0
-	lda ObjectsData_A885+3,Y
+	lda ObjectsData_A885+3,Y	; hi-byte of stage's enemies AI/Animation data(?)
 	sta objectPtr_34+1
-	lda var_58
-	asl A
+
+	; var_58 holds the index (address offset) for a given enemy's data
+	lda var_58					; this was the FIRST byte loaded from the object file
+	asl A						; multiply by 2 since address are WORDs (2 bytes)
 	tay
-	lda (objectPtr_34),Y
+	lda (objectPtr_34),Y		; lo-byte of a given enemy data
 	sta objectPtr_38+0
 	iny
-	lda (objectPtr_34),Y
+	lda (objectPtr_34),Y		; hi-byte of a given enemy data
 	sta objectPtr_38+1
+
 	ldy #$00
-	lda (objectPtr_38),Y
-	sta someObjProperty_0501,X
+	lda (objectPtr_38),Y		; lo-byte of of Enemy AI(?)
+	sta someObjProperty_0501,X	; stores lo-byte of of Enemy AI(?)
 	iny
-	lda (objectPtr_38),Y
-	sta someObjProperty_0502,X
+	lda (objectPtr_38),Y		; hi-byte of of Enemy AI(?)
+	sta someObjProperty_0502,X	; stores hi-byte of of Enemy AI(?)
 	iny
-	lda (objectPtr_38),Y
-	sta someObjProperty_0602,X
+	lda (objectPtr_38),Y		; loads #1 byte of 10
+	sta someObjProperty_0602,X	; stores #1 byte of 10
 	iny
-	lda (objectPtr_38),Y
-	ora #(BIT5+BIT6)
-	ora var_2D					; hold an extra flag?
-	sta someObjProperty_0405,X
+	lda (objectPtr_38),Y		; loads #2 byte of 10
+	ora #(BIT5+BIT6)			; turn ON flags 5 and 6
+	ora var_2D					; turn ON other flags from var_2D (see previous routine)
+	sta someObjProperty_0405,X	; store #2 byte of 10
 	iny
-	lda (objectPtr_38),Y
-	sta someObjProperty_0600,X
+	lda (objectPtr_38),Y		; loads #3 byte of 10
+	sta someObjProperty_0600,X	; stores #3 byte of 10
 	iny
-	lda (objectPtr_38),Y
-	sta someObjProperty_0601,X
+	lda (objectPtr_38),Y		; loads #4 byte of 10
+	sta someObjProperty_0601,X	; stores #4 byte of 10
 	iny
-	lda (objectPtr_38),Y
-	sta hitPoints_0603,X
+	lda (objectPtr_38),Y		; loads #5 byte of 10
+	sta hitPoints_0603,X		; stores #5 byte of 10
 	iny
-	lda (objectPtr_38),Y
-	sta someObjProperty_0302,X
+	lda (objectPtr_38),Y		; loads #6 byte of 10
+	sta someObjProperty_0302,X	; stores #6 byte of 10
 	iny
-	lda (objectPtr_38),Y
-	sta someObjProperty_0301,X
+	lda (objectPtr_38),Y		; loads #7 byte of 10
+	sta someObjProperty_0301,X	; stores #7 byte of 10
 	iny
-	lda (objectPtr_38),Y
-	sta someObjProperty_0604,X
+	lda (objectPtr_38),Y		; loads #8 byte of 10
+	sta someObjProperty_0604,X	; stores #8 byte of 10
 	iny
-	lda (objectPtr_38),Y
-	sta someObjProperty_0605,X
+	lda (objectPtr_38),Y		; loads #9 byte of 10
+	sta someObjProperty_0605,X	; stores #9 byte of 10
 	iny
-	lda (objectPtr_38),Y
-	sta someObjProperty_0700,X
-	sta someObjProperty_0300,X
+	lda (objectPtr_38),Y		; loads #10 byte of 10
+	sta someObjProperty_0700,X	; stores #10 byte of 10
+	sta someObjProperty_0300,X	; stores #10 byte of 10
+	
 	lda var_54
-	sta someObjProperty_0400,X
+	sta someObjProperty_0400,X 	; X position, #2 byte of object file
 	lda var_55
-	sta someObjProperty_0401,X
+	sta someObjProperty_0401,X	; #3 byte of object file
 	lda var_56
-	sta someObjProperty_0402,X
+	sta someObjProperty_0402,X	; Y position, #4 byte of object file
 	lda var_57
-	sta someObjProperty_0403,X
+	sta someObjProperty_0403,X	; #5 byte of object file
+	
 	lda #$00
-	sta someObjProperty_0503,X
-	sta someObjProperty_0504,X
-	sta someObjProperty_0505,X
-	sta someObjProperty_0303,X
-	lda #$80
-	sta someObjProperty_0404,X
+	sta someObjProperty_0503,X	; zero out 
+	sta someObjProperty_0504,X	; zero out 
+	sta someObjProperty_0505,X	; zero out 
+	sta someObjProperty_0303,X	; zero out 
+
+	lda #BIT7
+	sta someObjProperty_0404,X ; Object Control Flags(?)
 	pla
 	tay
 	rts
@@ -1188,7 +1209,7 @@ leaveThisRountine:
 	lda someObjProperty_0405,X
 	bit BIT_6
 	bne :+
-	jmp doneWithThisRoutine_X
+	jmp doneWithObjectCollision
 	
 	:
 	lda someObjProperty_0302,X
@@ -1221,7 +1242,7 @@ leaveThisRountine:
 	nop;
 	nop; jsr PlaySFX
 	inc livesCounter_11
-	jmp doneWithThisRoutine_X
+	jmp doneWithObjectCollision
 	handlePlayerGotPowerUp:
 	cmp #$29
 	bne handlePlayerGotHeart 
@@ -1246,11 +1267,11 @@ leaveThisRountine:
 	nop;
 	nop; jsr DoSomethingWithSound
  
-	jmp doneWithThisRoutine_X
+	jmp doneWithObjectCollision
 	
 	:
 	inc powerUp_P_64
-	jmp doneWithThisRoutine_X
+	jmp doneWithObjectCollision
 	
 	handlePlayerGotHeart:
 	cmp #$2A
@@ -1270,7 +1291,7 @@ leaveThisRountine:
 	nop; jsr PlaySFX
 
 	jsr AddOneHeart
-	jmp doneWithThisRoutine_X
+	jmp doneWithObjectCollision
 	
 	skipHeart:
 	cmp #$2B
@@ -1291,14 +1312,14 @@ leaveThisRountine:
 
 	lda #$03
 	sta speed_66
-	jmp doneWithThisRoutine_X
+	jmp doneWithObjectCollision
 	
 	:
 	cmp #$2C
 	bne :++
 	lda someObjProperty_0401,X
 	beq :+
-	jmp doneWithThisRoutine_X
+	jmp doneWithObjectCollision
 	
 	:
 	lda #$0C
@@ -1319,7 +1340,7 @@ leaveThisRountine:
 	sta someObjProperty_0505
 	lda #$D8
 	sta OAM_0200
-	jmp doneWithThisRoutine_X
+	jmp doneWithObjectCollision
 	
 	:
 	cmp #$1F
@@ -1381,7 +1402,7 @@ leaveThisRountine:
 	
 	:
 	cmp #$24
-	bne doneWithThisRoutine_X
+	bne doneWithObjectCollision
 	lda #$09
 	sta soundAddress_8D
 	nop;
@@ -1397,7 +1418,7 @@ leaveThisRountine:
 	sta var_58
 	lda someObjProperty_0404,X
 	and #$20
-	beq doneWithThisRoutine_X
+	beq doneWithObjectCollision
 	clc
 	lda someObjProperty_0400,X
 	sta var_54
@@ -1411,7 +1432,8 @@ leaveThisRountine:
 	adc #$00
 	sta var_57
 	jsr UnknownSub7
-	doneWithThisRoutine_X:
+
+	doneWithObjectCollision:
 	pla
 	tay
 	pla
@@ -1437,6 +1459,8 @@ leaveThisRountine:
 .endproc
 ;
 ; $86A9
+; Load object var_58 from ROM to 
+; an empty slot X
 .proc UnknownSub7
 	jsr X_FindFreeObjectSlot
 	cpx #$F0
@@ -1966,7 +1990,8 @@ Data_at8E3F:
 	pha
 	jsr X_FindFreeObjectSlot
 	cpx #$F0
-	bcs doneWithThis
+	bcs :+
+
 	jsr UnknownSub18
 	ldy var_4A
 	jsr UnknownSub19
@@ -1984,7 +2009,7 @@ Data_at8E3F:
 	lda #$80
 	sta someObjProperty_0404,X
 	
-	doneWithThis:
+	:
 	pla
 	tay
 	pla
@@ -2210,7 +2235,10 @@ LivesGraphicData:
 .endproc
 ;
 ; $93E1
-.proc Clear54Bytes_Page04
+; ClearObjectsDescription
+; Clear page $04 of RAM from $0400 to $0436
+; This page can hold up to 9 different enemy types(?)
+.proc ClearObjectsDescription
 	pha
 	txa
 	pha
