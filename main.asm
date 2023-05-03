@@ -17,10 +17,16 @@
 	; $02 every other frame	(30fps) (original)
 	; $03 every two frames 	(15fps)
 
-.define BG_SCROLL_LIMIT	 14
-	; 9  if BG_SCROLL_RATE = 3
-	; 14 if BG_SCROLL_RATE = 2 (original)
+.if BG_SCROLL_RATE = $01
 	; 27 if BG_SCROLL_RATE = 1
+	.define BG_SCROLL_LIMIT	 27
+.elseif BG_SCROLL_RATE = $02
+	; 14 if BG_SCROLL_RATE = 2 (original)
+	.define BG_SCROLL_LIMIT	 14
+.else 	
+	; 9  if BG_SCROLL_RATE = 3
+	.define BG_SCROLL_LIMIT	 9
+.endif
 
 .define SHOT_OBJECT_START	$0C
 .define OBJECT_BYTE_SIZE	$06
@@ -61,6 +67,16 @@
 	asl A
 	asl A
 	tay
+.endmacro
+
+.macro Copy source,destination,begin,end
+	ldy begin
+:
+	lda source,y
+	sta destination,y
+	iny
+	cpy end
+	bne :-
 .endmacro
 
 .segment "HEADER"
@@ -508,17 +524,9 @@ MaybeStartingNewGame:
 	lda currentStage_15
 	cmp #$02
 	bcs loopMain
-	
-	ldy #$00
 
-	EnableHeartAsSpriteZero:
-	:
-		lda HeartHUDData,Y
-		sta OAM_0200,Y
-		iny
-		cpy #$04
-		bne :-
-		
+	Copy HeartHUDData, OAM_0200, #0, #4
+	
 	SetupNewLevel:
 		lda #HEART_OFFSCREEN
 		sta OAM_0200
@@ -744,7 +752,8 @@ doneLoadingEnemyBatch:
 
 	; MACRO that reads the stage number and returns the index 
 	Y_GetObjectIndexFromStage	
-	
+	; now Y contains the index
+
 	lda ObjectsData_A885+2,Y	; lo-byte of stage's enemies AI/Animation data(?)
 	sta objectPtr_34+0
 	lda ObjectsData_A885+3,Y	; hi-byte of stage's enemies AI/Animation data(?)
@@ -1445,7 +1454,7 @@ doneLoadingEnemyBatch:
 		lda someObjProperty_0403,X
 		adc #$00
 		sta var_57
-		jsr UnknownSub7
+		jsr SpawnObject
 
 	doneWithObjectCollision:
 	pla
@@ -1481,7 +1490,7 @@ doneLoadingEnemyBatch:
 ;
 ; $86A9
 ; Load object var_58 from ROM to an empty slot X
-.proc UnknownSub7
+.proc SpawnObject
 	jsr X_FindFreeObjectSlot
 	cpx #$F0
 	bcc :+
@@ -2252,7 +2261,7 @@ LivesGraphicData:
 		sta someObjProperty_0500,Y
 		sta someObjProperty_0600,Y
 		sta someObjProperty_0700,Y
-		INY
+		iny
 		cpy #$DF
 		bne :-
 	rts 
@@ -2297,13 +2306,9 @@ LivesGraphicData:
 	jsr ClearMemoryPage0200_OAM
 	pla
 	sta OAM_0200
-	ldy #$01
-	:
-		lda HeartHUDData,Y
-		sta OAM_0200,Y
-		iny
-		cpy #$04
-		bne :-
+
+	Copy HeartHUDData, OAM_0200, #1, #4
+
 	lda healthPoints_0603
 	pha
 	jsr ClearPages_03_to_07_From_00
@@ -2329,7 +2334,7 @@ LivesGraphicData:
 	tay
 	loopClearZeroPage:
 		sta $0000,Y
-		INY
+		iny
 		bne loopClearZeroPage
 	jsr ClearPages_03_to_07_From_00
 	lda #$57
@@ -2345,7 +2350,7 @@ LivesGraphicData:
 	ldy #$00
 	:
 	sta OAM_0200,Y	
-	INY	
+	iny	
 	bne :-
 	rts 	
 .endproc
@@ -2696,7 +2701,7 @@ RepeatedTitles:
 	jsr ClearNametablePattern
 	lda #$00
 	tax
-	sta BankSwitching_FFF0+0,X
+	sta BankSwitching_FFF0,X
 	inc currentStage_15
 	lda #$0A
 	ldx #$00
@@ -2742,7 +2747,7 @@ RepeatedTitles:
 	jsr ClearNametablePattern
 	lda #$02
 	tax
-	sta BankSwitching_FFF0+0,X
+	sta BankSwitching_FFF0,X
 	lda flagPPUControl_17
 	and #$EF
 	sta flagPPUControl_17
@@ -2853,13 +2858,9 @@ EndCreditsData:
 	sta flagPPUControl_17
 	jsr WaitVBlank
 	jsr ClearMemoryPage0200_OAM
-	ldy #$00
-	:
-		lda Data_at97F5,Y
-		sta OAM_0200,Y
-		iny
-		cpy #$20
-		bne :-
+
+	Copy Data_at97F5, OAM_0200, #$00, #$20
+
 	jsr UpdatePPUSettings
 	lda #$02
 	jsr HandleAliveTimer
@@ -3038,10 +3039,10 @@ Data_at9D22:
 .endproc
 ;
 ; $A458
-.proc UnknownSub10
+.proc UnusedFunction1
 	
 	:
-	jsr UnknownSub11
+	jsr UnusedFunction2
 	bit someObjProperty_0100
 	dex
 	bne :-
@@ -3049,7 +3050,7 @@ Data_at9D22:
 .endproc
 ;
 ; $A462
-.proc UnknownSub11
+.proc UnusedFunction2
 	txa
 	pha
 	ldx #$00
