@@ -1,8 +1,8 @@
 
-.word Data_atAC98, Data_atAEC6 ; stage 1
-.word Data_atB8ED, Data_atBB5D ; stage 2
-.word Data_atC50D, Data_atC8B9 ; stage 3
-.word Data_atE3A6, Data_atC8B9 ; stage 4
+.addr Data_atAC98, Data_atAEC6 ; stage 1
+.addr Data_atB8ED, Data_atBB5D ; stage 2
+.addr Data_atC50D, Data_atC8B9 ; stage 3
+.addr Data_atE3A6, Data_atC8B9 ; stage 4
 
 Data_atA895:
 
@@ -67,7 +67,7 @@ NUMBER_ADDR_09: ; $a941 - offset $04
 ; ==========================================
 
 DATA_ADDR_10: ; $a945 - offset $04
-.incbin "rom-prg/objects/data-object-atA945.bin" ; "Game Over" text
+.incbin "rom-prg/objects/data-object-atA945.bin" ; "Game Over" text, NOT ASCII
 
 DATA_ADDR_11: ; $a958 - offset $13
 .incbin "rom-prg/objects/data-object-atA958.bin" ; Player Flying Frame 1/3

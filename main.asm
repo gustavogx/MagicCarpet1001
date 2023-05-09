@@ -3,7 +3,7 @@
 .define STARTING_POWER	$04
 .define HEART_HEALTH_POINTS $50
 
-; Engine Config.
+; Engine Configuration
 
 ; Heart is object zero
 ; Other objects go after HEART
@@ -55,12 +55,12 @@
 
 .define VRAM_PALETTES_PAGE $3F
 
-; Y_GetObjectIndexFromStage
+; macro GetObjectsIndexTable_Y
 ; Read the current stage index from currentStage_15
 ; Calculates the correct index on the object data file:
 ; Y(index) = (stage-1)*4
-; Destroys A and Y
-.macro Y_GetObjectIndexFromStage
+; Clobbers A and Y
+.macro GetObjectsIndexTable_Y
 	ldy currentStage_15
 	dey
 	tya
@@ -69,6 +69,11 @@
 	tay
 .endmacro
 
+; macro Copy
+; Copy data from <source> to <destination>
+; Starts at an offset <begin> from <source>
+; Ends at an offset <end> from <source>
+; Clobbers A and Y
 .macro Copy source,destination,begin,end
 	ldy begin
 :
@@ -77,6 +82,19 @@
 	iny
 	cpy end
 	bne :-
+.endmacro
+
+; macro Add16
+; 16-bit addition
+; Adds <value> to <address> and store the result at <address>
+.macro Add16 address, value
+	lda address+1
+	clc
+	adc value
+	sta address+1
+	lda address+0
+	adc #$00
+	sta address+0
 .endmacro
 
 .segment "HEADER"
@@ -354,7 +372,7 @@ HandleReset:
 	ldx #$10 ; Wait 16 cycles for PPU to reach its stable state
 	:	
 		lda PpuStatus_2002
-		DEX
+		dex
 		bne :-
 
 	lda BankSwitching_FFF0	; Loads #$00 from ROM filling (dangerous!)
@@ -453,9 +471,9 @@ MaybeStartingNewGame:
 
 	lda #$00
 	sta PpuControl_2000
-	jsr ClearNametablePattern
+	jsr ClearNametable_A
 	lda #$01
-	jsr ClearNametablePattern
+	jsr ClearNametable_A
 	
 	ldy currentStage_15
 	lda BankSequenceArray,Y
@@ -610,7 +628,7 @@ MaybeStartingNewGame:
 	; MACRO that reads the stage number and returns the index 
 	; (address offset) for this stage's object data.
 	:
-	Y_GetObjectIndexFromStage
+	GetObjectsIndexTable_Y
 	; now Y contains the index
 
 	lda ObjectsData_A885+0,Y	; lo-byte of stage's enemy data
@@ -644,7 +662,7 @@ MaybeStartingNewGame:
 	ldy #$00
 	loopYLoadObject:
 
-		jsr X_FindFreeObjectSlot; finds a free object slot and return it on X
+		jsr FindFreeObjectSlot_rX; finds a free object slot and return it on X
 		cpx #$F0 				; no slot available to load object
 		bcs doneLooping			; exit if no free slot found
 		
@@ -751,7 +769,7 @@ doneLoadingEnemyBatch:
 	pha
 
 	; MACRO that reads the stage number and returns the index 
-	Y_GetObjectIndexFromStage	
+	GetObjectsIndexTable_Y	
 	; now Y contains the index
 
 	lda ObjectsData_A885+2,Y	; lo-byte of stage's enemies AI/Animation data(?)
@@ -1491,7 +1509,7 @@ doneLoadingEnemyBatch:
 ; $86A9
 ; Load object var_58 from ROM to an empty slot X
 .proc SpawnObject
-	jsr X_FindFreeObjectSlot
+	jsr FindFreeObjectSlot_rX
 	cpx #$F0
 	bcc :+
 	rts
@@ -1770,7 +1788,7 @@ Data_at8B7A:
 .proc UnknownSub13
 
 	pha
-	jsr X_FindFreeShotSlot
+	jsr FindFreeShotSlot_rX
 	cpx #$30
 	bcc :+
 	pla
@@ -1828,12 +1846,12 @@ Data_at8D1D:
 .incbin "rom-prg/objects/data-block-at8D1D.bin"
 ;
 ; $8D4D
-; X_FindFreeShotSlot (return x)
+; FindFreeShotSlot_rX (return x)
 ; Check if flags 7 and 4 are set in $0434
 ; Starting at $0434 go over 32 slots stopping at
 ; the first FREE slot.
 ; Return the slot position in X
-.proc X_FindFreeShotSlot
+.proc FindFreeShotSlot_rX
 	clc
 	ldx #SHOT_OBJECT_START ; $0C
 	
@@ -1851,12 +1869,12 @@ Data_at8D1D:
 .endproc
 ;
 ; $8D60
-; X_FindFreeObjectSlot (return x)
+; FindFreeObjectSlot_rX (return x)
 ; Check if flags 7 and 4 are set in $0434
 ; Starting at $0434 go over 32 slots stopping at
 ; the first FREE slot.
 ; Return the slot position in X
-.proc X_FindFreeObjectSlot
+.proc FindFreeObjectSlot_rX
 	clc
 	ldx #ENEMY_OBJECT_START
 	:
@@ -1880,7 +1898,7 @@ Data_at8D1D:
 
 	:
 	lda someObjProperty_0404,X
-	and #$F7
+	and #(ALL1-BIT3)	; turn off bit 3
 	sta someObjProperty_0404,X
 	lda someObjProperty_0700,X
 	sta someObjProperty_0300,X
@@ -2021,7 +2039,7 @@ Data_at8E3F:
 	pha
 	tya
 	pha
-	jsr X_FindFreeObjectSlot
+	jsr FindFreeObjectSlot_rX
 	cpx #$F0
 	bcs :+
 
@@ -2208,6 +2226,7 @@ Data_at92D4:
 	tax
 	rts
 .endproc
+;
 ; $932D
 Data_at932D:
 ;.incbin "rom-prg/objects/data-block-at932D.bin"
@@ -2239,7 +2258,7 @@ Data_at934D: ; Boss 4 shoot animation (five frames)
 	asl A
 	tax
 	ldy #$06
-	lda LivesGraphicData,X
+	lda LivesGraphicData+0,X
 	sta someObjProperty_0501,Y
 	lda LivesGraphicData+1,X
 	sta someObjProperty_0502,Y
@@ -2326,9 +2345,9 @@ LivesGraphicData:
 	cld
 	jsr ClearMemoryPage0200_OAM
 	lda #$00
-	jsr ClearNametablePattern
+	jsr ClearNametable_A
 	lda #$01
-	jsr ClearNametablePattern
+	jsr ClearNametable_A
 	doClearZeroPage:
 	lda #$00
 	tay
@@ -2356,7 +2375,19 @@ LivesGraphicData:
 .endproc
 ;
 ; $9464
-.proc ClearNametablePattern
+; ClearNametable_A
+; Clear all bytes (tile 0)
+; Set all attributes to palette 3
+; Starting point is defined by A as an offset from $2000
+;	A=0 : Nametable 0 : $2000
+;	A=1 : Nametable 1 : $2400
+;	A=2 : Nametable 2 : $2800
+;	A=3 : Nametable 3 : $2C00
+; Since this rom uses vertical mirroring, A=2 or 3 are
+; never used, because: 
+; 	A=2 : Nametable 0 (same as 2)
+; 	A=3 : Nametable 1 (same as 3)
+.proc ClearNametable_A
 	asl A
 	asl A
 	clc	
@@ -2364,22 +2395,22 @@ LivesGraphicData:
 	sta PpuAddr_2006
 	lda #$00
 	sta PpuAddr_2006
-
-	ldx #$20
-	loopXClearNametable:
-		ldy #$1E
-		loopYClearNameTable:
+	; clear pattern
+	ldx #$20		; 32 columns
+	:
+		ldy #$1E	; 30 rows
+		:
 			sta PpuData_2007
 			dey
-			bne loopYClearNameTable
-		DEX
-		bne loopXClearNametable
-
-	lda #$FF
+			bne :-
+		dex
+		bne :--
+	; clear attributes
+	lda #$FF		; all tiles using palette 3
 	ldx #$40
 	:
 		sta PpuData_2007
-		DEX
+		dex
 		bne :-
 	rts 
 .endproc
@@ -2696,9 +2727,9 @@ RepeatedTitles:
 	sta PpuControl_2000
 	sta screenScrollX_29
 	sta var_2A
-	jsr ClearNametablePattern
+	jsr ClearNametable_A
 	lda #$01
-	jsr ClearNametablePattern
+	jsr ClearNametable_A
 	lda #$00
 	tax
 	sta BankSwitching_FFF0,X
@@ -2727,9 +2758,11 @@ RepeatedTitles:
 		lda input1_20
 		cmp inputPrev_22
 		beq :-
+	
 	nop;
 	nop;
 	nop; jsr Sound_DontKnowWhatItDoes
+
 	lda #$00
 	sta screenScrollX_29
 	sta var_2A
@@ -2742,16 +2775,17 @@ RepeatedTitles:
 	sta PpuControl_2000
 	sta screenScrollX_29
 	sta var_2A
-	jsr ClearNametablePattern
+	jsr ClearNametable_A
 	lda #$01
-	jsr ClearNametablePattern
+	jsr ClearNametable_A
 	lda #$02
 	tax
 	sta BankSwitching_FFF0,X
 	lda flagPPUControl_17
-	and #$EF
+	and #(ALL1-BIT4)
 	sta flagPPUControl_17
 	sta flagPPUControl_19
+	
 	lda #$0B
 	ldx #$00
 	jsr LoadStage
@@ -2768,21 +2802,32 @@ RepeatedTitles:
 	jsr RollEndCredits
 	lda #$05
 	jsr RollEndCredits
+
 	lda #$00
+	sta PpuScroll_2005  ; reset scrolling
 	sta PpuScroll_2005
-	sta PpuScroll_2005
-	:
-	jmp :- ; End of Credits, Must Reset 
+	
+	: 		; End of Credits
+	jmp :-  ; This is the shortest loop to soft lock the game. Must Reset!
 .endproc
 ;
 ; $96AC
+; RollEndCredits
+; Loads the End Credits from address EndCreditsData
+; A select which phrase to write (there are five)
 .proc RollEndCredits
+	; shifts left to compensate for the fact that
+	; each address is a word (16bit)
 	asl A
 	tay
-	lda EndCreditsData,Y
+	lda EndCreditsData+0,Y
 	sta addressPtr_32+0
 	lda EndCreditsData+1,Y
 	sta addressPtr_32+1
+	; addressPtr_32 holds the address for the phrase
+	; the first two bytes are the coordinates where to write
+	; (actually, the address in vram)
+	; Store the coordinates at vramAddress_67
 	ldy #$00
 	lda (addressPtr_32),Y
 	sta vramAddress_67+0
@@ -2790,43 +2835,48 @@ RepeatedTitles:
 	lda (addressPtr_32),Y
 	sta vramAddress_67+1
 	iny
+	; Loop over all the caracters until
+	; until a control character $FF is found
 	loopLoadCredits:
+		; move "cursor" to the correct position
 		lda vramAddress_67+0
 		sta PpuAddr_2006
 		lda vramAddress_67+1
 		sta PpuAddr_2006
+		; load the next character (ASCII code)
 		lda (addressPtr_32),Y
+		; if "EOF", finish writing line.
 		cmp #$FF
 		beq leaveEndCredits
+		; if "SPACE", write character $OO
 		cmp #$20
 		bne :+
 		lda #$00
 		sta PpuData_2007
 		lda #$00
-		sta PpuScroll_2005
+		sta PpuScroll_2005 ; reset scrolling
 		sta PpuScroll_2005
 		beq :++
-		:
+
+		: 	; writing a character
 		sec
-		sbc #$36
+		sbc #$36 ; subtract offset to convert from ASCII to CHR
 		sta PpuData_2007
 		lda #$00
+		sta PpuScroll_2005 ; reset scrolling
 		sta PpuScroll_2005
-		sta PpuScroll_2005
+		
+		; play a sound effect
 		lda #$0A
 		sta soundAddress_8D
 		nop;
 		nop;
 		nop;jsr PlaySFX
-		:
-		lda vramAddress_67+1
-		clc
-		adc #$01
-		sta vramAddress_67+1
-		lda vramAddress_67+0
-		adc #$00
-		sta vramAddress_67+0
-		doWait_07_Blanks:
+
+		: ; advance to next screen position
+		Add16 vramAddress_67, #1
+		
+		; wait 7 vblanks between characters
 		ldx #$07
 		:
 			jsr WaitVBlank
@@ -2834,9 +2884,12 @@ RepeatedTitles:
 			bne :-
 		iny
 		bne loopLoadCredits
+	
+	; play another sound
 	nop;
 	nop;
 	nop;jsr DoSomethingWithSound 
+
 	leaveEndCredits:
 	rts
 .endproc
@@ -3371,7 +3424,7 @@ Data_at9D22:
 	bne :++
 	lda var_43
 	bne :++
-	lda (addressPtr_32),Y ; XXX
+	lda (addressPtr_32),Y ; 
 	sta OAM_0200+OBJ_TILE,X	; tile #
 	lda objects_Y_42				
 	sta OAM_0200+OBJ_Y,X	; y 
