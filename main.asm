@@ -2304,9 +2304,17 @@ Data_at90BF:
 ;.incbin "rom-prg/objects/data-block-at90BF.bin"
 .res 10
 
-Data_at90C9:
+Data_at90C9: ; Boss 1 Sparkles
 ;.incbin "rom-prg/objects/data-block-at90C9.bin"
-.res 59
+.byte $3D, $FD, $FE, $3C, $FD, $FF, $3D, $FD
+.byte $FF, $3C, $FD, $00, $3D, $FD, $01, $3C
+.byte $FD, $01, $3D, $FD, $02, $3C, $FD, $01
+.byte $3D, $FE, $02, $3C, $FF, $03, $3D, $01
+.byte $03, $3C, $02, $02, $3D, $03, $01, $3C
+.byte $03, $FF, $3D, $02, $FE, $3C, $01, $FD
+.byte $3D, $FF, $FD, $3C, $FE, $FE, $3D, $FD
+.byte $FF, $FE, $00
+;.res 59
 
 Data_at9104:
 ;.incbin "rom-prg/objects/data-block-at9104.bin"
