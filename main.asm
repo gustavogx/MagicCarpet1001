@@ -2362,23 +2362,63 @@ Data_at9152:
 
 Data_at9158:
 ;.incbin "rom-prg/objects/data-block-at9158.bin"
-.res 59
+.byte $18, $FE, $FC, $17, $FE, $FD, $18, $FE
+.byte $FD, $17, $FE, $FF, $18, $FE, $00, $17
+.byte $FE, $00, $18, $FE, $01, $17, $FE, $00
+.byte $18, $FF, $01, $17, $00, $02, $18, $00
+.byte $02, $17, $01, $01, $18, $02, $00, $17
+.byte $02, $FD, $18, $01, $FC, $17, $00, $FB
+.byte $18, $00, $FB, $17, $FF, $FC, $18, $FE
+.byte $FD, $FE, $00
+;.res 59
 
 Data_at9193:
 ;.incbin "rom-prg/objects/data-block-at9193.bin"
-.res 59
+.byte $18, $FD, $FC, $17, $FD, $FD, $18, $FD
+.byte $FD, $17, $FD, $FF, $18, $FD, $01, $17
+.byte $FD, $01, $18, $FD, $02, $17, $FD, $01
+.byte $18, $FE, $02, $17, $FF, $03, $18, $01
+.byte $03, $17, $02, $02, $18, $03, $01, $17
+.byte $03, $FE, $18, $02, $FD, $17, $01, $FC
+.byte $18, $FF, $FC, $17, $FD, $FC, $18, $FC
+.byte $FD, $FE, $00
+;.res 59
 
 Data_at91CE:
 ;.incbin "rom-prg/objects/data-block-at91CE.bin"
-.res 59
+.byte $18, $FD, $FE, $17, $FD, $FF, $18, $FD
+.byte $FF, $17, $FD, $00, $18, $FD, $01, $17
+.byte $FD, $01, $18, $FD, $02, $17, $FD, $01
+.byte $18, $FD, $02, $17, $FE, $03, $18, $00
+.byte $03, $17, $01, $02, $18, $02, $01, $17
+.byte $02, $FF, $18, $01, $FE, $17, $00, $FD
+.byte $18, $FE, $FD, $17, $FD, $FE, $18, $FC
+.byte $FF, $FE, $00
+;.res 59
 
 Data_at9209:
 ;.incbin "rom-prg/objects/data-block-at9209.bin"
-.res 59
+.byte $18, $FD, $04, $17, $FD, $03, $18, $FD
+.byte $03, $17, $FD, $01, $18, $FD, $FF, $17
+.byte $FD, $FF, $18, $FD, $FE, $17, $FD, $FF
+.byte $18, $FE, $FE, $17, $FF, $FD, $18, $01
+.byte $FD, $17, $02, $FE, $18, $03, $FF, $17
+.byte $03, $02, $18, $02, $03, $17, $01, $04
+.byte $18, $FF, $04, $17, $FD, $04, $18, $FC
+.byte $03, $FE, $00
+;.res 59
 
 Data_at9244:
 ;.incbin "rom-prg/objects/data-block-at9244.bin"
-.res 59
+.byte $18, $FE, $04, $17, $FE, $03, $18, $FE 
+.byte $03, $17, $FE, $01, $18, $FE, $00, $17
+.byte $FE, $00, $18, $FE, $FF, $17, $FE, $00
+.byte $18, $FF, $FF, $17, $00, $FE, $18, $00
+.byte $FE, $17, $01, $FF, $18, $02, $00, $17
+.byte $02, $03, $18, $01, $04, $17, $00, $05
+.byte $18, $00, $05, $17, $FF, $04, $18, $FE
+.byte $03, $FE, $00
+;.res 59
 
 
 ;
