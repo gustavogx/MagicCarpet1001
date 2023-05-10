@@ -24,7 +24,7 @@ function printInfo()
   emu.drawString(175, 12, "Stage " .. emu.read(0x15,type), 0xFFFFFF, 0xFF000000, 1)
   
   nObj=0
-  for i=0,32,1
+  for i=0,31,1
   do
    
     x=54+i*6
@@ -48,7 +48,7 @@ function printInfo()
   end
 
   emu.drawString(12,22,"#obj "..nObj,0xFFFFFF, 0xFF000000, 1)
-  emu.drawString(12, 39,"Enemy Batch #"..emu.read(0x5B,type),0xFFFFFF, 0xFF000000, 1)    
+  emu.drawString(12, 39,"Enemy Wave #"..emu.read(0x5B,type),0xFFFFFF, 0xFF000000, 1)    
   emu.drawString(106, 39, "Next: "..emu.read(0x5C,type) , 0xFFFFFF, 0xFF000000, 1)
   emu.drawString(175, 39, "Progress: "..emu.read(0x16,type) , 0xFFFFFF, 0xFF000000, 1)
 

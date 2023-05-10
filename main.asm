@@ -198,8 +198,8 @@
 .define var_58				$58 ; 5
 .define var_59				$59 ; 5 ; flag that is either #$06 or #$FA (250)
 .define var_5A				$5A ; 3
-.define currentEnemyBatch_5B	$5B ; 3
-.define nextEnemyBatch_5C		$5C ; 5
+.define currentEnemyWave_5B	$5B ; 3
+.define nextEnemyWave_5C	$5C ; 5
 ; $5D
 .define var_5E				$5E ; 2
 .define var_5F				$5F ; 9
@@ -257,7 +257,7 @@
 
 .segment "RAM" ; LSB 0100 - 07FF
 
-.define someObjProperty_0100 $0100 ; 1 only used once
+.define someObjProperty_0100 $0100 ; 1 only used once in UnusedFunction1
 
 ; page 02 - OAM
 .define OBJ_Y 		0
@@ -312,8 +312,8 @@
 .define someObjProperty_0601 $0601 ; #4 of 10-byte file
 .define someObjProperty_0602 $0602 ; #1 of 10-byte file
 .define healthPoints_0603 	 $0603 ; #5 of 10-byte file
-.define someObjProperty_0604 $0604 ; #8 of 10-byte file
-.define someObjProperty_0605 $0605 ; #9 of 10-byte file
+.define someObjProperty_0604 $0604 ; #8 of 10-byte file ;; maybe speedX_0604
+.define someObjProperty_0605 $0605 ; #9 of 10-byte file ;; maybe speedY_0604
 
 ; page 07
 .define someObjProperty_0700 $0700 ; #10 of 10-byte file (also $0300)
@@ -514,12 +514,12 @@ MaybeStartingNewGame:
 	sta flagPPUControl_19
 	
 	lda #$0A
-	sta nextEnemyBatch_5C
+	sta nextEnemyWave_5C
 	
 	lda #$00
 	sta input1_20
 	sta inputPrev_22
-	sta currentEnemyBatch_5B
+	sta currentEnemyWave_5B
 	sta aliveTimer_14
 	sta frameCounter64_13
 	
@@ -616,11 +616,11 @@ MaybeStartingNewGame:
 ; $8175
 ; LoadEnemyBatch
 ; Loads Batch of Enemies
-; Inputs: nextEnemyBatch_5C, currentEnemyBatch_5B
-; Variable nextEnemyBatch_5C holds the timer for loading next enemy batch.
+; Inputs: nextEnemyWave_5C, currentEnemyWave_5B
+; Variable nextEnemyWave_5C holds the timer for loading next enemy batch.
 ; If timer larger than or equal to $FA, spawn new batch.
 .proc LoadEnemyBatch
-	lda nextEnemyBatch_5C 		; count down until next batch load
+	lda nextEnemyWave_5C 		; count down until next batch load
 	cmp #$FA					; will load next batch if counter >= $FA 
 	bcs :+						; continue if it is time to load
 	jmp doneLoadingEnemyBatch	; exit 
@@ -636,7 +636,7 @@ MaybeStartingNewGame:
 	lda ObjectsData_A885+1,Y	; hi-byte of stage's enemy data
 	sta objectPtr_34+1
 
-	lda currentEnemyBatch_5B	; index for current enemy batch
+	lda currentEnemyWave_5B	; index for current enemy batch
 	asl A
 	tay
 	lda (objectPtr_34),Y		; lo-byte of current enemy batch
@@ -752,12 +752,12 @@ MaybeStartingNewGame:
 
 doneLooping:
 
-	inc currentEnemyBatch_5B
+	inc currentEnemyWave_5B
 
-	lda nextEnemyBatch_5C
+	lda nextEnemyWave_5C
 	clc
 	adc #$F0
-	sta nextEnemyBatch_5C
+	sta nextEnemyWave_5C
 
 doneLoadingEnemyBatch:
 	rts
@@ -2041,9 +2041,9 @@ Data_at8E3F:
 	pha
 	jsr FindFreeObjectSlot_rX
 	cpx #$F0
-	bcs :+
+	bcs :+ ; no slot available
 
-	jsr UnknownSub18
+	jsr UpdatePosition_ObjectX_EnemyY
 	ldy var_4A
 	jsr UnknownSub19
 	lda #$01
@@ -2069,20 +2069,27 @@ Data_at8E3F:
 .endproc
 ;
 ; $8E81
-.proc UnknownSub18
+; UpdatePosition_ObjectX_EnemyY
+; Updates the position of an Object (X)
+; by adding a displacement from an
+; Enemy (Y) A.I.
+.proc UpdatePosition_ObjectX_EnemyY
 
-	lda someObjProperty_0400,Y
+	; Add16 $0604 to $0400
+	lda someObjProperty_0400,Y ; positionX_Lo
 	clc
-	adc someObjProperty_0604,Y
-	sta someObjProperty_0400,X
-	lda someObjProperty_0401,Y
+	adc someObjProperty_0604,Y ; speedX
+	sta someObjProperty_0400,X 
+	lda someObjProperty_0401,Y ; positionX_Hi
 	adc #$00
 	sta someObjProperty_0401,X
-	lda someObjProperty_0402,Y
+
+	; Add16 $0605 to $0402
+	lda someObjProperty_0402,Y ; positionY_Lo
 	clc
-	adc someObjProperty_0605,Y
+	adc someObjProperty_0605,Y ; speedY
 	sta someObjProperty_0402,X
-	lda someObjProperty_0403,Y
+	lda someObjProperty_0403,Y ; positionY_Hi
 	adc #$00
 	sta someObjProperty_0403,X
 	rts
@@ -2103,7 +2110,265 @@ Data_at8E3F:
 ;
 ; $8EBE
 Data_at8EBE:
-.incbin "rom-prg/objects/data-block-at8EBE.bin"
+.addr Data_at8F36, Data_at8F3F, Data_at8F4A, Data_at8F55
+.addr Data_at8F5F, Data_at8F69, Data_at8F72, Data_at8F7D
+.addr Data_at8F88, Data_at8F92, Data_at8F97, Data_at8FA0
+.addr Data_at8FAB, Data_at8FB6, Data_at8FC0, Data_at8FC5
+.addr Data_at8FCE, Data_at8FD9, Data_at8FE4, Data_at8FEE
+.addr Data_at8FF3, Data_at8FFC, Data_at9007, Data_at9012
+.addr Data_at901C, Data_at9021, Data_at902A, Data_at9035
+.addr Data_at9040, Data_at904A, Data_at904F, Data_at9058
+.addr Data_at9063, Data_at906E, Data_at9078, Data_at907D
+.addr Data_at9086, Data_at9091, Data_at909C, Data_at90A6
+.addr Data_at90AB, Data_at90B5, Data_at90BF, Data_at90C9
+.addr Data_at9104, Data_at910E, Data_at9118, Data_at9122
+.addr Data_at9128, Data_at9131, Data_at9137, Data_at913D
+.addr Data_at9143, Data_at914C, Data_at9152, Data_at9158
+.addr Data_at9193, Data_at91CE, Data_at9209, Data_at9244
+
+;.incbin "rom-prg/objects/data-block-at8EBE-2.bin"
+
+Data_at8F36:
+;.incbin "rom-prg/objects/data-block-at8F36.bin"
+.res 9
+
+Data_at8F3F:
+;.incbin "rom-prg/objects/data-block-at8F3F.bin"
+.res 11
+
+Data_at8F4A:
+;.incbin "rom-prg/objects/data-block-at8F4A.bin"
+.res 11
+
+Data_at8F55:
+;.incbin "rom-prg/objects/data-block-at8F55.bin"
+.res 10
+
+Data_at8F5F:
+;.incbin "rom-prg/objects/data-block-at8F5F.bin"
+.res 10
+
+Data_at8F69:
+;.incbin "rom-prg/objects/data-block-at8F69.bin"
+.res 9
+
+Data_at8F72:
+;.incbin "rom-prg/objects/data-block-at8F72.bin"
+.res 11
+
+Data_at8F7D:
+;.incbin "rom-prg/objects/data-block-at8F7D.bin"
+.res 11
+
+Data_at8F88:
+;.incbin "rom-prg/objects/data-block-at8F88.bin"
+.res 10
+
+Data_at8F92:
+;.incbin "rom-prg/objects/data-block-at8F92.bin"
+.res 5
+
+Data_at8F97:
+;.incbin "rom-prg/objects/data-block-at8F97.bin"
+.res 9
+
+Data_at8FA0:
+;.incbin "rom-prg/objects/data-block-at8FA0.bin"
+.res 11
+
+Data_at8FAB:
+;.incbin "rom-prg/objects/data-block-at8FAB.bin"
+.res 11
+
+Data_at8FB6:
+;.incbin "rom-prg/objects/data-block-at8FB6.bin"
+.res 10
+
+Data_at8FC0:
+;.incbin "rom-prg/objects/data-block-at8FC0.bin"
+.res 5
+
+Data_at8FC5:
+;.incbin "rom-prg/objects/data-block-at8FC5.bin"
+.res 9
+
+Data_at8FCE:
+;.incbin "rom-prg/objects/data-block-at8FCE.bin"
+.res 11
+
+Data_at8FD9:
+;.incbin "rom-prg/objects/data-block-at8FD9.bin"
+.res 11
+
+Data_at8FE4:
+;.incbin "rom-prg/objects/data-block-at8FE4.bin"
+.res 10
+
+Data_at8FEE:
+;.incbin "rom-prg/objects/data-block-at8FEE.bin"
+.res 5
+
+Data_at8FF3:
+;.incbin "rom-prg/objects/data-block-at8FF3.bin"
+.res 9
+
+Data_at8FFC:
+;.incbin "rom-prg/objects/data-block-at8FFC.bin"
+.res 11
+
+Data_at9007:
+;.incbin "rom-prg/objects/data-block-at9007.bin"
+.res 11
+
+Data_at9012:
+;.incbin "rom-prg/objects/data-block-at9012.bin"
+.res 10
+
+Data_at901C:
+;.incbin "rom-prg/objects/data-block-at901C.bin"
+.res 5
+
+Data_at9021:
+;.incbin "rom-prg/objects/data-block-at9021.bin"
+.res 9
+
+Data_at902A:
+;.incbin "rom-prg/objects/data-block-at902A.bin"
+.res 11
+
+Data_at9035:
+;.incbin "rom-prg/objects/data-block-at9035.bin"
+.res 11
+
+Data_at9040:
+;.incbin "rom-prg/objects/data-block-at9040.bin"
+.res 10
+
+Data_at904A:
+;.incbin "rom-prg/objects/data-block-at904A.bin"
+.res 5
+
+Data_at904F:
+;.incbin "rom-prg/objects/data-block-at904F.bin"
+.res 9
+
+Data_at9058:
+;.incbin "rom-prg/objects/data-block-at9058.bin"
+.res 11
+
+Data_at9063:
+;.incbin "rom-prg/objects/data-block-at9063.bin"
+.res 11
+
+Data_at906E:
+;.incbin "rom-prg/objects/data-block-at906E.bin"
+.res 10
+
+Data_at9078:
+;.incbin "rom-prg/objects/data-block-at9078.bin"
+.res 5
+
+Data_at907D:
+;.incbin "rom-prg/objects/data-block-at907D.bin"
+.res 9
+
+Data_at9086:
+;.incbin "rom-prg/objects/data-block-at9086.bin"
+.res 11
+
+Data_at9091:
+;.incbin "rom-prg/objects/data-block-at9091.bin"
+.res 11
+
+Data_at909C:
+;.incbin "rom-prg/objects/data-block-at909C.bin"
+.res 10
+
+Data_at90A6:
+;.incbin "rom-prg/objects/data-block-at90A6.bin"
+.res 5
+
+Data_at90AB:
+;.incbin "rom-prg/objects/data-block-at90AB.bin"
+.res 10
+
+Data_at90B5:
+;.incbin "rom-prg/objects/data-block-at90B5.bin"
+.res 10
+
+Data_at90BF:
+;.incbin "rom-prg/objects/data-block-at90BF.bin"
+.res 10
+
+Data_at90C9:
+;.incbin "rom-prg/objects/data-block-at90C9.bin"
+.res 59
+
+Data_at9104:
+;.incbin "rom-prg/objects/data-block-at9104.bin"
+.res 10
+
+Data_at910E:
+;.incbin "rom-prg/objects/data-block-at910E.bin"
+.res 10
+
+Data_at9118:
+;.incbin "rom-prg/objects/data-block-at9118.bin"
+.res 10
+
+Data_at9122:
+;.incbin "rom-prg/objects/data-block-at9122.bin"
+.res 6
+
+Data_at9128:
+;.incbin "rom-prg/objects/data-block-at9128.bin"
+.res 9
+
+Data_at9131:
+;.incbin "rom-prg/objects/data-block-at9131.bin"
+.res 6
+
+Data_at9137:
+;.incbin "rom-prg/objects/data-block-at9137.bin"
+.res 6
+
+Data_at913D:
+;.incbin "rom-prg/objects/data-block-at913D.bin"
+.res 6
+
+Data_at9143:
+;.incbin "rom-prg/objects/data-block-at9143.bin"
+.res 9
+
+Data_at914C:
+;.incbin "rom-prg/objects/data-block-at914C.bin"
+.res 6
+
+Data_at9152:
+;.incbin "rom-prg/objects/data-block-at9152.bin"
+.res 6
+
+Data_at9158:
+;.incbin "rom-prg/objects/data-block-at9158.bin"
+.res 59
+
+Data_at9193:
+;.incbin "rom-prg/objects/data-block-at9193.bin"
+.res 59
+
+Data_at91CE:
+;.incbin "rom-prg/objects/data-block-at91CE.bin"
+.res 59
+
+Data_at9209:
+;.incbin "rom-prg/objects/data-block-at9209.bin"
+.res 59
+
+Data_at9244:
+;.incbin "rom-prg/objects/data-block-at9244.bin"
+.res 59
+
+
 ;
 ; $927F
 .proc UnknownSub20
@@ -2112,12 +2377,12 @@ Data_at8EBE:
 	ldx #$00
 	
 	:
-	lda Data_at9291,X
-	sta var_4A
-	jsr UnknownSub17
-	inx
-	cpx #$05
-	bne :-
+		lda Data_at9291,X
+		sta var_4A
+		jsr UnknownSub17
+		inx
+		cpx #$05
+		bne :-
 	rts
 .endproc
 ;
@@ -2185,6 +2450,7 @@ Data_at92D4:
 .byte $66, $68, $6A, $6E, $70, $72, $74, $76
 ;
 ; $92DC
+; Clobbers A
 .proc UnknownSub15
 	txa
 	pha
@@ -2206,7 +2472,7 @@ Data_at92D4:
 	sta someObjProperty_0533
 	sta someObjProperty_0534
 	sta someObjProperty_0535
-	lda #<Data_at932D ;; see data below
+	lda #<Data_at932D ;; see data below XXX
 	sta objectPtr_34+0
 	lda #>Data_at932D ;; see data below
 	sta objectPtr_34+1
@@ -2230,8 +2496,8 @@ Data_at92D4:
 ; $932D
 Data_at932D:
 ;.incbin "rom-prg/objects/data-block-at932D.bin"
-.word Data_at9335, Data_at933D
-.word Data_at9345, Data_at934D
+.addr Data_at9335, Data_at933D
+.addr Data_at9345, Data_at934D
 
 Data_at9335: ; Boss 1 shoot animation (one frame)
 .byte $29, $00, $00, $86, $29, $00, $00, $FF 
@@ -3018,7 +3284,7 @@ Data_at9D22:
 	lda frameCounter_12
 	and #$01 	; Checking if this is an ODD frame
 	bne :+		; Skip if ODD
-	dec nextEnemyBatch_5C	; Decrement the counter for next enemy batch on EVEN frames
+	dec nextEnemyWave_5C	; Decrement the counter for next enemy batch on EVEN frames
 	
 	:
 	lda var_5E
