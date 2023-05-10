@@ -2128,21 +2128,25 @@ Data_at8EBE:
 
 ;.incbin "rom-prg/objects/data-block-at8EBE-2.bin"
 
-Data_at8F36:
+Data_at8F36: ; bubble shots (rocket beduins?)
 ;.incbin "rom-prg/objects/data-block-at8F36.bin"
-.res 9
+.byte $16, $FE, $FE, $81, $16, $00, $00, $FE, $00
+;.res 9
 
 Data_at8F3F:
 ;.incbin "rom-prg/objects/data-block-at8F3F.bin"
-.res 11
+.byte $16, $FF, $FF, $C2, $00, $16, $FF, $00, $81, $FE, $00
+;.res 11
 
-Data_at8F4A:
+Data_at8F4A: ; bubble shots (bees?)
 ;.incbin "rom-prg/objects/data-block-at8F4A.bin"
-.res 11
+.byte $16, $FE, $FF, $81, $C4, $00, $16, $00, $00, $FE, $00
+;.res 11
 
-Data_at8F55:
+Data_at8F55: ; bubble shots (rocket beduins?)
 ;.incbin "rom-prg/objects/data-block-at8F55.bin"
-.res 10
+.byte $16, $FF, $00, $C2, $00, $16, $FF, $FF, $FE, $00
+;.res 10
 
 Data_at8F5F:
 ;.incbin "rom-prg/objects/data-block-at8F5F.bin"
@@ -3631,22 +3635,22 @@ Data_at9D22:
 	
 	ReplaceMeLabel_6:
 	lda someObjProperty_0404,X
-	and #$20
+	and #BIT5
 	bne :+
 	jmp SecondPart
 	
 	:
 	lda someObjProperty_0405,X
-	and #$18
+	and #(BIT3+BIT4)
 	beq :+
 	lda frameCounter_12
-	and #$03
+	and #(BIT0+BIT1)
 	bne :+
 	dec someObjProperty_0300,X
 	lda someObjProperty_0300,X
 	bne :+
 	lda someObjProperty_0404,X
-	ora #$08
+	ora #BIT3
 	sta someObjProperty_0404,X
 	
 	:
