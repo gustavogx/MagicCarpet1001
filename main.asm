@@ -165,19 +165,19 @@
 ; $39 low byte of $38
 .define objectPtr_3A		$3A ; 13 (word address)
 ; $3B low byte of $3A
-.define var_3C				$3C ; 2
+.define counter_W_3C		$3C ; 2
 .define var_3D				$3D	; 3
 .define oamAddressPtr_3E	$3E ; 6 (word address)
 ; $3F low byte of $3E
 
 .define var_40				$40	; 5
 .define var_41				$41 ; 5
-.define objects_Y_42		$42	; 7 ; used for Lives HUD and enemy shots
-.define var_43				$43 ; 6
+.define tile_Y_Lo_42		$42	; 7
+.define tile_Y_Hi_43				$43 ; 6
 .define var_44				$44 ; 2
-.define var_45				$45 ; 2
-.define objects_X_46		$46 ; 6 ; used for Lives HUD and enemy shots
-.define var_47				$47	; 7
+.define counter_H_45				$45 ; 2
+.define tile_X_Lo_46		$46 ; 6 
+.define tile_X_Hi_47		$47	; 7
 .define var_48				$48 ; 2
 .define var_49				$49 ; 4
 .define var_4A				$4A ; 7
@@ -3266,11 +3266,11 @@ Data_at97F5:
 .segment "SOUNDENGINE"
 ;.include "sound-engine.asm"
 
-.res 1293
+;.res 1293
 
 ; $9D22 data
 Data_at9D22:
-.incbin "rom-prg/sound/sound-data-at9D32.bin"
+;.incbin "rom-prg/sound/sound-data-at9D32.bin"
 
 ;
 ; $A3AC
@@ -3463,9 +3463,9 @@ Data_at9D22:
 	ldy someObjProperty_0503,X
 	
 	ReplaceMeLabel_7:
-	lda (objectPtr_36),Y
-	bmi :+
-	jmp ReplaceMeLabel_3
+	lda (objectPtr_36),Y ; reads which object to load
+	bmi :+				 ; if index is negative, skip ahead
+	jmp RetrieveObject   ; if index is positive, will load
 	
 	:
 	asl A
@@ -3486,13 +3486,13 @@ Data_at9D22:
 	lda #$00
 	
 	:
-	sta var_47
+	sta tile_X_Hi_47
 	lda var_0C
 	clc
 	adc someObjProperty_0400,X
 	sta someObjProperty_0400,X
 	sta var_40
-	lda var_47
+	lda tile_X_Hi_47
 	adc someObjProperty_0401,X
 	sta someObjProperty_0401,X
 	sta var_41
@@ -3510,11 +3510,11 @@ Data_at9D22:
 	clc
 	adc someObjProperty_0402,X
 	sta someObjProperty_0402,X
-	sta objects_Y_42
+	sta tile_Y_Lo_42
 	lda var_49
 	adc someObjProperty_0403,X
 	sta someObjProperty_0403,X
-	sta var_43
+	sta tile_Y_Hi_43
 	jmp ReplaceMeLabel_5
 	
 	ReplaceMeLabel_4:
@@ -3523,9 +3523,9 @@ Data_at9D22:
 	lda someObjProperty_0401,X
 	sta var_41
 	lda someObjProperty_0402,X
-	sta objects_Y_42
+	sta tile_Y_Lo_42
 	lda someObjProperty_0403,X
-	sta var_43
+	sta tile_Y_Hi_43
 	
 	ReplaceMeLabel_5:
 	inc someObjProperty_0503,X
@@ -3559,7 +3559,7 @@ Data_at9D22:
 		lda (objectPtr_36),Y
 		tay
 		lda (objectPtr_36),Y
-		jmp ReplaceMeLabel_3
+		jmp RetrieveObject
 		
 		loopTest:
 		cmp #$F8
@@ -3606,14 +3606,14 @@ Data_at9D22:
 	:
 	jmp SecondPart
 	
-	ReplaceMeLabel_3:
-	asl A
-	sta someObjProperty_0701,X
-	tax
-	lda Data_atA895+0,X
+	RetrieveObject:				; A holds index for object to be loaded
+	asl A						; index is doubled since addresses are 16bit (double stride)
+	sta someObjProperty_0701,X 	; store obj index
+	tax							; start using index as X offset
+	lda Data_atA895+0,X 		; Data_atA895 is the animation frames book.
 	sta addressPtr_32+0
 	lda Data_atA895+1,X
-	sta addressPtr_32+1
+	sta addressPtr_32+1 		; Now addressPtr_32 points to the animation frame
 	iny
 	ldx var_5F
 	lda someObjProperty_0405,X
@@ -3627,7 +3627,7 @@ Data_at9D22:
 	lda (objectPtr_36),Y
 	
 	:
-	sta objects_X_46
+	sta tile_X_Lo_46
 	bpl :+
 	lda #$FF
 	bne :++
@@ -3636,13 +3636,13 @@ Data_at9D22:
 	lda #$00
 	
 	:
-	sta var_47
-	lda objects_X_46
+	sta tile_X_Hi_47
+	lda tile_X_Lo_46
 	clc
 	adc someObjProperty_0400,X
 	sta someObjProperty_0400,X
 	sta var_40
-	lda var_47
+	lda tile_X_Hi_47
 	adc someObjProperty_0401,X
 	sta someObjProperty_0401,X
 	sta var_41
@@ -3672,11 +3672,11 @@ Data_at9D22:
 	clc
 	adc someObjProperty_0402,X
 	sta someObjProperty_0402,X
-	sta objects_Y_42
+	sta tile_Y_Lo_42
 	lda var_49
 	adc someObjProperty_0403,X
 	sta someObjProperty_0403,X
-	sta var_43
+	sta tile_Y_Hi_43
 	iny
 	tya
 	sta someObjProperty_0503,X
@@ -3701,90 +3701,95 @@ Data_at9D22:
 	ora #BIT3
 	sta someObjProperty_0404,X
 	
-	:
-	ldy #$00
-	lda (addressPtr_32),Y
-	bpl :+
-	jmp ReplaceMeLabel_8
+	; loads a frame of animation
+	; X indexes the object
+	; Y indexes the file being loaded
+	:				
+	ldy #$00			  ; starts from first tile
+	lda (addressPtr_32),Y ; reads object WIDTH in pixels
+	bpl :+				  ; if positive, continue
+	jmp ReplaceMeLabel_8  ; if negative, do something else
 	
 	:
-	sta someObjProperty_0600,X
+	sta someObjProperty_0600,X	; stores WIDTH
+	lsr A						; divide by 8 (get size in tiles)
 	lsr A
+	lsr A
+	clc		
+	adc #$01					; add 1
+	sta var_44  				; store W in temp variable
+	iny							; next value
+	lda (addressPtr_32),Y		; reads	object HEIGHT in pixels
+	sta someObjProperty_0601,X	; store HEIGHT
+	lsr A						; divide by 8 (get size in tiles)
 	lsr A
 	lsr A
 	clc
-	adc #$01
-	sta var_44
-	iny
-	lda (addressPtr_32),Y
-	sta someObjProperty_0601,X
-	lsr A
-	lsr A
-	lsr A
-	clc
-	adc #$01
-	sta var_45
-	iny
-	ldx oamAddressPtr_3E
+	adc #$01					; add 1
+	sta counter_H_45			; store H in temp variable
+	iny							; next value
+	ldx oamAddressPtr_3E		; loads next OAM free address
 	
 	ReplaceMeLabel_11:
 	lda var_44
-	sta var_3C
-	lda var_40
-	sta objects_X_46
-	lda var_41
-	sta var_47
+	sta counter_W_3C			; counts tiles in X
+	lda var_40					; X position LO
+	sta tile_X_Lo_46
+	lda var_41					; X position HI
+	sta tile_X_Hi_47
 	
-	ReplaceMeLabel_10:
-	lda (addressPtr_32),Y
-	beq :+
-	lda var_47
-	bne :++
-	lda var_43
-	bne :++
-	lda (addressPtr_32),Y ; 
-	sta OAM_0200+OBJ_TILE,X	; tile #
-	lda objects_Y_42				
-	sta OAM_0200+OBJ_Y,X	; y 
-	iny
-	lda (addressPtr_32),Y
-	sta OAM_0200+OBJ_ATT,X	; attributes
-	lda objects_X_46
-	sta OAM_0200+OBJ_X,X	; x
+	
+	loopLoadFrameTiles:			; load frame tiles
+	lda (addressPtr_32),Y		; load tile index
+	beq :+						; if tile $00 (blank), skip
+	lda tile_X_Hi_47			; check X HI
+	bne :++						; break if X HI not zero
+	lda tile_Y_Hi_43			; check Y HI
+	bne :++						; break if Y HI not zero
+	lda (addressPtr_32),Y 		; load tile index from file
+	sta OAM_0200+OBJ_TILE,X		; store tile index in OAM
+	lda tile_Y_Lo_42			; load tile Y position from RAM
+	sta OAM_0200+OBJ_Y,X		; store tile Y position in OAM 
+	iny							; next value
+	lda (addressPtr_32),Y		; load tile attributes
+	sta OAM_0200+OBJ_ATT,X		; store tile attributes in OAM
+	lda tile_X_Lo_46			; load tile X position from RAM
+	sta OAM_0200+OBJ_X,X		; store tile X position in OAM
 	txa
 	clc
-	adc #$04
-	beq ReplaceMeLabel_9
-	tax
+	adc #$04					; 4-byte stride in OAM
+	beq ReplaceMeLabel_9		; break if overflow
+	tax	
 	
+	; also arive here if found a blank tile
 	:
-	iny
-	dec var_3C
-	beq :++
-	lda objects_X_46
+	iny						; next value
+	dec counter_W_3C		; decrement W counter
+	beq :++					; break if end-of-line
+	lda tile_X_Lo_46		
 	adc #$08
-	sta objects_X_46
-	bcc ReplaceMeLabel_10
-	inc var_47
-	jmp ReplaceMeLabel_10
+	sta tile_X_Lo_46		; step 8 pixels in X
+	bcc loopLoadFrameTiles	; loop if less than $FF
+	inc tile_X_Hi_47		; add carry to X_HI
+	jmp loopLoadFrameTiles  ; loop
 	
 	:
 	iny
 	jmp :--
 	
-	:
-	dec var_45
-	beq :+
-	lda objects_Y_42
+	: ; end-of-line
+	dec counter_H_45		; decrement H counter
+	beq :+					; break if end-of-file
+	lda tile_Y_Lo_42		
 	clc
 	adc #$08
-	sta objects_Y_42
-	bcc ReplaceMeLabel_11
-	inc var_43
-	jmp ReplaceMeLabel_11
+	sta tile_Y_Lo_42		; step 8 pixels in Y
+	bcc ReplaceMeLabel_11	; if not overflow, loop to next frame
+	inc tile_Y_Hi_43		; if overflow, add to Y HI
+	jmp ReplaceMeLabel_11	; loop to next frame
 	
 	:
-	stx oamAddressPtr_3E
+	stx oamAddressPtr_3E	; stores back next OAM free address
 	
 	SecondPart:
 	lda var_5F
@@ -3809,9 +3814,9 @@ Data_at9D22:
 	ldx oamAddressPtr_3E
 	lda var_41
 	bne SecondPart
-	lda var_43
+	lda tile_Y_Hi_43
 	bne SecondPart
-	lda objects_Y_42
+	lda tile_Y_Lo_42
 	sta OAM_0200+OBJ_Y,X
 	iny
 	lda (addressPtr_32),Y
