@@ -34,6 +34,8 @@
 .define FREE_OBJECT_SLOTS	$20
 .define ENEMY_OBJECT_START	FREE_SHOT_SLOTS*OBJECT_BYTE_SIZE+SHOT_OBJECT_START
 
+.define VRAM_PALETTES_PAGE $3F
+
 ; using MESEN naming convention
 .define PpuControl_2000		$2000
 .define PpuMask_2001		$2001
@@ -53,7 +55,6 @@
 .define BankSwitching_FFF0 	$FFF0
 .define UpdateDuringVBlank_Flag2	$75
 
-.define VRAM_PALETTES_PAGE $3F
 
 ; macro GetObjectsIndexTable_Y
 ; Read the current stage index from currentStage_15
@@ -260,13 +261,13 @@
 .define var_56				$56 ; 5 ; object loading property
 .define var_57				$57 ; 5 ; object loading property
 .define var_58				$58 ; 5
-.define var_59				$59 ; 5 ; flag that is either #$06 or #$FA (250)
+.define objIndexStep_59		$59 ; 5 ; it is either +6 or -6
 .define var_5A				$5A ; 3
 .define currentEnemyWave_5B	$5B ; 3
 .define nextEnemyWave_5C	$5C ; 5
 ; $5D
 .define var_5E				$5E ; 2
-.define var_5F				$5F ; 9
+.define objectIndex_5F		$5F ; 9
 
 .define var_60				$60 ; 7
 ; $61
@@ -386,8 +387,8 @@
 .define someObjProperty_0601 $0601 ; #4 of 10-byte file
 .define someObjProperty_0602 $0602 ; #1 of 10-byte file
 .define healthPoints_0603 	 $0603 ; #5 of 10-byte file
-.define someObjProperty_0604 $0604 ; #8 of 10-byte file ;; maybe speedX_0604
-.define someObjProperty_0605 $0605 ; #9 of 10-byte file ;; maybe speedY_0604
+.define someObjProperty_0604 $0604 ; #8 of 10-byte file 
+.define someObjProperty_0605 $0605 ; #9 of 10-byte file
 
 ; page 07
 .define someObjProperty_0700 $0700 ; #10 of 10-byte file (also $0300)
@@ -445,9 +446,10 @@ BankSequenceArray:
 ; $8010
 ; Reset handler, called by reset interrupt
 HandleReset:
-	lda #(BIT7+BIT6)	; flags %1100 0000
+	lda #(BIT7+BIT6)		; flags %1100 0000
 	sta Ctrl2_FrameCtr_4017
 	
+	; PPU Warm up
 	ldx #$10 ; Wait 16 cycles for PPU to reach its stable state
 	:	
 		lda PpuStatus_2002
@@ -460,7 +462,7 @@ HandleReset:
 	ldx #$00
 	jsr SetupAfterReset	
 
-	jsr SetFlag_59
+	jsr SetStep_59
 	nop;
 	nop;
 	nop; jsr ResetSoundEngine
@@ -685,10 +687,15 @@ MaybeStartingNewGame:
 ; $8170
 ; Why use a JMP call for this?
 ; It is used only once during Reset and
-; having these 2 lines there is of no consequence.
-.proc SetFlag_59
-	lda #$06
-	sta var_59
+; having these 2 lines, it is of no consequence.
+; Maybe it was a last minute fix done on the ROM itself.
+; This step is used to add or subtract from the unknownCounter_5F
+; It has two possible values: 6 or -6
+; unknownCounter_5F counts up from 0 to 240
+; and then counts down from 240 back 	to 0
+.proc SetStep_59
+	lda #OBJECT_BYTE_SIZE	
+	sta objIndexStep_59
 	rts
 .endproc
 ;
@@ -1733,7 +1740,7 @@ Data_at8B7A:
 ;
 ; $8BE5
 .proc InitializeGameVariables2
-	ldy #$06
+	ldy #OBJECT_BYTE_SIZE
 	lda #$C0
 	sta object_X_Lo_0400,Y
 	lda #$D8
@@ -1762,7 +1769,7 @@ Data_at8B7A:
 ; $8C23
 .proc MaybeTriggerNextLevel
 	lda #$00
-	sta var_5F
+	sta objectIndex_5F		; reset object handling index
 	lda flagNextLevel_1B
 	bne :+
 	lda #$02
@@ -3350,9 +3357,9 @@ Data_at97F5:
 Data_at9D22:
 ;.incbin "rom-prg/sound/sound-data-at9D32.bin"
 
+.segment "CODEBLOCK2"
 ;
 ; $A3AC
-.segment "CODEBLOCK2"
 .proc HandleVBlank
 PushAXY
 	lda updateDuringVBlank_0E
@@ -3407,8 +3414,8 @@ PushAXY
 	sta PpuControl_2000
 	
 	lda frameCounter_12
-	and #$01 	; Checking if this is an ODD frame
-	bne :+		; Skip if ODD
+	and #$01 				; Checking if this is an ODD frame
+	bne :+					; Skip if ODD
 	dec nextEnemyWave_5C	; Decrement the counter for next enemy batch on EVEN frames
 	
 	:
@@ -3425,7 +3432,7 @@ PushAXY
 	nop;
 	nop; jsr UpdateSoundAtVBlank
 
-PullAXY
+	PullAXY
 	RTI
 .endproc
 ;
@@ -3461,8 +3468,7 @@ PullAXY
 	bne doneWithScrolling
 	ldx levelProgression_16
 	
-	; testIfScrolled_14_Screens:
-	cpx #BG_SCROLL_LIMIT
+	cpx #BG_SCROLL_LIMIT		; test if reached end of stage
 	bcc doKeepScrollingStage 
 	lda #$02
 	sta flagGameMode_26
@@ -3505,17 +3511,20 @@ PullAXY
 .endproc
 ;
 ; $A46F
+; HandleObjects
+; This routine updates every object of the game, every VBlank time.
 .proc HandleObjects
 	lda #FIRST_OBJECT_SLOT		; Configuration constant
 	sta oamAddressPtr_3E		; Store first OAM address
-	lda var_5F					; Object index, initialized with $00
+	
+	lda objectIndex_5F			; Object index, initialized with $00
 	sta var_3D					; Store current object index
 	
 	BeginHere:
-	ldx var_5F					; load object index into X
-	lda object_Attrib_1_0404,X	; 
-	bmi :+
-	jmp SecondPart
+	ldx objectIndex_5F			; load object index into X
+	lda object_Attrib_1_0404,X	; check if object should be handled
+	bmi :+						; if negative, handle object
+	jmp UpdateObjectIndex		; else move forward.
 	
 	:
 	ldy someObjProperty_0504,X
@@ -3604,7 +3613,7 @@ PullAXY
 	sta addressPtr_32+0
 	lda Data_atA895+1,X
 	sta addressPtr_32+1
-	ldx var_5F
+	ldx objectIndex_5F
 	jmp ReplaceMeLabel_6
 	
 	ReplaceMeLabel_1:
@@ -3643,7 +3652,7 @@ PullAXY
 	lda object_Attrib_1_0404,X
 	ora #$08
 	sta object_Attrib_1_0404,X
-	jmp SecondPart
+	jmp UpdateObjectIndex
 	
 	:
 	lda someObjProperty_0303,X
@@ -3673,7 +3682,7 @@ PullAXY
 	sta object_Attrib_1_0404,X
 	
 	:
-	jmp SecondPart
+	jmp UpdateObjectIndex
 	
 	RetrieveObject:				; A holds index for object to be loaded
 	asl A						; index is doubled since addresses are 16bit (double stride)
@@ -3684,7 +3693,7 @@ PullAXY
 	lda Data_atA895+1,X
 	sta addressPtr_32+1 		; Now addressPtr_32 points to the animation frame
 	iny
-	ldx var_5F
+	ldx objectIndex_5F
 	lda object_Attrib_2_0405,X
 	bpl :+
 	lda (objectPtr_36),Y
@@ -3754,7 +3763,7 @@ PullAXY
 	lda object_Attrib_1_0404,X
 	and #BIT5
 	bne :+
-	jmp SecondPart
+	jmp UpdateObjectIndex
 	
 	:
 	lda object_Attrib_2_0405,X
@@ -3772,7 +3781,7 @@ PullAXY
 	
 	; loads a frame of animation
 	; X indexes the object
-	; Y indexes the file being loaded
+	; Y indexes the byte being loaded
 	:				
 	ldy #$00			  ; starts from first tile
 	lda (addressPtr_32),Y ; reads object WIDTH in pixels
@@ -3780,7 +3789,7 @@ PullAXY
 	jmp ReplaceMeLabel_8  ; if negative, do something else
 	
 	:
-	sta someObjProperty_0600,X	; stores WIDTH
+	sta someObjProperty_0600,X	; stores WIDTH in pixels
 	lsr A						; divide by 8 (get size in tiles)
 	lsr A
 	lsr A
@@ -3789,7 +3798,7 @@ PullAXY
 	sta var_44  				; store W in temp variable
 	iny							; next value
 	lda (addressPtr_32),Y		; reads	object HEIGHT in pixels
-	sta someObjProperty_0601,X	; store HEIGHT
+	sta someObjProperty_0601,X	; store HEIGHT in pixels
 	lsr A						; divide by 8 (get size in tiles)
 	lsr A
 	lsr A
@@ -3815,7 +3824,7 @@ PullAXY
 	bne :++						; break if X HI not zero
 	lda tile_Y_Hi_43			; check Y HI
 	bne :++						; break if Y HI not zero
-	lda (addressPtr_32),Y 		; load tile index from file
+	lda (addressPtr_32),Y 		; load tile index
 	sta OAM_0200+OBJ_TILE,X		; store tile index in OAM
 	lda tile_Y_Lo_42			; load tile Y position from RAM
 	sta OAM_0200+OBJ_Y,X		; store tile Y position in OAM 
@@ -3858,33 +3867,33 @@ PullAXY
 	jmp ReplaceMeLabel_11	; loop to next frame
 	
 	:
-	stx oamAddressPtr_3E	; stores back next OAM free address
+	stx oamAddressPtr_3E	; stores next OAM free address
 	
-	SecondPart:
-	lda var_5F
-	clc
-	adc var_59
-	cmp #$F0
-	bcc :++
-	beq :+
-	lda #$EA
-	bne :++
-	
-	:
-	lda #$00
-	
-	:
-	sta var_5F
-	cmp var_3D
-	beq ReplaceMeLabel_12
-	jmp BeginHere
+	UpdateObjectIndex:
+		lda objectIndex_5F
+		clc
+		adc objIndexStep_59
+		cmp #$F0			; Check if 240 (40 objects)
+		bcc :++
+		beq :+
+		lda #$EA
+		bne :++
+		
+		:
+		lda #$00
+		
+		:	; 
+		sta objectIndex_5F
+		cmp var_3D
+		beq ReplaceMeLabel_12
+		jmp BeginHere
 	
 	ReplaceMeLabel_8:
 	ldx oamAddressPtr_3E
 	lda var_41
-	bne SecondPart
+	bne UpdateObjectIndex
 	lda tile_Y_Hi_43
-	bne SecondPart
+	bne UpdateObjectIndex
 	lda tile_Y_Lo_42
 	sta OAM_0200+OBJ_Y,X
 	iny
@@ -3900,7 +3909,7 @@ PullAXY
 	adc #$04
 	beq ReplaceMeLabel_9
 	sta oamAddressPtr_3E
-	jmp SecondPart
+	jmp UpdateObjectIndex
 	
 	ReplaceMeLabel_12:
 	ldx oamAddressPtr_3E
@@ -3914,14 +3923,16 @@ PullAXY
 	bne :-
 	
 	ReplaceMeLabel_9:
-	lda var_5F
+	lda objectIndex_5F
 	cmp var_3D
 	bne :+
-	lda #$00
-	sta var_5F
+
+	; reverse the indexing
+	lda #$00				
+	sta objectIndex_5F		; reset object index
 	sec
-	sbc var_59
-	sta var_59
+	sbc objIndexStep_59		; convert +6 into -6
+	sta objIndexStep_59
 
 	:
 	rts

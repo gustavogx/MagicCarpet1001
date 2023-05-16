@@ -1,108 +1,133 @@
 ; The offset used to read from this list, stored in var_58
 ; is the first byte in each file. 
 ; The address itself is stored in otherObjPtr_38
-.word Data_atAF06
-.word Data_atAF12
-.word Data_atAF1E
-.word Data_atAF2A
-.word Data_atAF36
-.word Data_atAF42
-.word Data_atAF4E
-.word Data_atAF5A
-.word Data_atAF66
-.word Data_atAF72
-.word Data_atAF7E
-.word Data_atAF8A
-.word Data_atB27D
-.word Data_atB289
-.word Data_atB295
-.word Data_atB2A1
-.word Data_atB2AD
-.word Data_atB2B9
-.word Data_atB2C5
-.word Data_atB2D1
-.word Data_atB2DD
-.word Data_atB2E9
-.word Data_atB2F5
-.word Data_atB301 
-.word Data_atB30D
-.word Data_atB319
-.word Data_atB325
-.word Data_atB331
-.word Data_atAF96
-.word Data_atB33D
-.word Data_atB349
-.word Data_atB355
+.addr Data_atAF06
+.addr Data_atAF12
+.addr Data_atAF1E
+.addr Data_atAF2A
+.addr Data_atAF36
+.addr Data_atAF42
+.addr Data_atAF4E
+.addr Data_atAF5A
+.addr Data_atAF66
+.addr Data_atAF72
+.addr Data_atAF7E
+.addr Data_atAF8A
+.addr Data_atB27D
+.addr Data_atB289
+.addr Data_atB295
+.addr Data_atB2A1
+.addr Data_atB2AD
+.addr Data_atB2B9
+.addr Data_atB2C5
+.addr Data_atB2D1
+.addr Data_atB2DD
+.addr Data_atB2E9
+.addr Data_atB2F5
+.addr Data_atB301 
+.addr Data_atB30D
+.addr Data_atB319
+.addr Data_atB325
+.addr Data_atB331
+.addr Data_atAF96
+.addr Data_atB33D
+.addr Data_atB349
+.addr Data_atB355
 
-;; These below are PROBABLY enemies, followed by their AI
+;; These below are enemies, followed by their AI
 
 Data_atAF06:
-.word Data_atAFA2
+.addr Data_atAFA2
 .incbin "rom-prg/objects/data-12bytes-atAF08.bin"
-
+;.byte $02, $70, $10, $0B, $10, $1F, $01, $05, $0A, $00
+;.byte $02, $70, $00, $00, $00, $00, $00, $00, $00, $00
 
 Data_atAF12:
-.word Data_atB004
+.addr Data_atB004
 .incbin "rom-prg/objects/data-12bytes-atAF14.bin"
-
+;.byte $02, $70, $10, $0E, $02, $1F, $01, $00, $0A, $00
+;.byte $02, $70, $00, $00, $00, $00, $00, $00, $00, $00
 
 Data_atAF1E:
-.word Data_atB03A
+.addr Data_atB03A
 .incbin "rom-prg/objects/data-12bytes-atAF20.bin"
+;.byte $00, $00, $00, $00, $00, $00, $00, $00, $00, $00
 
 
 Data_atAF2A:
-.word Data_atB070
+.addr Data_atB070
 .incbin "rom-prg/objects/data-12bytes-atAF2C.bin"
+;.byte $00, $00, $00, $00, $00, $00, $00, $00, $00, $00
 
 
 Data_atAF36:
-.word Data_atB09A
+.addr Data_atB09A
 .incbin "rom-prg/objects/data-12bytes-atAF38.bin"
 
 
 Data_atAF42:
-.word Data_atB0AD
+.addr Data_atB0AD
 .incbin "rom-prg/objects/data-12bytes-atAF44.bin"
 
 
 Data_atAF4E:
-.word Data_atB0BF
+.addr Data_atB0BF
 .incbin "rom-prg/objects/data-12bytes-atAF50.bin"
 
 
 Data_atAF5A:
-.word Data_atB123
+.addr Data_atB123
 .incbin "rom-prg/objects/data-12bytes-atAF5C.bin"
 
 
 Data_atAF66:
-.word Data_atB169
+.addr Data_atB169
 .incbin "rom-prg/objects/data-12bytes-atAF68.bin"
 
 
 Data_atAF72:
-.word Data_atB18F
+.addr Data_atB18F
 .incbin "rom-prg/objects/data-12bytes-atAF74.bin"
 
 
 Data_atAF7E:
-.word Data_atB211
+.addr Data_atB211
 .incbin "rom-prg/objects/data-12bytes-atAF80.bin"
 
 
 Data_atAF8A:
-.word Data_atB247
+.addr Data_atB247
 .incbin "rom-prg/objects/data-12bytes-atAF8C.bin"
 
 
 Data_atAF96:
-.word Data_atB146
+.addr Data_atB146
 .incbin "rom-prg/objects/data-12bytes-atAF98.bin"
 
 
-; Each one of the above has one below (enemy AI?)
+; Enemy type and movement
+; Blocks of 4 bytes
+; Terminated by $FE, $00
+;
+; First byte is the enemy sprite/animation frame
+;
+; 19, 1A        : Rocket Bedouin
+; 1B, 1C        : Head
+; 1D, 1E        : Bee
+; 1F, 20, 21    : Duck
+; 2D, 2E, 2F    : Bat
+
+; 33, 34        : Ball
+; 35, 36        : Mine
+; 31, 32		: 4-Piece Block
+; 3A, 3B		: 4-Piece Block/Breaking up
+;
+; Next 2 bytes are displacement in X and Y (between frames of animation)
+;
+; Last byte how many frames between updates (negative number)
+;
 Data_atAFA2:
+; Bee moving sine wave
 .incbin "rom-prg/objects/data-block-atAFA2.bin"
 
 Data_atB004:
@@ -147,79 +172,79 @@ Data_atB247:
 ;; These below are PROBABLY enemies, followed by their AI
 
 Data_atB27D:
-.word Data_atB361
+.addr Data_atB361
 .incbin "rom-prg/objects/data-12bytes-atB27F.bin" 
 
 Data_atB289:
-.word Data_atB377
+.addr Data_atB377
 .incbin "rom-prg/objects/data-12bytes-atB28B.bin" 
 
 Data_atB295:
-.word Data_atB38D
+.addr Data_atB38D
 .incbin "rom-prg/objects/data-12bytes-atB297.bin" 
 
 Data_atB2A1:
-.word Data_atB397
+.addr Data_atB397
 .incbin "rom-prg/objects/data-12bytes-atB2A3.bin" 
 
 Data_atB2AD:
-.word Data_atB3AD
+.addr Data_atB3AD
 .incbin "rom-prg/objects/data-12bytes-atB2AF.bin" 
 
 Data_atB2B9:
-.word Data_atB3C3
+.addr Data_atB3C3
 .incbin "rom-prg/objects/data-12bytes-atB2BB.bin" 
 
 Data_atB2C5:
-.word Data_atB3E9
+.addr Data_atB3E9
 .incbin "rom-prg/objects/data-12bytes-atB2C7.bin" 
 
 Data_atB2D1:
-.word Data_atB40F
+.addr Data_atB40F
 .incbin "rom-prg/objects/data-12bytes-atB2D3.bin" 
 
 Data_atB2DD:
-.word Data_atB421
+.addr Data_atB421
 .incbin "rom-prg/objects/data-12bytes-atB2DF.bin" 
 
 Data_atB2E9:
-.word Data_atB447
+.addr Data_atB447
 .incbin "rom-prg/objects/data-12bytes-atB2EB.bin" 
 
 Data_atB2F5:
-.word Data_atB46D
+.addr Data_atB46D
 .incbin "rom-prg/objects/data-12bytes-atB2F7.bin" 
 
 Data_atB301:
-.word Data_atB511
+.addr Data_atB511
 .incbin "rom-prg/objects/data-12bytes-atB303.bin" 
 
 Data_atB30D:
-.word Data_atB5B5
+.addr Data_atB5B5
 .incbin "rom-prg/objects/data-12bytes-atB30F.bin" 
 
 Data_atB319:
-.word Data_atB659
+.addr Data_atB659
 .incbin "rom-prg/objects/data-12bytes-atB31B.bin" 
 
 Data_atB325:
-.word Data_atB6FD
+.addr Data_atB6FD
 .incbin "rom-prg/objects/data-12bytes-atB327.bin" 
 
 Data_atB331:
-.word Data_atB7A1
+.addr Data_atB7A1
 .incbin "rom-prg/objects/data-12bytes-atB333.bin" 
 
 Data_atB33D:
-.word Data_atB845
+.addr Data_atB845
 .incbin "rom-prg/objects/data-12bytes-atB33F.bin" 
 
 Data_atB349:
-.word Data_atB859
+.addr Data_atB859
 .incbin "rom-prg/objects/data-12bytes-atB34B.bin" 
 
 Data_atB355:
-.word Data_atB86D
+.addr Data_atB86D
 .incbin "rom-prg/objects/data-12bytes-atB357.bin"
 
 ; Each one of the above has one below (enemy AI?)

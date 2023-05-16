@@ -42,6 +42,13 @@ function printInfo()
       yo=emu.read(0x0432+i*6,type)
       emu.drawPixel(xo, yo,0x00FFFF, true)
       emu.drawString(xo+1, yo-8,i , 0xFFFFFF, 0xFF000000, 1)
+
+      
+      dxo=0--emu.read(0x631+i*6,type)
+      dyo=0--emu.read(0x634+i*6,type)
+      ho=emu.read(0x630+i*6,type)
+      wo=emu.read(0x635+i*6,type)
+      emu.drawRectangle(xo,yo,wo,ho,0x0000FFFF,false,1)
     end
     
     
@@ -53,10 +60,16 @@ function printInfo()
   emu.drawString(175, 39, "Progress: "..emu.read(0x16,type) , 0xFFFFFF, 0xFF000000, 1)
 
   x=emu.read(0x0400,type)
-  emu.drawLine(x,0,x,239,0x0FFF0FFF)
+  --emu.drawLine(x,0,x,239,0x0FFF0FFF)
   y=emu.read(0x0402,type)
-  emu.drawLine(0,y,255,y,0x0FFF0FFF)
+  --emu.drawLine(0,y,255,y,0x0FFF0FFF)
   emu.drawString(x+1, y-8, "Player" , 0xFFFFFF, 0xFF000000, 1)
+
+  dx=8--emu.read(0x601,type)
+  dy=1--emu.read(0x604,type)
+  h=emu.read(0x604,type)
+  w=emu.read(0x605,type)
+  emu.drawRectangle(x+dx,y+dy,w,h,0x0000FFFF,false,1)
 
   
  end

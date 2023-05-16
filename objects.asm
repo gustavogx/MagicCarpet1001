@@ -14,7 +14,7 @@ Data_atA895:
 .word DATA_ADDR_10                              ; "Game Over" text
 
 ; Player
-.word DATA_ADDR_11, DATA_ADDR_12, DATA_ADDR_13  ; Player Flying (3 frames)
+.word DATA_ADDR_11, DATA_ADDR_11, DATA_ADDR_11  ; Player Flying (3 frames)
 .word DATA_ADDR_14                              ; Player Shooting
 .word DATA_ADDR_15, DATA_ADDR_16                ; Player Death (2 frames)
 
@@ -70,7 +70,28 @@ DATA_ADDR_10: ; $a945 - offset $04
 .incbin "rom-prg/objects/data-object-atA945.bin" ; "Game Over" text, NOT ASCII
 
 DATA_ADDR_11: ; $a958 - offset $13
-.incbin "rom-prg/objects/data-object-atA958.bin" ; Player Flying Frame 1/3
+;.incbin "rom-prg/objects/data-object-atA958.bin" ; Player Flying Frame 1/3
+.byte $1F, $1D ; W and H in pixels
+
+.byte $00		; blank
+.byte $12, $02	; tile, attribute (palette)
+.byte $13, $02
+.byte $00
+
+.byte $00
+.byte $14, $00
+.byte $15, $02
+.byte $00
+
+.byte $00
+.byte $16, $02
+.byte $17, $02
+.byte $18, $00
+
+.byte $19, $00
+.byte $1A, $00
+.byte $1B, $00
+.byte $1C, $00
 
 DATA_ADDR_12: ; $a975 - offset $1d
 .incbin "rom-prg/objects/data-object-atA975.bin" ; Player Flying Frame 2/3
@@ -106,22 +127,22 @@ DATA_ADDR_22: ; $aa1b - offset $04
 .byte $04, $04, $4d, $01		;   Bubble enemy shot
 
 DATA_ADDR_23: ; $aa1f - offset $04
-.byte $07, $07, $4e, $00		;   Small puff of smoke 1
+.byte $07, $07, $4e, $00		;   Fireball 1
 
 DATA_ADDR_24: ; $aa23 - offset $04
-.byte $07, $07, $4f, $03		;   Small puff of smoke 2
+.byte $07, $07, $4f, $03		;   Fireball 2
 
 DATA_ADDR_25: ; $aa27 - offset $04
-.incbin "rom-prg/objects/data-object-atAA27.bin" ;  Enemy flying rock ninja Frame 1/2
+.incbin "rom-prg/objects/data-object-atAA27.bin" ;  Enemy flying rocket-bedouin Frame 1/2
 
 DATA_ADDR_26: ; $aa39 - offset $12
-.incbin "rom-prg/objects/data-object-atAA39.bin" ;  Enemy flying rock ninja Frame 1/2
+.incbin "rom-prg/objects/data-object-atAA39.bin" ;  Enemy flying rocket-bedouin Frame 1/2
 
 DATA_ADDR_27: ; $aa47 - offset $0e
-.incbin "rom-prg/objects/data-object-atAA47.bin" ;  Enemy flying mask Frame 1/2
+.incbin "rom-prg/objects/data-object-atAA47.bin" ;  Enemy flying heads Frame 1/2
 
 DATA_ADDR_28: ; $aa51 - offset $0a
-.incbin "rom-prg/objects/data-object-atAA51.bin" ;  Enemy flying mask Frame 2/2
+.incbin "rom-prg/objects/data-object-atAA51.bin" ;  Enemy flying heads Frame 2/2
 
 DATA_ADDR_29: ; $aa5b - offset $0a
 .incbin "rom-prg/objects/data-object-atAA5B.bin" ;  Enemy bee Frame 1/2
@@ -211,10 +232,10 @@ DATA_ADDR_57: ; $ac2e - offset $12
 .incbin "rom-prg/objects/data-object-atAC2E.bin" ; Mouth Boss Frame 3/3 (open animation)
 
 DATA_ADDR_58: ; $ac48 - offset $1a
-.incbin "rom-prg/objects/data-object-atAC48.bin" ; Enemy 4-pieces block (breaking up?) Frame 1/2
+.incbin "rom-prg/objects/data-object-atAC48.bin" ; Enemy 4-pieces block (breaking up) Frame 1/2
 
 DATA_ADDR_59: ; $ac57 - offset $0f
-.incbin "rom-prg/objects/data-object-atAC57.bin" ; Enemy 4-pieces block (breaking up?) Frame 2/2
+.incbin "rom-prg/objects/data-object-atAC57.bin" ; Enemy 4-pieces block (breaking up) Frame 2/2
 
 DATA_ADDR_60: ; $ac66 - offset $0f
 .byte $06, $06, $f6, $01 ; Enemy shot sparkle Frame 1/2
