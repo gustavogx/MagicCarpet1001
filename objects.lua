@@ -30,7 +30,7 @@ function printInfo()
     x=54+i*6
     y=24
 
-    hasObj = 0x90 & emu.read(0x0434+i*6,type);    
+    hasObj = 0x80 & emu.read(0x0434+i*6,type);    
     
     emu.drawRectangle(x,y ,4,4, 0x8000FFFF, false, 1)
     
@@ -40,15 +40,26 @@ function printInfo()
 
       xo=emu.read(0x0430+i*6,type)
       yo=emu.read(0x0432+i*6,type)
-      emu.drawPixel(xo, yo,0x00FFFF, true)
-      emu.drawString(xo+1, yo-8,i , 0xFFFFFF, 0xFF000000, 1)
-
       
-      dxo=0--emu.read(0x631+i*6,type)
-      dyo=0--emu.read(0x634+i*6,type)
-      ho=emu.read(0x630+i*6,type)
-      wo=emu.read(0x635+i*6,type)
-      emu.drawRectangle(xo,yo,wo,ho,0x0000FFFF,false,1)
+      colorText = 0xFFFFFF
+      colorPoint= 0x00FFFF
+      if(emu.read(0x0431+i*6,type)>0) then
+        colorText = 0x80FFFFFF
+        colorPoint= 0x80FFFF00
+         
+      end
+      emu.drawPixel(xo, yo,colorPoint, true)
+      emu.drawString(xo+1, yo-8,i , colorText, 0xFF000000, 1)
+      
+      if(emu.read(0x0431+i*6,type)==0 and (emu.read(0x0433+i*6,type)==0) )then
+        h1xo=emu.read(0x732+i*6,type)
+        h2xo=emu.read(0x733+i*6,type)
+        h1yo=emu.read(0x734+i*6,type)
+        h2yo=emu.read(0x735+i*6,type)
+        wo=h2xo-h1xo
+        ho=h2yo-h1yo 
+        emu.drawRectangle(h1xo,h1yo,wo,ho,0x0000FFFF,false,1)
+      end
     end
     
     
@@ -65,11 +76,13 @@ function printInfo()
   --emu.drawLine(0,y,255,y,0x0FFF0FFF)
   emu.drawString(x+1, y-8, "Player" , 0xFFFFFF, 0xFF000000, 1)
 
-  dx=8--emu.read(0x601,type)
-  dy=1--emu.read(0x604,type)
-  h=emu.read(0x604,type)
-  w=emu.read(0x605,type)
-  emu.drawRectangle(x+dx,y+dy,w,h,0x0000FFFF,false,1)
+  h1x=emu.read(0x702,type)
+  h2x=emu.read(0x703,type)
+  h1y=emu.read(0x704,type)
+  h2y=emu.read(0x705,type)
+  w=h2x-h1x
+  h=h2y-h1y 
+  emu.drawRectangle(h1x,h1y,w,h,0x0000FFFF,false,1)
 
   
  end

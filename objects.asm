@@ -14,7 +14,7 @@ Data_atA895:
 .word DATA_ADDR_10                              ; "Game Over" text
 
 ; Player
-.word DATA_ADDR_11, DATA_ADDR_11, DATA_ADDR_11  ; Player Flying (3 frames)
+.word DATA_ADDR_11, DATA_ADDR_12, DATA_ADDR_13  ; Player Flying (3 frames)
 .word DATA_ADDR_14                              ; Player Shooting
 .word DATA_ADDR_15, DATA_ADDR_16                ; Player Death (2 frames)
 

@@ -2,15 +2,18 @@
 .define STARTING_LIVES	$16
 .define STARTING_POWER	$04
 .define HEART_HEALTH_POINTS $50
-
+.define MAGIC_LAMP_HEALTH_POINTS $50
 ; Engine Configuration
 
 ; Heart is object zero
-; Other objects go after HEART
-.define FIRST_OBJECT_SLOT $04
-
 .define HEART_HUD_Y		$D8
 .define HEART_OFFSCREEN $F8
+.define HEART_HUD_TILE	$81
+.define HEART_HUD_ATT	$01
+.define HEART_HUD_X		$38
+
+; Other objects go after HEART
+.define FIRST_OBJECT_SLOT $04
 
 .define BG_SCROLL_RATE	$02
 	; $01 every frame 		(60fps)
@@ -28,9 +31,9 @@
 	.define BG_SCROLL_LIMIT	 9
 .endif
 
-.define SHOT_OBJECT_START	$0C
-.define OBJECT_BYTE_SIZE	$06
-.define FREE_SHOT_SLOTS		$06
+.define SHOT_OBJECT_START	$0C	;	12
+.define OBJECT_BYTE_SIZE	$06 ;	
+.define FREE_SHOT_SLOTS		$06	;	
 .define FREE_OBJECT_SLOTS	$20
 .define ENEMY_OBJECT_START	FREE_SHOT_SLOTS*OBJECT_BYTE_SIZE+SHOT_OBJECT_START
 
@@ -249,7 +252,7 @@
 .define var_4B				$4B ; 5
 .define var_4C				$4C ; 6
 .define var_4D				$4D ; 6
-.define var_4E				$4E ; 3
+.define flagLoadShots_4E	$4E ; 3
 .define var_4F				$4F ; 2
 
 .define var_50				$50 ; 4
@@ -260,7 +263,7 @@
 .define var_55				$55 ; 5 ; object loading property
 .define var_56				$56 ; 5 ; object loading property
 .define var_57				$57 ; 5 ; object loading property
-.define var_58				$58 ; 5
+.define objectType_58				$58 ; 5
 .define objIndexStep_59		$59 ; 5 ; it is either +6 or -6
 .define var_5A				$5A ; 3
 .define currentEnemyWave_5B	$5B ; 3
@@ -269,11 +272,11 @@
 .define var_5E				$5E ; 2
 .define objectIndex_5F		$5F ; 9
 
-.define var_60				$60 ; 7
+.define arrowsFlying_60				$60 ; 7
 ; $61
-.define var_62				$62 ; 3
+.define flagPlayerHasShot_62	$62 ; 3
 ; $63
-.define powerUp_P_64		$64 ; 10
+.define powerLevel_64		$64 ; 10
 ; $65
 .define speed_66			$66 ; 6
 .define vramAddress_67		$67 ; 3
@@ -349,18 +352,28 @@
 .define object_X_Hi_0401 $0401 ; object_X_Hi_0401
 .define object_Y_Lo_0402 $0402 ; object_Y_Lo_0402
 .define object_Y_Hi_0403 $0403 ; object_Y_Hi_0403
+
 .define object_Attrib_1_0404 $0404
+; object_Attrib_1_0404   7654 3210
+; 						 |||| |||+-- 0:
+;						 |||| ||+--- 1:
+;						 |||| |+---- 2:
+;						 |||| +----- 3:
+;						 |||+------- 4: 
+;						 ||+-------- 5: Player can shoot
+;						 |+--------- 6:
+;						 +---------- 7: Object is valid
+
 .define object_Attrib_2_0405 $0405 ; #2 of 10-byte file (flags) BIT6 = can collide
 ; object_Attrib_2_0405   7654 3210
 ; 						 |||| |||+-- 0:
 ;						 |||| ||+--- 1: Enemy is part of a set
 ;						 |||| |+---- 2:
 ;						 |||| +----- 3:
-;						 |||+------- 4: 
+;						 |||+------- 4: Enemy is a boss 
 ;						 ||+-------- 5:
 ;						 |+--------- 6: Obj can collide
 ;						 +---------- 7:
-
 
 ; page 05
 .define someObjProperty_0500 $0500
@@ -383,8 +396,8 @@
 .define someObjProperty_05FF $05FF ;$0535
 
 ; page 06
-.define someObjProperty_0600 $0600 ; #3 of 10-byte file
-.define someObjProperty_0601 $0601 ; #4 of 10-byte file
+.define objectWidth_0600 $0600 ; #3 of 10-byte file
+.define objectHeight_0601 $0601 ; #4 of 10-byte file
 .define someObjProperty_0602 $0602 ; #1 of 10-byte file
 .define healthPoints_0603 	 $0603 ; #5 of 10-byte file
 .define someObjProperty_0604 $0604 ; #8 of 10-byte file 
@@ -393,10 +406,10 @@
 ; page 07
 .define someObjProperty_0700 $0700 ; #10 of 10-byte file (also $0300)
 .define someObjProperty_0701 $0701
-.define someObjProperty_0702 $0702
-.define someObjProperty_0703 $0703
-.define someObjProperty_0704 $0704
-.define someObjProperty_0705 $0705
+.define objectHitBox_Left_X_0702 	$0702	; maybe vertices of hit box
+.define objectHitBox_Right_X_0703 	$0703	; maybe vertices of hit box
+.define objectHitBox_Top_Y_0704 	$0704	; maybe vertices of hit box
+.define objectHitBox_Bottom_Y_0705 	$0705	; maybe vertices of hit box
 
 .define BIT0	%00000001
 .define BIT1	%00000010
@@ -438,7 +451,7 @@ BIT_7:	.byte BIT7
 
 ; $8008
 HeartHUDData:
-.byte $D8, $81, $01, $38; 8008 - 800B
+.byte HEART_HUD_Y, HEART_HUD_TILE, HEART_HUD_ATT, HEART_HUD_X
 
 BankSequenceArray:
 .byte $01, $01, $01, $02; 800C - 800F
@@ -490,7 +503,7 @@ HandleReset:
 	sta currentStage_15
 	
 	lda #STARTING_POWER
-	sta powerUp_P_64
+	sta powerLevel_64
 	
 	lda #STARTING_LIVES
 	sta livesCounter_11
@@ -578,13 +591,13 @@ MaybeStartingNewGame:
 	lda #$FF
 	sta var_0C
 	
-	lda #ZERO	;	no flags %0000 0000
+	lda #ZERO				; no flags %0000 0000
 	sta flagGameMode_26
 	
-	ldx #BG_SCROLL_RATE	;	how fast to update backgrounds
+	ldx #BG_SCROLL_RATE		; how fast to update backgrounds
 	stx frameScrollAt_27
 	
-	ldx #$01	;   counts how many screen have scrolled
+	ldx #$01				; counts how many screen have scrolled
 	stx levelProgression_16
 	
 	lda #(BIT4+BIT3+BIT2) 	; flags %0001 1100
@@ -606,9 +619,9 @@ MaybeStartingNewGame:
 	
 	jsr InitializeGameVariables
 	jsr InitializeGameVariables2
-	jsr MaybeTriggerNextLevel
+	jsr TriggerNextLevel
 	
-	lda #$00
+	lda #ZERO
 	sta flagNextLevel_1B
 	sta flagUnknown_1A
 	
@@ -631,16 +644,18 @@ MaybeStartingNewGame:
 		sta OAM_0200
 
 		jsr InitializeGameVariables
-		jsr MaybeTriggerNextLevel
+		jsr TriggerNextLevel
 
 	loopMain:
 		jsr UnknownSub1
 		jsr LoadEnemyBatch
 		jsr LivesHUD
-		lda var_62
-		beq :+
-		sta var_4E
-		jsr UnknownSub12
+
+		lda flagPlayerHasShot_62	; did the player shoot?
+		beq :+						; if not, skip
+		sta flagLoadShots_4E		; else, order shots
+		jsr HandlePlayerShots
+		
 		:
 		lda flagPlayerHit_1E
 		beq skipPlayerHit
@@ -820,7 +835,7 @@ MaybeStartingNewGame:
 		; no control character found. 
 		; loading enemy
 		: 
-		sta var_58			 	; #1 byte of object file
+		sta objectType_58			 	; #1 byte of object file
 		iny
 		lda (objectPtr_3A),Y
 		sta var_54				; X position, #2 byte of object file
@@ -833,7 +848,7 @@ MaybeStartingNewGame:
 		iny
 		lda (objectPtr_3A),Y
 		sta var_57				; #5 byte of object file
-		jsr LoadEnemyType		; Use's var_58 to load the specific enemy type
+		jsr LoadEnemyType		; Use's objectType_58 to load the specific enemy type
 		iny
 		jmp loopYLoadObject
 
@@ -864,8 +879,8 @@ doneLoadingEnemyBatch:
 	lda ObjectsData_A885+3,Y	; hi-byte of stage's enemies AI/Animation data(?)
 	sta objectPtr_34+1
 
-	; var_58 holds the index (address offset) for a given enemy's data
-	lda var_58					; this was the FIRST byte loaded from the object file
+	; objectType_58 holds the index (address offset) for a given enemy's data
+	lda objectType_58					; this was the FIRST byte loaded from the object file
 	asl A						; multiply by 2 since address are WORDs (2 bytes)
 	tay
 	lda (objectPtr_34),Y		; lo-byte of a given enemy data
@@ -890,10 +905,10 @@ doneLoadingEnemyBatch:
 	sta object_Attrib_2_0405,X	; store #2 byte of 10
 	iny
 	lda (objectPtr_38),Y		; loads #3 byte of 10
-	sta someObjProperty_0600,X	; stores #3 byte of 10
+	sta objectWidth_0600,X	; stores #3 byte of 10
 	iny
 	lda (objectPtr_38),Y		; loads #4 byte of 10
-	sta someObjProperty_0601,X	; stores #4 byte of 10
+	sta objectHeight_0601,X	; stores #4 byte of 10
 	iny
 	lda (objectPtr_38),Y		; loads #5 byte of 10
 	sta healthPoints_0603,X		; stores #5 byte of 10
@@ -938,7 +953,7 @@ doneLoadingEnemyBatch:
 ;
 ; $82C9
 .proc UnknownSub1
-	jsr UnknownSub2
+	jsr MakePlayerHitBox
 	lda #$00
 	sta var_5A
 	lda #$06
@@ -970,7 +985,7 @@ doneLoadingEnemyBatch:
 	bne SecondPart
 	lda object_X_Lo_0400,X
 	clc
-	adc someObjProperty_0600,X
+	adc objectWidth_0600,X
 	bcc SecondPart
 	:
 	lda object_Y_Hi_0403,X
@@ -979,7 +994,7 @@ doneLoadingEnemyBatch:
 	bne SecondPart
 	lda object_Y_Lo_0402,X
 	clc
-	adc someObjProperty_0601,X
+	adc objectHeight_0601,X
 	bcs ThirdPart
 	
 	SecondPart:
@@ -1003,7 +1018,7 @@ doneLoadingEnemyBatch:
 	lda object_Attrib_1_0404,X
 	ora #BIT5
 	sta object_Attrib_1_0404,X
-	jsr UnknownSub3
+	jsr MakeEnemyHitBox
 	lda object_Attrib_1_0404,X
 	and #BIT3
 	beq doneWithThis
@@ -1025,30 +1040,35 @@ doneLoadingEnemyBatch:
 .endproc
 ;
 ; $8369
-.proc UnknownSub2
-	lda object_X_Lo_0400
+.proc MakePlayerHitBox
+
+	lda object_X_Lo_0400			; get player's X position
 	clc
-	adc #$08
-	sta someObjProperty_0702
-	lda object_X_Lo_0400
-	adc someObjProperty_0600
-	sbc #$08
-	sta someObjProperty_0703
-	lda object_Y_Lo_0402
-	adc #$03
-	sta someObjProperty_0704
-	lda object_Y_Lo_0402
-	adc someObjProperty_0601
-	sbc #$04
-	sta someObjProperty_0705
+	adc #$08						; add 8 pixels
+	sta objectHitBox_Left_X_0702	; store left X
+	
+	lda object_X_Lo_0400			; get player's X position
+	adc objectWidth_0600			; add object's width (in pixels)
+	sbc #$08						; subtract 8 pixels
+	sta objectHitBox_Right_X_0703	; store right X
+
+	lda object_Y_Lo_0402			; get player's Y position
+	adc #$03						; add 3 pixels
+	sta objectHitBox_Top_Y_0704		; store top Y
+
+	lda object_Y_Lo_0402			; get player's Y position
+	adc objectHeight_0601			; add object's height
+	sbc #$04						; subtract 4 pixels
+	sta objectHitBox_Bottom_Y_0705	; store bottom Y
+
 	rts
 .endproc
 ;
 ; $8391
-.proc UnknownSub3
+.proc MakeEnemyHitBox
 	lda object_Attrib_2_0405,X
-	and #$10
-	beq SecondPart
+	and #BIT4
+	beq objectIsBoss
 	
 	lda object_X_Hi_0401,X
 	beq :+
@@ -1059,7 +1079,7 @@ doneLoadingEnemyBatch:
 	lda object_X_Lo_0400,X
 	
 	:
-	sta someObjProperty_0702,X
+	sta objectHitBox_Left_X_0702,X
 	lda object_Y_Hi_0403,X
 	beq :+
 	lda #$00
@@ -1069,38 +1089,38 @@ doneLoadingEnemyBatch:
 	lda object_Y_Lo_0402,X
 	
 	:
-	sta someObjProperty_0704,X
+	sta objectHitBox_Top_Y_0704,X
 	lda object_X_Lo_0400,X
 	clc
-	adc someObjProperty_0600,X
-	cmp someObjProperty_0702,X
+	adc objectWidth_0600,X
+	cmp objectHitBox_Left_X_0702,X
 	bcs :+
 	lda #$FF
 	
 	:
-	sta someObjProperty_0703,X
+	sta objectHitBox_Right_X_0703,X
 	lda object_Y_Lo_0402,X
 	clc
-	adc someObjProperty_0601,X
-	cmp someObjProperty_0704,X
+	adc objectHeight_0601,X
+	cmp objectHitBox_Top_Y_0704,X
 	bcs :+
 	lda #$FF
 	
 	:
-	sta someObjProperty_0705,X
+	sta objectHitBox_Bottom_Y_0705,X
 	rts
 
-	SecondPart:
+	objectIsBoss: ; make the hit box the same size as the sprite
 	lda object_X_Lo_0400,X
-	sta someObjProperty_0702,X
+	sta objectHitBox_Left_X_0702,X
 	clc
-	adc someObjProperty_0600,X
-	sta someObjProperty_0703,X
+	adc objectWidth_0600,X
+	sta objectHitBox_Right_X_0703,X
 	lda object_Y_Lo_0402,X
-	sta someObjProperty_0704,X
+	sta objectHitBox_Top_Y_0704,X
 	clc
-	adc someObjProperty_0601,X
-	sta someObjProperty_0705,X
+	adc objectHeight_0601,X
+	sta objectHitBox_Bottom_Y_0705,X
 	rts
 
 .endproc
@@ -1121,13 +1141,13 @@ doneLoadingEnemyBatch:
 	jmp DoneWithThis			; if not, break
 	
 	:	; flag 6 is set: object has collision enabled
-	lda someObjProperty_0702,Y ;
+	lda objectHitBox_Left_X_0702,Y ;
 	sta var_4F
-	lda someObjProperty_0703,Y
+	lda objectHitBox_Right_X_0703,Y
 	sta var_50
-	lda someObjProperty_0704,Y
+	lda objectHitBox_Top_Y_0704,Y
 	sta var_51
-	lda someObjProperty_0705,Y
+	lda objectHitBox_Bottom_Y_0705,Y
 	sta var_52
 	
 	ldx #$30
@@ -1149,17 +1169,17 @@ doneLoadingEnemyBatch:
 	jmp dontHandleObjCollision
 	
 	: ; $843B
-	lda someObjProperty_0702,X
+	lda objectHitBox_Left_X_0702,X
 	cmp var_50
 	bcs StartLeaving
 	lda var_4F
-	cmp someObjProperty_0703,X
+	cmp objectHitBox_Right_X_0703,X
 	bcs StartLeaving
-	lda someObjProperty_0704,X
+	lda objectHitBox_Top_Y_0704,X
 	cmp var_52
 	bcs StartLeaving
 	lda var_51
-	cmp someObjProperty_0705,X
+	cmp objectHitBox_Bottom_Y_0705,X
 	bcs StartLeaving
 	lda healthPoints_0603,X
 	sec
@@ -1199,9 +1219,9 @@ doneLoadingEnemyBatch:
 	cmp #$14
 	bcs doStoreHitPointsAndLeave
 	pha
-	lda #$D7
+	lda #<Data_at8BD7
 	sta someObjProperty_0501
-	lda #$8B
+	lda #>Data_at8BD7
 	sta someObjProperty_0502
 	lda #$00
 	sta someObjProperty_0503
@@ -1327,30 +1347,38 @@ doneLoadingEnemyBatch:
 ; X = 0 is the player
 .proc HandleObjectCollision
 	PushXY
-	lda object_Attrib_2_0405,X		; object status flags
+	lda object_Attrib_2_0405,X		; Object status flags
 	bit BIT_6						; check if the object is tangible (flag 6)
-	bne :+							; if tangile (can collide) continue
-	jmp doneWithObjectCollision		; exit
+	bne :+							; if TANGIBLE (can collide), continue
+	jmp doneWithObjectCollision		; else exit
 	
 	:
-	lda someObjProperty_0302,X		; Object type?
+	lda someObjProperty_0302,X		; Collision type?
 	bne :+							; this is useless, skips nothing at all
 									; could be replaced by nop nop
 	:
-	cmp #$06 ; maybe? BIT1+BIT2		; what does it checks?
-	bne handlePlayerGotExtraLife	; skip to GotExtraLife
+	cmp #$06 ; BIT1+BIT2 maybe?		; Check if pickup collision happened.
+	bne handlePickups				; if it did, continue to handlePickups
 	
-	lda var_60
-	beq :+
-	dec var_60
+	lda arrowsFlying_60				; else, check if arrowsFlying_60 is zero
+	beq :+							; if it is, go to secondPart
+	dec arrowsFlying_60				; else, decrease arrowsFlying_60 and then go to secondPart
 	
 	:
-	lda #$00
+	lda #$00						
 	jmp SecondPart
 
+	handlePickups:
+
+	; Pickups section
+	; Detecting if the player has collected a power up.
+
 	handlePlayerGotExtraLife:
-		cmp #$28
-		bne handlePlayerGotPowerUp
+
+		cmp #$28	
+		bne handlePlayerGotPowerUp	; if pickup is not ExtraLife, skip to next
+		
+		; Sound effect =================
 		nop;
 		nop;
 		nop; jsr UnknownSoundSub2
@@ -1364,12 +1392,16 @@ doneLoadingEnemyBatch:
 		nop;
 		nop;
 		nop; jsr PlaySFX
+		; ==============================
+
 		inc livesCounter_11
 		jmp doneWithObjectCollision
 
 	handlePlayerGotPowerUp:
-		cmp #$29
+		cmp #$29	;	BIT0+BIT3+BIT5
 		bne handlePlayerGotHeart 
+
+		; Sound effect =================
 		nop;
 		nop;
 		nop; jsr UnknownSoundSub2
@@ -1383,10 +1415,13 @@ doneLoadingEnemyBatch:
 		nop;
 		nop;
 		nop; jsr PlaySFX
+		; ==============================
 
-		lda powerUp_P_64
+		lda powerLevel_64
 		cmp #$04
-		bcc :+
+
+		bcc :+ 	; if didn't reach maximum power, continue to power increase
+				; else play sound cue and exit
 		nop;
 		nop;
 		nop; jsr DoSomethingWithSound
@@ -1394,12 +1429,14 @@ doneLoadingEnemyBatch:
 		jmp doneWithObjectCollision
 	
 		:
-		inc powerUp_P_64
+		inc powerLevel_64
 		jmp doneWithObjectCollision
 	
 	handlePlayerGotHeart:
-		cmp #$2A
-		bne skipHeart
+		cmp #$2A	;	BIT1+BIT3+BIT5
+		bne handlePlayerGotSpeedUp
+
+		; Sound effect =================
 		nop;
 		nop;
 		nop; jsr UnknownSoundSub2
@@ -1407,66 +1444,73 @@ doneLoadingEnemyBatch:
 		nop;
 		nop;
 		nop; jsr DoSomethingWithSound
-	
+
 		lda #$07
 		sta soundAddress_8D
 		nop;
 		nop;
 		nop; jsr PlaySFX
+		; ==============================
 
 		jsr AddOneHeart
 		jmp doneWithObjectCollision
 	
-	skipHeart:
-	cmp #$2B
-	bne :+
-	nop;
-	nop;
-	nop; jsr UnknownSoundSub2
+	handlePlayerGotSpeedUp:
+		cmp #$2B	;	BIT0+BIT1+BIT3+BIT5
+		bne handlePlayerGotMagicLamp
 
-	nop;
-	nop;
-	nop; jsr DoSomethingWithSound
- 
-	lda #$07
-	sta soundAddress_8D
-	nop;
-	nop;
-	nop; jsr PlaySFX
+		; Sound effect =================
+		nop;
+		nop;
+		nop; jsr UnknownSoundSub2
 
-	lda #$03
-	sta speed_66
-	jmp doneWithObjectCollision
-	
-	:
-	cmp #$2C
-	bne :++
-	lda object_X_Hi_0401,X
-	beq :+
-	jmp doneWithObjectCollision
-	
-	:
-	lda #$0C
-	sta soundAddress_8D
-	nop;
-	nop;
-	nop; jsr PlaySFX
+		nop;
+		nop;
+		nop; jsr DoSomethingWithSound
 
-	lda #$50
-	sta healthPoints_0603
-	lda #$BD
-	sta someObjProperty_0501
-	lda #$8B
-	sta someObjProperty_0502
-	lda #$00
-	sta someObjProperty_0503
-	sta someObjProperty_0504
-	sta someObjProperty_0505
-	lda #$D8
-	sta OAM_0200
-	jmp doneWithObjectCollision
+		lda #$07
+		sta soundAddress_8D
+		nop;
+		nop;
+		nop; jsr PlaySFX
+		; ==============================
+
+		lda #$03
+		sta speed_66
+		jmp doneWithObjectCollision
 	
-	:
+	handlePlayerGotMagicLamp:
+		cmp #$2C
+		bne doneWithPickups
+
+		lda object_X_Hi_0401,X			; check if Magic Lamp is not offscreen
+		beq :+							; if not, continue forward
+		jmp doneWithObjectCollision		; else (is offscreen), break.
+		:
+
+		; Sound effect =================
+		lda #$0C
+		sta soundAddress_8D
+		nop;
+		nop;
+		nop; jsr PlaySFX
+		; ==============================
+
+		lda #MAGIC_LAMP_HEALTH_POINTS
+		sta healthPoints_0603
+		lda #<Data_at8BBD
+		sta someObjProperty_0501
+		lda #>Data_at8BBD
+		sta someObjProperty_0502
+		lda #$00
+		sta someObjProperty_0503
+		sta someObjProperty_0504
+		sta someObjProperty_0505
+		lda #HEART_HUD_Y
+		sta OAM_0200
+		jmp doneWithObjectCollision
+	
+	doneWithPickups:
 	cmp #$1F
 	bne :+
 	lda #$02
@@ -1527,6 +1571,7 @@ doneLoadingEnemyBatch:
 	:
 	cmp #$24
 	bne doneWithObjectCollision
+
 	lda #$09
 	sta soundAddress_8D
 	nop;
@@ -1539,9 +1584,9 @@ doneLoadingEnemyBatch:
 	sbc #$00
 	
 	SecondPart:
-		sta var_58
+		sta objectType_58
 		lda object_Attrib_1_0404,X
-		and #$20
+		and #BIT5
 		beq doneWithObjectCollision
 
 		clc
@@ -1588,7 +1633,7 @@ doneLoadingEnemyBatch:
 .endproc
 ;
 ; $86A9
-; Load object var_58 from ROM to an empty slot X
+; Load object objectType_58 from ROM to an empty slot X
 .proc SpawnObject
 	jsr FindFreeObjectSlot_rX
 	cpx #$F0
@@ -1596,7 +1641,7 @@ doneLoadingEnemyBatch:
 	rts
 	
 	:
-	lda var_58
+	lda objectType_58
 	asl A
 	asl A
 	asl A
@@ -1610,9 +1655,9 @@ doneLoadingEnemyBatch:
 	lda Data_at8715+3,Y
 	sta object_Attrib_2_0405,X
 	lda Data_at8715+4,Y
-	sta someObjProperty_0600,X
+	sta objectWidth_0600,X
 	lda Data_at8715+5,Y
-	sta someObjProperty_0601,X
+	sta objectHeight_0601,X
 	lda Data_at8715+6,Y
 	sta someObjProperty_0302,X
 	lda Data_at8715+7,Y
@@ -1632,7 +1677,7 @@ doneLoadingEnemyBatch:
 	sta someObjProperty_0700,X
 	sta someObjProperty_0300,X
 	sta someObjProperty_0301,X
-	lda #$80
+	lda #BIT7
 	sta object_Attrib_1_0404,X
 	rts
 .endproc
@@ -1658,23 +1703,23 @@ Data_at8715:
 	;	  7 0000 0111
 
 	bne :+					; case 0: Extra life (1/8 chance)
-	lda #$32
+	lda #$32				; $0A + $28 
 	bne doneWithDrops
 	
 	:
 	bit BIT_0				; case 2, 4, 6: Power (3/8 chance)
 	bne :+
-	lda #$33
+	lda #$33				; $0A + $29
 	bne doneWithDrops
 	
 	:
 	bit BIT_1				; case 1, 5: Heart (2/8 chance)
 	bne :+
-	lda #$34
+	lda #$34				; $0A + $2A
 	bne doneWithDrops
 	
-	:
-	lda #$35				; case 3, 7: Speed (2/8 chance)
+	:						; case 3, 7: Speed (2/8 chance)
+	lda #$35				; $0A + $2B
 	
 	doneWithDrops:
 		pha
@@ -1695,11 +1740,11 @@ Data_at8715:
 	sta object_X_Hi_0401
 	lda #$70
 	sta object_Y_Lo_0402
-	lda #$7D
+	lda #<Data_at8B7D					
 	sta someObjProperty_0501
-	lda #$8B
+	lda #>Data_at8B7D		
 	sta someObjProperty_0502
-	lda #(BIT7+BIT5); $A0
+	lda #(BIT7+BIT5)			; $A0
 	sta object_Attrib_1_0404
 	lda #$00
 	sta someObjProperty_0503
@@ -1712,9 +1757,9 @@ Data_at8715:
 	lda #$03
 	sta someObjProperty_0602
 	lda #$14
-	sta someObjProperty_0600
+	sta objectWidth_0600
 	lda #$18
-	sta someObjProperty_0601
+	sta objectHeight_0601
 	lda #$18
 	sta someObjProperty_0604
 	lda #$0E
@@ -1722,21 +1767,46 @@ Data_at8715:
 	lda #$00
 	sta object_Attrib_2_0405
 	lda #$00
-	sta var_60
+	sta arrowsFlying_60
+	
 	lda flagNextLevel_1B
 	bne :+
 	lda #$01
 	sta healthPoints_0603
-	lda powerUp_P_64
+	lda powerLevel_64
 	beq :+
-	dec powerUp_P_64
+	dec powerLevel_64
+
 	:
 	rts
+	
+	unusedReturn:				; This part is unaccessible.
+	sta powerLevel_64			; It seems to be left over from 
+	rts							; older code.
 .endproc
 ;
-; $8B7D ;;;;;;; objects?
-Data_at8B7A:
-.incbin "rom-prg/objects/data-block-at8B7A.bin"
+; $8B7D
+Data_at8B7D:
+.incbin "rom-prg/objects/data-block-at8B7D.bin"
+;.byte $0B, $10, $00, $81, $0C, $0C, $00, $81
+;.byte $0D, $0B, $00, $81, $0B, $09, $00, $82
+;.byte $0C, $07, $00, $82, $0D, $05, $00, $82
+;.byte $0B, $00, $00, $81, $43, $00, $00, $82
+;.byte $0C, $00, $00, $81, $43, $00, $00, $82
+;.byte $0D, $00, $00, $81, $43, $00, $00, $82
+;.byte $C7, $18, $0B, $00, $00, $86, $0C, $00 
+;.byte $00, $86, $0D, $00, $00, $86, $FE, $32
+
+Data_at8BBD:
+.incbin "rom-prg/objects/data-block-at8BBD.bin"
+;.byte $0B, $00, $00, $81, $43, $00, $00, $83
+;.byte $0C, $00, $00, $81, $43, $00, $00, $83
+;.byte $0D, $00, $00, $81, $43, $00, $00, $83
+;.byte $FE, $00
+
+Data_at8BD7:
+.incbin "rom-prg/objects/data-block-at8BD7.bin"
+;.byte $0B, $00, $00, $86, $0C, $00, $00, $86, $0D, $00, $00, $86, $FE, $00
 ;
 ; $8BE5
 .proc InitializeGameVariables2
@@ -1760,14 +1830,14 @@ Data_at8B7A:
 	lda #$FF
 	sta healthPoints_0603,Y
 	lda #$07
-	sta someObjProperty_0600,Y
+	sta objectWidth_0600,Y
 	lda #$07
-	sta someObjProperty_0601,Y
+	sta objectHeight_0601,Y
 	rts
 .endproc
 ;
 ; $8C23
-.proc MaybeTriggerNextLevel
+.proc TriggerNextLevel
 	lda #$00
 	sta objectIndex_5F		; reset object handling index
 	lda flagNextLevel_1B
@@ -1781,73 +1851,119 @@ Data_at8B7A:
 .endproc
 ;
 ; $8C34
-.proc UnknownSub12
+; HandlePlayerShots
+; Shoots arrows according to flagLoadShots_4E
+; and to the player's current power level.
+; powerLevel_64 = 	1 - single arrow, shoot once
+;					2 - single arrow, shoot twice
+;					3 - triple arrow, shoot one
+;					4 - triple arrow, shoot twice
+; Clobbers A
+.proc HandlePlayerShots
+
 	txa
 	pha
-	lda var_4E
+
+	lda flagLoadShots_4E		; check for autorization
 	bit BIT_1
-	beq skipThisRoutine
+	beq doneShooting
 	
-	ldx powerUp_P_64
-	txa
-	beq secondPart
-	cpx #$01
-	bne :+
-	lda #$01
-	bne secondPart
-	
-	:
-	cpx #$02
-	bne :+
-	lda #$02
-	bne secondPart
-	
-	:
-	cpx #$03
-	bne :+
-	lda #$02
-	bne secondPart
+
+	ldx powerLevel_64			; check power level
+	txa							
+	beq doShootArrow			; if power = 0, continue to doShootArrow
+
+	; X is the Power Level
+	; Set a relation between the power level and 
+	; the number of allowed arrows on the screen.
+	; 	X | A
+	; 	1 | 1
+	; 	2 | 2
+	; 	3 | 2
+	; 	4 | 3
+	cpx #$01					; check if power = 1
+	bne :+						; if not, skip forward
+	lda #$01					; else (power=1), A = 1 and
+	bne doShootArrow			; continue to doShootArrow
 	
 	:
-	cpx #$04
-	bne skipOtherPath
-	lda #$03
-	
-	secondPart:
-	cmp var_60
-	bcc skipThisRoutine
-	cpx #$03
-	bcc :+
-	inc var_60
-	inc var_60
-	lda #$01
-	jsr UnknownSub13
-	lda #$02
-	jsr UnknownSub13
-	
+	cpx #$02					; check if power = 2
+	bne :+						; if not, skip forward
+	lda #$02					; else (power=2), A = 2 and
+	bne doShootArrow			; continue to doShootArrow
 	
 	:
-	inc var_60
-	lda #$00
-	jsr UnknownSub13
+	cpx #$03					; check if power = 3
+	bne :+						; if not, skip forward
+	lda #$02					; else (power=3), A = 2 and
+	bne doShootArrow			; continue to doShootArrow
+	
+	:
+	cpx #$04					; check if power = 4
+	bne skipOtherPath			; if not, skip forward
+	lda #$03					; else (power=4), A = 3 and
+	
+	doShootArrow:
+		; Check the number of arrows allowed on the screen
+		; Will only shoot if A is at least equal to arrowsFlying_60.
+		;
+		; arrowsFlying_60 = 0 (no arrows on the screen)
+		; 		Any value of A allow shooting
+		;
+		; arrowsFlying_60 = 1
+		;		Allow shooting if power level not zero (A>=1)
+		; 
+		; arrowsFlying_60 = 2
+		; 		Allow shooting if power level greater than 2 (A>=2)
+		;
+		; arrowsFlying_60 = 3
+		; 		Only allow shooting if power level equal to max (A=3)
+		;
+		; arrowsFlying_60 >= 4
+		; 		Cannot shoot on any power level.
+		;
+		cmp arrowsFlying_60		; compare A to arrowsFlying_60
+		bcc doneShooting		; if A < arrowsFlying_60, break.
+
+								; else (A>=arrowsFlying_60)
+		cpx #$03				; compare power to level 3
+		bcc singleShot			; if power<3 (levels 1 or 2), do singleShot
+
+	tripleShot:
+		inc arrowsFlying_60
+		inc arrowsFlying_60
+		lda #$01
+		jsr ShootArrow_A
+		lda #$02
+		jsr ShootArrow_A
+	
+	singleShot:
+		inc arrowsFlying_60
+		lda #$00
+		jsr ShootArrow_A
+
 	lda soundAddress_8D
 	cmp #$07
 	bne :+
+	
 	lda frameCounter_12
 	and #$03
-	bne skipThisRoutine
+	bne doneShooting
+	
+	; Sound effect =================
 	nop;
 	nop;
 	nop; jsr $9C91; This is sound
 	nop;
 	nop;
 	nop; jsr DoSomethingWithSound 
+	; ==============================
 	
 	beq :++
 	
 	:
 	cmp #$05
-	beq skipThisRoutine
+	beq doneShooting
 	
 	:
 	lda #$03
@@ -1856,85 +1972,129 @@ Data_at8B7A:
 	nop; 
 	nop; jsr PlaySFX
 	
-	skipThisRoutine:
-	lda #$00
-	sta var_62
-	sta var_4E
-	pla
-	tax
-	rts
+	doneShooting:
+		lda #$00
+		sta flagPlayerHasShot_62	;	clear flags
+		sta flagLoadShots_4E		; 	clear flags
+		pla
+		tax
+		rts
 	
 	skipOtherPath:
-	cpx #$05
-	bcc :+
-	lda #$02
-	sta powerUp_P_64
+		cpx #$05
+		bcc :+
+		lda #$02
+		sta powerLevel_64
 
 	:
-	jmp skipThisRoutine
+	jmp doneShooting
 
 .endproc
 ;
 ; $8CB0
-.proc UnknownSub13
+; ShootArrow_A
+; Loads the arrow object and shoots it.
+; 	A = 0 Straight arrow
+; 	A = 1 Up arrow
+; 	A = 2 Down arrow
+.proc ShootArrow_A
 
-	pha
-	jsr FindFreeShotSlot_rX
-	cpx #$30
-	bcc :+
-	pla
+	pha							; temporarily put A away
+	jsr FindFreeShotSlot_rX		; look for free shot slot
+	cpx #$30					; check if shot list is not full
+	bcc :+						; if not, continue
+	pla							; else (list full), retrieve A and leave.
 	rts
 
 	:
-	pla
+	pla							; retrieve parameter A
+	asl A				
 	asl A
-	asl A
-	asl A
-	tay
-	lda Data_at8D1D+0,Y
+	asl A						; Calculate offset for 8-byte stride
+	tay							; use A as index
+	lda Data_at8D1D+0,Y			; Movement Table lo byte
 	sta someObjProperty_0501,X
-	lda Data_at8D1D+1,Y
-	sta someObjProperty_0502,X
-	lda Data_at8D1D+2,Y
-	cpy #$00
-	beq :+
-	clc
-	adc #$02
+	lda Data_at8D1D+1,Y			; Movement Table hi byte
+	sta someObjProperty_0502,X	
+
+	lda Data_at8D1D+2,Y			; load byte 1
+	cpy #$00					; check if single arrow
+	beq :+						; if single arrow, skip forward
+	clc							; else, 
+	adc #$02					; add 2
 	
 	:
-	sta someObjProperty_0602,X
-	lda Data_at8D1D+3,Y
-	sta someObjProperty_0302,X
-	lda Data_at8D1D+4,Y
-	sta someObjProperty_0600,X
-	lda Data_at8D1D+5,Y
-	sta someObjProperty_0601,X
-	lda object_X_Lo_0400
+	sta someObjProperty_0602,X	; store A (byte 1) #$02 single, #$04 triple
+	lda Data_at8D1D+3,Y			; load byte 2
+	sta someObjProperty_0302,X	; store byte 2
+	lda Data_at8D1D+4,Y			; load byte 3
+	sta objectWidth_0600,X	; store byte 3
+	lda Data_at8D1D+5,Y			; load byte 4
+	sta objectHeight_0601,X	; store byte 4
+	
+	lda object_X_Lo_0400		; load player X position from RAM
 	clc
-	adc Data_at8D1D+6,Y
-	sta object_X_Lo_0400,X
-	lda object_Y_Lo_0402
+	adc Data_at8D1D+6,Y			; add arrow X position (byte 5)
+	sta object_X_Lo_0400,X		; store arrow position
+	
+	lda object_Y_Lo_0402		; load player Y position from RAM
 	clc
-	adc Data_at8D1D+7,Y
-	sta object_Y_Lo_0402,X
-	lda #$00
+	adc Data_at8D1D+7,Y			; add arrow Y position (byte 6)
+	sta object_Y_Lo_0402,X		; store arrow position
+	
+	lda #$00					; zero-out other properties
 	sta someObjProperty_0503,X
 	sta someObjProperty_0504,X
 	sta someObjProperty_0505,X
 	sta object_X_Hi_0401,X
 	sta object_Y_Hi_0403,X
 	sta healthPoints_0603,X
-	lda #$40
+
+	lda #BIT6					; set attribute
 	sta object_Attrib_2_0405,X
-	lda #$80
+
+	lda #BIT7					; set attribute
 	sta object_Attrib_1_0404,X
+	
 	rts
 
 .endproc
 ;
 ; $8D1D
 Data_at8D1D:
-.incbin "rom-prg/objects/data-block-at8D1D.bin"
+; Arrow data
+; (word) Address for movement table
+;
+; 	6 bytes:
+;	1	2	3	4	5	6
+;	|	|	|	|	|   |
+;	|	|	|	|	|	+-- Y relative to player
+;	|	|	|	|	+------ X relative to player
+;	|	|	|	+----------
+;	|	|	+--------------
+;	|	+------------------
+;	+----------------------
+;
+;.incbin "rom-prg/objects/data-block-at8D1D.bin"
+
+.addr Data_at8D35
+.byte $02, $06, $06, $05, $12, $0C 
+
+.addr Data_at8D3D
+.byte $02, $06, $06, $05, $13, $0C
+
+.addr Data_at8D45
+.byte $02, $06, $06, $05, $13, $0C
+
+Data_at8D35:
+.byte $11, $00, $00, $11, $05, $00, $FE, $03
+
+Data_at8D3D:
+.byte $24, $00, $00, $24, $04, $FF, $FE, $03
+
+Data_at8D45:
+.byte $25, $00, $00, $25, $04, $01, $FE, $03
+;
 ;
 ; $8D4D
 ; FindFreeShotSlot_rX (return x)
@@ -2139,8 +2299,8 @@ PushXY
 	lda #$60
 	sta object_Attrib_2_0405,X
 	lda #$04
-	sta someObjProperty_0600,X
-	sta someObjProperty_0601,X
+	sta objectWidth_0600,X
+	sta objectHeight_0601,X
 	lda #$00
 	sta healthPoints_0603,X
 	sta someObjProperty_0301,X
@@ -3789,7 +3949,7 @@ PushAXY
 	jmp ReplaceMeLabel_8  ; if negative, do something else
 	
 	:
-	sta someObjProperty_0600,X	; stores WIDTH in pixels
+	sta objectWidth_0600,X	; stores WIDTH in pixels
 	lsr A						; divide by 8 (get size in tiles)
 	lsr A
 	lsr A
@@ -3798,7 +3958,7 @@ PushAXY
 	sta var_44  				; store W in temp variable
 	iny							; next value
 	lda (addressPtr_32),Y		; reads	object HEIGHT in pixels
-	sta someObjProperty_0601,X	; store HEIGHT in pixels
+	sta objectHeight_0601,X	; store HEIGHT in pixels
 	lsr A						; divide by 8 (get size in tiles)
 	lsr A
 	lsr A
@@ -3960,12 +4120,12 @@ PushAXY
 	bne :+
 	cmp flagUnknown_1F
 	beq :+
-	inc powerUp_P_64
-	lda powerUp_P_64
+	inc powerLevel_64
+	lda powerLevel_64
 	cmp #$05
 	bcc :+
 	lda #$00
-	sta powerUp_P_64
+	sta powerLevel_64
 	
 	:
 	lda input1_20
@@ -4019,8 +4179,8 @@ HandlePlayerActions:
 		bcc checkInputDown
 		sbc speed_66
 
-	:
-	sta object_X_Lo_0400
+		:
+		sta object_X_Lo_0400
 	
 	checkInputDown:
 		lda input1_20
@@ -4039,6 +4199,7 @@ HandlePlayerActions:
 		cmp #$14
 		bcc checkInputA
 		sbc speed_66
+
 		:
 		sta object_Y_Lo_0402
 	
@@ -4049,9 +4210,11 @@ HandlePlayerActions:
 		lda inputPrev_22
 		bit BUTTON_A
 		bne OnlyCheckForPause
-		lda #$02
-		jsr UnknownSub6
-		sta var_62
+		
+		lda #BIT1
+		jsr CheckPlayerCanShoot_A_rA
+		sta flagPlayerHasShot_62
+		
 		lda healthPoints_0603
 		cmp #$14
 		bcc :+
@@ -4087,13 +4250,18 @@ Data_atA80A:
 .incbin "rom-prg/objects/data-block-atA80A.bin"
 ;
 ; $A83C
-.proc UnknownSub6
+; CheckPlayerCanShoot_A_rA
+; Checks if the player is able to shoot.
+; In case not, zeoes-out A
+; else, leaves A untouched.
+.proc CheckPlayerCanShoot_A_rA
 	pha
 	lda object_Attrib_1_0404
 	bit BIT_5
 	beq :+
 	pla
 	rts
+
 	:
 	pla
 	lda #$00
