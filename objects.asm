@@ -70,28 +70,29 @@ DATA_ADDR_10: ; $a945 - offset $04
 .incbin "rom-prg/objects/data-object-atA945.bin" ; "Game Over" text, NOT ASCII
 
 DATA_ADDR_11: ; $a958 - offset $13
-;.incbin "rom-prg/objects/data-object-atA958.bin" ; Player Flying Frame 1/3
-.byte $1F, $1D ; W and H in pixels
+.incbin "rom-prg/objects/data-object-atA958.bin" ; Player Flying Frame 1/3
 
-.byte $00		; blank
-.byte $12, $02	; tile, attribute (palette)
-.byte $13, $02
-.byte $00
+;.byte $1F, $1D ; W and H in pixels
 
-.byte $00
-.byte $14, $00
-.byte $15, $02
-.byte $00
+;.byte $00		; blank
+;.byte $12, $02	; tile, attribute (palette)
+;.byte $13, $02
+;.byte $00
 
-.byte $00
-.byte $16, $02
-.byte $17, $02
-.byte $18, $00
+;.byte $00
+;.byte $14, $00
+;.byte $15, $02
+;.byte $00
 
-.byte $19, $00
-.byte $1A, $00
-.byte $1B, $00
-.byte $1C, $00
+;.byte $00
+;.byte $16, $02
+;.byte $17, $02
+;.byte $18, $00
+
+;.byte $19, $00
+;.byte $1A, $00
+;.byte $1B, $00
+;.byte $1C, $00
 
 DATA_ADDR_12: ; $a975 - offset $1d
 .incbin "rom-prg/objects/data-object-atA975.bin" ; Player Flying Frame 2/3
