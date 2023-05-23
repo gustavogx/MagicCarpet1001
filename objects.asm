@@ -67,6 +67,8 @@ NUMBER_ADDR_09: ; $a941 - offset $04
 ; ==========================================
 
 DATA_ADDR_10: ; $a945 - offset $04
+;   This "GAME OVER" object is never used, since the 
+; current GAME OVER is loaded into OAM from the ROM.
 .incbin "rom-prg/objects/data-object-atA945.bin" ; "Game Over" text, NOT ASCII
 
 DATA_ADDR_11: ; $a958 - offset $13

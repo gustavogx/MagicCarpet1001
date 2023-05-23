@@ -555,7 +555,7 @@ WaitForPressStart:
 	lda input1_20
 	
 	checkInputStart:
-	cmp #BIT4 ; not cmp BUTTON_START for some reason
+	cmp #BIT4 ; equivalent to BUTTON_START
 	beq :+
 	jmp WaitForPressStart
 
@@ -687,7 +687,7 @@ StartingNewStage:
 		beq skipPlayerHit
 		dec livesCounter_11
 		lda #$01					; Wait 1 second before
-		jsr WaitAliveTime_A	; respawning the player
+		jsr WaitAliveTime_A			; respawning the player
 		lda #$00
 		sta flagPlayerHit_1E
 		sta soundAddress_8F
@@ -699,7 +699,8 @@ StartingNewStage:
 		nop;
 		nop;
 		nop; jsr Sound_DontKnowWhatItDoes
-		jsr UnknownSub5
+
+		jsr ShowGameOver_WaitAnyButtonPress
 		jsr PaletteFading
 		jsr RenderingOFF
 		lda #$FF
@@ -1733,7 +1734,101 @@ doneLoadingEnemyBatch:
 ; Object type table?
 ; MUST unroll
 Data_at8715:
-.incbin "rom-prg/objects/data-block-at8715.bin"
+;.incbin "rom-prg/objects/data-block-at8715.bin"
+
+.addr Data_at877D	; hit sprite when arrow hits enemy
+.byte $00, $00, $00, $00, $00, $00 
+
+.addr Data_at8782
+.byte $00, $00, $00, $00, $00, $00
+
+.addr Data_at878A	; puff of smoke when enemy dies
+.byte $00, $00, $00, $00, $00, $00
+
+.addr Data_at8798
+.byte $00, $00, $01, $01, $00, $02
+
+.addr Data_at87CF
+.byte $00, $68, $0B, $0B, $28, $03 
+
+.addr Data_at87EA 
+.byte $00, $68, $08, $08, $29, $03
+
+.addr Data_at8805
+.byte $00, $68, $08, $08, $2A, $03
+
+.addr Data_at8820
+.byte $00, $68, $08, $08, $2B, $03
+
+.addr Data_at883B
+.byte $00, $00, $07, $07, $00, $04
+
+.addr Data_at88E0
+.byte $00, $00, $07, $07, $00, $04
+
+.addr Data_at8985
+.byte $00, $00, $07, $07, $00, $04
+
+.addr Data_at8A2A
+.byte $00, $00, $07, $07, $00, $04
+
+.addr Data_at8ACF
+.byte $00, $E0, $10, $10, $2C, $03
+
+Data_at877D:
+.incbin "rom-prg/objects/data-block-at877D.bin"
+;.res 5
+;.byte $12, $00, $00, $82, $FF
+
+Data_at8782:
+.incbin "rom-prg/objects/data-block-at8782.bin"
+;.res 8
+;.byte $12, $00, $00, $13, $00, $00, $83, $FF
+
+Data_at878A:
+.incbin "rom-prg/objects/data-block-at878A.bin"
+;.res 14
+
+Data_at8798:
+.incbin "rom-prg/objects/data-block-at8798.bin"
+;.res 55
+
+Data_at87CF:
+.incbin "rom-prg/objects/data-block-at87CF.bin"
+;.res 27
+
+Data_at87EA:
+.incbin "rom-prg/objects/data-block-at87EA.bin"
+;.res 27
+
+Data_at8805:
+.incbin "rom-prg/objects/data-block-at8805.bin"
+;.res 27
+
+Data_at8820:
+.incbin "rom-prg/objects/data-block-at8820.bin"
+;.res 27
+
+Data_at883B:
+.incbin "rom-prg/objects/data-block-at883B.bin"
+;.res 165
+
+Data_at88E0:
+.incbin "rom-prg/objects/data-block-at88E0.bin"
+;.res 165
+
+Data_at8985:
+.incbin "rom-prg/objects/data-block-at8985.bin"
+;.res 165
+
+Data_at8A2A:
+.incbin "rom-prg/objects/data-block-at8A2A.bin"
+;.res 165
+
+Data_at8ACF:
+.incbin "rom-prg/objects/data-block-at8ACF.bin"
+;.res 27
+
 ;
 ; $8AEA
 .proc GenerateDrop ; Generate a random drop
@@ -3332,6 +3427,7 @@ RepeatedTitles:
 ;
 ; $954B
 .proc UpdatePPUSettings
+
 	jsr WaitVBlank
 	lda flagPPUMask_18
 	sta PpuMask_2001
@@ -3342,19 +3438,21 @@ RepeatedTitles:
 ;
 ; $9559
 .proc WaitVBlank
+
 	pha
 	jsr CheckForVBlank
-	doCheckPPUStatus:
+	:
 		lda PpuStatus_2002
-		bpl doCheckPPUStatus
+		bpl :-
 	pla
 	rts
 .endproc
 ;
 ; $9564
 .proc CheckForVBlank
+	:
 	lda PpuStatus_2002
-	bmi CheckForVBlank
+	bmi :-
 	rts
 .endproc
 ;
@@ -3402,35 +3500,61 @@ RepeatedTitles:
 .endproc
 ;
 ; $9598
+; ReadControl_A
+; Reads 8 bits from control A
+; A control being read: 0 = player 1, 1 = player 2
+;
+; 	Since this function clobbers X and it
+; calls ShiftRegisterController_X, which clobbers A,
+; there doesn't seem to be a reason not to use X as controller 
+; index from the start.
 .proc ReadControl_A
-	ldx #$01
+
+	ldx #$01			; Strobe control port to reset its latch.
 	stx Ctrl1_4016
 	ldx #$00
 	stx Ctrl1_4016
-	tax
+
+	tax					; Transfer A to X.
 
 	ldy #$08
 	:
-		jsr StrobeControl_X
+		jsr ShiftRegisterController_X
 		dey
 		bne :-
 	rts
 .endproc
 ;
 ; $95AC
-.proc StrobeControl_X
-	asl input1_20
-	lda Ctrl1_4016,X
-	lsr A
-	bcs RegisterInput
-	lsr A
-	bcs RegisterInput
-	rts
-.endproc
+; ShiftRegisterController_X
+;	Strobe the controller port.
+;	Each bit, in order, is a possible button press.
+;	X : Controller 0 = Player 1, 1 = Player 2
 ;
-; $95B8
-.proc RegisterInput
-	inc input1_20
+;	7654 3210
+;	|||| ||||
+;	|||| |||+-- A
+; 	|||| ||+--- B
+; 	|||| |+---- Select
+;	|||| +----- Start
+; 	|||+------- Up
+; 	||+-------- Down
+; 	|+--------- Left
+;	+---------- Right
+;
+; Clobbers A
+.proc ShiftRegisterController_X
+
+	asl input1_20			; Shift bits to the left <<
+	lda Ctrl1_4016,X		; Strobe port 0 (player 1)
+	lsr A					; Shift bits to the left, with carry
+	bcs RegisterInput		; If carry set, proceed to register it.
+	lsr A					; else, shift again.
+	bcs RegisterInput		; If carry set, proceed to register it.
+	rts
+
+RegisterInput:
+	inc input1_20			; Add the bit corresponding to the pressed button 
 	rts
 .endproc
 ;
@@ -3658,7 +3782,7 @@ EndCreditsData:
 .incbin "rom-prg/stages/EndCredits.bin"
 ;
 ; $97AD
-.proc UnknownSub5
+.proc ShowGameOver_WaitAnyButtonPress
 	lda #$00
 	sta currentStage_15
 	sta PpuControl_2000
@@ -3678,26 +3802,31 @@ EndCreditsData:
 	jsr WaitAliveTime_A		; before respawning the player
 	lda #$00
 	sta frameCounter64_13
-	:
-	lda input1_20
-	bne WaitforButtonPress
-	lda frameCounter64_13
-	cmp #$0A
-	bne :-
-	rts
-.endproc
-;
-; $97EC
-.proc WaitforButtonPress
-	sta inputPrev_22
-	:
-		lda input1_20
-		cmp inputPrev_22
-		beq :-
-	rts
+	
+	; Wait for any button to be pressed before reseting.
+	;
+	; Checks for a button being pressed and then released.
+	; First, checks for button presses every 10 frames.
+	; Then, checks for a change on the controller state every frame.
+	: ; Check for press
+	lda input1_20			; Load current button being pressed.
+	bne :+					; If pressed, skip forward.
+	lda frameCounter64_13	; else, check if 10 frames have passed.
+	cmp #$0A				; If so (10 frames since last check),
+	bne :-					; check for the first press again.
+	rts						; else (other frames), return.
+
+	: ; Wait for release	
+	sta inputPrev_22		; Store the previous press
+	:						
+		lda input1_20		; Load the new controller state.
+		cmp inputPrev_22	; Compare with the previous one.
+		beq :-				; While they are the same, loop back.
+	rts						; else, return.
 .endproc
 ;
 ; $97F5 32 bytes of data
+; Hard-coded "GAME OVER" message using game 8 sprites
 Data_at97F5:
 .incbin "rom-prg/objects/data-block-at97F5.bin"
 ;

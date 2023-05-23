@@ -157,86 +157,107 @@ Data_atCA35:
 Data_atCA41:
 .word Data_atD448 ;$d448
 .incbin "rom-prg/objects/data-block-atCA43.bin";$ca41
+;.res 186 ; ba ;;; NOT HERE, but down at D448
 
 Data_atCA4D:
 .word $d502
 .incbin "rom-prg/objects/data-block-atCA4F.bin";$ca4d
+;.res 44 ; 2c
 
 Data_atCA59:
 .word $d52e
 .incbin "rom-prg/objects/data-block-atCA5B.bin";$ca59 
+;.res 124 ; 7c
 
 Data_atCA65:
 .word $d5aa
 .incbin "rom-prg/objects/data-block-atCA67.bin";$ca65
+;.res 134 ; 86
 
 Data_atCA71:
 .word $d630
 .incbin "rom-prg/objects/data-block-atCA73.bin";$ca71
+;.res 134 ; 86
 
 Data_atCA7D:
 .word $d6b6
 .incbin "rom-prg/objects/data-block-atCA7F.bin";$ca7d
+;.res 134 ; 86
 
 Data_atCA89:
 .word $d73c
 .incbin "rom-prg/objects/data-block-atCA8B.bin";$ca89  
+;.res 134 ; 86
 
 Data_atCA95:
 .word $d7c2
 .incbin "rom-prg/objects/data-block-atCA97.bin";$ca95
+;.res 134 ; 86
 
 Data_atCAA1:
 .word $d848
 .incbin "rom-prg/objects/data-block-atCAA3.bin";$caa1
+;.res 24 ; 18
 
 Data_atCAAD:
 .word $d860
 .incbin "rom-prg/objects/data-block-atCAAF.bin";$caad
+;.res 24 ; 18
 
 Data_atCAB9:
 .word $d878
 .incbin "rom-prg/objects/data-block-atCABB.bin";$cab9 
+;.res 21 ; 15
 
 Data_atCAC5:
 .word $d88d
 .incbin "rom-prg/objects/data-block-atCAC7.bin";$cac5
+;.res 21 ; 15
 
 Data_atCAD1:
 .word $d8a2
 .incbin "rom-prg/objects/data-block-atCAD3.bin";$cad1
+;.res 15 ; f
 
 Data_atCADD:
 .word $d8b1
 .incbin "rom-prg/objects/data-block-atCADF.bin";$cadd
+;.res 15 ; f
 
 Data_atCAE9:
 .word $d8c0
 .incbin "rom-prg/objects/data-block-atCAEB.bin";$cae9 
+;.res 69 ; 45
 
 Data_atCAF5:
 .word $d905
 .incbin "rom-prg/objects/data-block-atCAF7.bin";$caf5
+;.res 119 ; 77
 
 Data_atCB01:
 .word $d97c
 .incbin "rom-prg/objects/data-block-atCB03.bin";$cb01
+;.res 125 ; 7d
 
 Data_atCB0D:
 .word $d9f9
 .incbin "rom-prg/objects/data-block-atCB0F.bin";$cb0d
+;.res 125 ; 7d
 
 Data_atCB19:
 .word $da76
 .incbin "rom-prg/objects/data-block-atCB1B.bin";$cb19 
+;.res 125 ; 7d
 
 Data_atCB25:
 .word $daf3
 .incbin "rom-prg/objects/data-block-atCB27.bin";$cb25
+;.res 119 ; 77
 
 Data_atCB31:
 .word $db6a
 .incbin "rom-prg/objects/data-block-atCB33.bin";$cb31
+;.res 125 ; 7d
 
 Data_atCB3D:
 .word $dbe7
@@ -355,7 +376,7 @@ Data_atCC81:
 Data_atCC8D:
 .incbin "rom-prg/objects/data-block-atCC8D.bin"
 
-Data_atCCF5:
+Data_atCCF5: 
 .incbin "rom-prg/objects/data-block-atCCF5.bin"
 
 Data_atCD5D:
@@ -416,4 +437,202 @@ Data_atD426:
 .incbin "rom-prg/objects/data-block-atD426.bin"
 
 Data_atD448:
-.incbin "rom-prg/objects/data-block-atD448.bin" ;;; parei aqui
+.incbin "rom-prg/objects/data-block-atD448.bin" ;;; STOPPED HERE
+;.res 186 ; ba
+
+Data_atD502:
+;.incbin "rom-prg/objects/data-block-atD502.bin"
+;.res 44 ; 2c
+
+Data_atD52E:
+;.incbin "rom-prg/objects/data-block-atD52E.bin"
+;.res 124 ; 7c
+
+Data_atD5AA:
+;.incbin "rom-prg/objects/data-block-atD5AA.bin"
+;.res 134 ; 86
+
+Data_atD630:
+;.incbin "rom-prg/objects/data-block-atD630.bin"
+;.res 134 ; 86
+
+Data_atD6B6:
+;.incbin "rom-prg/objects/data-block-atD6B6.bin"
+;.res 134 ; 86
+
+Data_atD73C:
+;.incbin "rom-prg/objects/data-block-atD73C.bin"
+;.res 134 ; 86
+
+Data_atD7C2:
+;.incbin "rom-prg/objects/data-block-atD7C2.bin"
+;.res 134 ; 86
+
+Data_atD848:
+;.incbin "rom-prg/objects/data-block-atD848.bin"
+;.res 24 ; 18
+
+Data_atD860:
+;.incbin "rom-prg/objects/data-block-atD860.bin"
+;.res 24 ; 18
+
+Data_atD878:
+;.incbin "rom-prg/objects/data-block-atD878.bin"
+;.res 21 ; 15
+
+Data_atD88D:
+;.incbin "rom-prg/objects/data-block-atD88D.bin"
+;.res 21 ; 15
+
+Data_atD8A2:
+;.incbin "rom-prg/objects/data-block-atD8A2.bin"
+;.res 15 ; f
+
+Data_atD8B1:
+;.incbin "rom-prg/objects/data-block-atD8B1.bin"
+;.res 15 ; f
+
+Data_atD8C0:
+;.incbin "rom-prg/objects/data-block-atD8C0.bin"
+;.res 69 ; 45
+
+Data_atD905:
+;.incbin "rom-prg/objects/data-block-atD905.bin"
+;.res 119 ; 77
+
+Data_atD97C:
+;.incbin "rom-prg/objects/data-block-atD97C.bin"
+;.res 125 ; 7d
+
+Data_atD9F9:
+;.incbin "rom-prg/objects/data-block-atD9F9.bin"
+;.res 125 ; 7d
+
+Data_atDA76:
+;.incbin "rom-prg/objects/data-block-atDA76.bin"
+;.res 125 ; 7d
+
+Data_atDAF3:
+;.incbin "rom-prg/objects/data-block-atDAF3.bin"
+;.res 119 ; 77
+
+Data_atDB6A:
+;.incbin "rom-prg/objects/data-block-atDB6A.bin"
+;.res 125 ; 7d
+
+Data_atDBE7:
+;.incbin "rom-prg/objects/data-block-atDBE7.bin"
+;.res 125 ; 7d
+
+Data_atDC64:
+;.incbin "rom-prg/objects/data-block-atDC64.bin"
+;.res 125 ; 7d
+
+Data_atDCE1:
+;.incbin "rom-prg/objects/data-block-atDCE1.bin"
+;.res 186 ; ba
+
+Data_atDD9B:
+;.incbin "rom-prg/objects/data-block-atDD9B.bin"
+;.res 5 ; 5
+
+Data_atDDA0:
+;.incbin "rom-prg/objects/data-block-atDDA0.bin"
+;.res 5 ; 5
+
+Data_atDDA5:
+;.incbin "rom-prg/objects/data-block-atDDA5.bin"
+;.res 5 ; 5
+
+Data_atDDAA:
+;.incbin "rom-prg/objects/data-block-atDDAA.bin"
+;.res 101 ; 65
+
+Data_atDE0F:
+;.incbin "rom-prg/objects/data-block-atDE0F.bin"
+;.res 105 ; 69
+
+Data_atDE78:
+;.incbin "rom-prg/objects/data-block-atDE78.bin"
+;.res 101 ; 65
+
+Data_atDEDD:
+;.incbin "rom-prg/objects/data-block-atDEDD.bin"
+;.res 104 ; 68
+
+Data_atDF45:
+;.incbin "rom-prg/objects/data-block-atDF45.bin"
+;.res 101 ; 65
+
+Data_atDFAA:
+;.incbin "rom-prg/objects/data-block-atDFAA.bin"
+;.res 105 ; 69
+
+Data_atE013:
+;.incbin "rom-prg/objects/data-block-atE013.bin"
+;.res 101 ; 65
+
+Data_atE078:
+;.incbin "rom-prg/objects/data-block-atE078.bin"
+;.res 105 ; 69
+
+Data_atE0E1:
+;.incbin "rom-prg/objects/data-block-atE0E1.bin"
+;.res 18 ; 12  
+
+Data_atE0F3:
+;.incbin "rom-prg/objects/data-block-atE0F3.bin"
+;.res 22 ; 16
+
+Data_atE109:
+;.incbin "rom-prg/objects/data-block-atE109.bin"
+;.res 57 ; 39
+
+Data_atE142:
+;.incbin "rom-prg/objects/data-block-atE142.bin"
+;.res 31 ; 1F
+
+Data_atE161:
+;.incbin "rom-prg/objects/data-block-atE161.bin"
+;.res x ; x
+
+Data_atE180:
+;.incbin "rom-prg/objects/data-block-atE180.bin"
+;.res x ; x
+
+Data_atE19F:
+;.incbin "rom-prg/objects/data-block-atE19F.bin"
+;.res x ; x
+
+Data_atE1BE:
+;.incbin "rom-prg/objects/data-block-atE1BE.bin"
+;.res x ; x
+
+Data_atE1DD:
+;.incbin "rom-prg/objects/data-block-atE1DD.bin"
+;.res x ; x
+
+Data_atE1FC:
+;.incbin "rom-prg/objects/data-block-atE1FC.bin"
+;.res x ; x
+
+Data_atE21B:
+;.incbin "rom-prg/objects/data-block-atE21B.bin"
+;.res x ; x
+
+Data_atE262:
+;.incbin "rom-prg/objects/data-block-atE262.bin"
+;.res x ; x
+
+Data_atE2B5:
+;.incbin "rom-prg/objects/data-block-atE2B5.bin"
+;.res 1356 ; 54C
+
+Data_atE801:
+;.incbin "rom-prg/objects/data-block-atE21B.bin"
+;.res x ; x
+
+
+
+
+
