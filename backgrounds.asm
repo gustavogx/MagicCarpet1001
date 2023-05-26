@@ -1,20 +1,20 @@
 
-.word Data_TitleScreen 	;$e85f
-.word Data_TitleScreen 	;$e85f
-.word Data_Stage01_A	;$e882
-.word Data_Stage01_B	;$e895
-.word Data_Stage02_A	;$e8ee
-.word Data_Stage02_B	;$e901
-.word Data_Stage03_A	;$e8b8
-.word Data_Stage03_B	;$e8cb
-.word Data_Stage04_A	;$e924
-.word Data_Stage04_B	;$e937
-.word Data_Ending 		;$e95a
-.word Data_BlankScreen 	;$e97d
+.addr Data_TitleScreen 	;$e85f
+.addr Data_TitleScreen 	;$e85f
+.addr Data_Stage01_A	;$e882
+.addr Data_Stage01_B	;$e895
+.addr Data_Stage02_A	;$e8ee
+.addr Data_Stage02_B	;$e901
+.addr Data_Stage03_A	;$e8b8
+.addr Data_Stage03_B	;$e8cb
+.addr Data_Stage04_A	;$e924
+.addr Data_Stage04_B	;$e937
+.addr Data_Ending 		;$e95a
+.addr Data_BlankScreen 	;$e97d
 
 ;; ============ Title Screen =============
 Data_TitleScreen:
-	.word NameTable_TitleScreen ;$e9b3
+	.addr NameTable_TitleScreen ;$e9b3
 	.byte PaletteOBJ_TitleScreen - Data_TitleScreen
 	
 	PaletteBG_TitleScreen:
@@ -25,14 +25,14 @@ Data_TitleScreen:
 
 ;; ============== Stage 01 ===============
 Data_Stage01_A:
-	.word NameTable_Stage01_A ;$eb30
+	.addr NameTable_Stage01_A ;$eb30
 	.byte PaletteOBJ_Stage01 - Data_Stage01_A
 	
 	PaletteBG_Stage01_A:
 	.incbin "rom-prg/stages/Stage01_A_BPL.bin"
 
 Data_Stage01_B:
-	.word NameTable_Stage01_B ;$ed8a
+	.addr NameTable_Stage01_B ;$ed8a
 	.byte PaletteOBJ_Stage01 - Data_Stage01_B
 
 	PaletteBG_Stage01_B:
@@ -43,14 +43,14 @@ Data_Stage01_B:
 
 ;; ============== Stage 03 ===============
 Data_Stage03_A: ; $68b8
-	.word NameTable_Stage03_A ;$efc8
+	.addr NameTable_Stage03_A ;$efc8
 	.byte PaletteOBJ_Stage03 - Data_Stage03_A
 	
 	PaletteBG_Stage03_A:
 	.incbin "rom-prg/stages/Stage03_A_BPL.bin"
 
 Data_Stage03_B:
-	.word NameTable_Stage03_B ;$f1f9
+	.addr NameTable_Stage03_B ;$f1f9
 	.byte PaletteOBJ_Stage03 - Data_Stage03_B
 
 	PaletteBG_Stage03_B:
@@ -61,14 +61,14 @@ Data_Stage03_B:
 
 ;; ============== Stage 02 ===============
 Data_Stage02_A:
-	.word NameTable_Stage02_A ;$f3f0
+	.addr NameTable_Stage02_A ;$f3f0
 	.byte PaletteOBJ_Stage02 - Data_Stage02_A
 	
 	PaletteBG_Stage02_A:
 	.incbin "rom-prg/stages/Stage02_A_BPL.bin"
 
 Data_Stage02_B:
-	.word NameTable_Stage02_B ;$f65a
+	.addr NameTable_Stage02_B ;$f65a
 	.byte PaletteOBJ_Stage02 - Data_Stage02_B
 	
 	PaletteBG_Stage02_B:
@@ -79,14 +79,14 @@ Data_Stage02_B:
 
 ;; ============== Stage 04 ===============
 Data_Stage04_A:
-	.word NameTable_Stage04_A ;$f8ee
+	.addr NameTable_Stage04_A ;$f8ee
 	.byte PaletteOBJ_Stage04 - Data_Stage04_A
 
 	PaletteBG_Stage04_A:
 	.incbin "rom-prg/stages/Stage04_A_BPL.bin"
 
 Data_Stage04_B:
-	.word NameTable_Stage04_B ;$fad0
+	.addr NameTable_Stage04_B ;$fad0
 	.byte PaletteOBJ_Stage04 - Data_Stage04_B
 
 	PaletteBG_Stage04_B:
@@ -97,7 +97,7 @@ Data_Stage04_B:
 
 ;; ============== Ending ===============
 Data_Ending:
-	.word NameTable_Ending ;$fcb7
+	.addr NameTable_Ending ;$fcb7
 	.byte PaletteOBJ_Ending - Data_Ending
 
 	PaletteBG_Ending:
@@ -107,7 +107,7 @@ Data_Ending:
 	.incbin "rom-prg/stages/Ending_OPL.bin"
 
 Data_BlankScreen: 
-	.word NameTable_Blank ;$e9a0
+	.addr NameTable_Blank ;$e9a0
 	.byte PaletteOBJ_BlankScreen - Data_BlankScreen
 	
 	PaletteBG_BlankScreen:
