@@ -7,7 +7,7 @@
 .word $ffff
 
 DATA_S1_01: ; $acb8
-.incbin "rom-prg/objects/data-object-atACB8.bin" ; 
+.incbin "rom-prg/objects/data-object-atACB8.bin" 
 
 DATA_S1_02: ; $ace1
 .incbin "rom-prg/objects/data-object-atACE1.bin"

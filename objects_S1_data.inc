@@ -13,6 +13,7 @@
 .addr Data_atAF72
 .addr Data_atAF7E
 .addr Data_atAF8A
+
 .addr Data_atB27D
 .addr Data_atB289
 .addr Data_atB295
@@ -99,7 +100,7 @@ Data_atAF8A:
 .addr Data_atB247
 .incbin "rom-prg/objects/data-10bytes-atAF8C.bin"
 
-
+; This one seems off place. Boss???
 Data_atAF96:
 .addr Data_atB146
 .incbin "rom-prg/objects/data-10bytes-atAF98.bin"
