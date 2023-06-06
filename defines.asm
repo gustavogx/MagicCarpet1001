@@ -30,3 +30,14 @@
 .define RAMPage_5 	$0500
 .define RAMPage_6 	$0600
 .define RAMPage_7 	$0700
+
+.define BIT0	%00000001
+.define BIT1	%00000010
+.define BIT2	%00000100
+.define BIT3	%00001000
+.define BIT4	%00010000
+.define BIT5	%00100000
+.define BIT6	%01000000
+.define BIT7	%10000000
+.define ZERO    $00
+.define ALL1	$FF

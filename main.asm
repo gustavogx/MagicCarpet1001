@@ -1,3 +1,4 @@
+.define DISABLE_SOUND 1
 .include "macros.asm"
 .include "defines.asm"
 .include "engine-config.asm"
@@ -6,7 +7,6 @@
 .include "inesheader.inc"
 
 .segment "ZEROPAGE" ; LSB 0 - FF
-
 
 ; $00
 ; $01
@@ -152,10 +152,10 @@
 ; $8B
 ; $8C
 .define soundIndex_8D		$8D
-.define flagUpdateSoundAtVBlank_8E $8E
+.define flagUpdateSoundAtVBlank_8E	$8E
 .define flagPlaySFX_8F		$8F
 
-.define apuStatusFlag_C9	$C9
+.define flagAPUStatus_C9	$C9
 .define bgPalette_E0		$E0 ; 4
 
 
@@ -246,17 +246,6 @@
 .define objectHitBox_Top_Y_0704 	$0704	; maybe vertices of hit box
 .define objectHitBox_Bottom_Y_0705 	$0705	; maybe vertices of hit box
 
-.define BIT0	%00000001
-.define BIT1	%00000010
-.define BIT2	%00000100
-.define BIT3	%00001000
-.define BIT4	%00010000
-.define BIT5	%00100000
-.define BIT6	%01000000
-.define BIT7	%10000000
-.define ZERO    $00
-.define ALL1	$FF
-
 .segment "STARTUP"
 
 
@@ -312,7 +301,7 @@ HandleReset:
 	jsr SetupAfterReset	
 	jsr InitializeObjectIndexStep
 
-	jsr ResetSoundEngine
+	ResetSound
 
 	lda #$01 
 	sta flagGameMode_26
@@ -349,10 +338,7 @@ HandleReset:
 	
 	jsr RenderON
 	
-	lda #$00
-	sta soundIndex_8D
-	
-	jsr InitializeSound ; see sound engine
+	PlayThisSong #$00
 
 WaitForPressStart:
 	
@@ -372,11 +358,8 @@ WaitForPressStart:
 		cmp inputPrev_22
 		beq :-
 
-	jsr Sound_DontKnowWhatItDoes
-
-	lda #$07
-	sta soundIndex_8D
-	jsr PlaySFX
+	StopPlaying
+	PlayThisSFX #$07
 	
 	lda #$00
 	sta currentStage_15
@@ -386,7 +369,7 @@ StartingNewStage:
 
 	jsr RenderingOFF
 
-	jsr DoSomethingWithSound 
+	UpdateSound 
 
 	lda #$00
 	sta PpuControl_2000
@@ -452,9 +435,7 @@ StartingNewStage:
 	
 	jsr RenderON
 
-	lda #$01
-	sta soundIndex_8D
-	jsr InitializeSound
+	PlayThisSong #$01
 	
 	lda currentStage_15
 	cmp #$02
@@ -493,7 +474,7 @@ StartingNewStage:
 		skipPlayerHit:
 		lda livesCounter_11
 		bne skipSomethingImportant
-		jsr Sound_DontKnowWhatItDoes
+		StopPlaying
 
 		jsr ShowGameOver_WaitAnyButtonPress
 		jsr PaletteFading
@@ -506,7 +487,7 @@ StartingNewStage:
 		skipSomethingImportant:
 		lda flagNextLevel_1B
 		beq dontAdvanceLevel
-		jsr Sound_DontKnowWhatItDoes
+		StopPlaying
 
 		; Handles when a stage is cleared.
 		; Decides if the program has to 
@@ -601,14 +582,11 @@ StartingNewStage:
 		ldx #$30				; WHY? 
 		jsr ClearObjectsDescription; Clears page $04 of RAM
 	
-		jsr Sound_DontKnowWhatItDoes
+		StopPlaying
 	
-		jsr DoSomethingWithSound 
+		UpdateSound 
 	
-		lda #$02
-		sta soundIndex_8D
-
-		jsr InitializeSound
+	PlayThisSong #$02
 
 		iny
 		lda (objectPtr_3A),Y
@@ -1157,11 +1135,9 @@ doneLoadingEnemyBatch:
 	lda soundIndex_8D
 	cmp #$05
 	beq skipHandlingCollision
-	jsr DoSomethingWithSound 
 
-	lda #$04
-	sta soundIndex_8D
-	jsr PlaySFX
+	UpdateSound 
+	PlayThisSFX #$04
 
 	jmp skipHandlingCollision
 	
@@ -1210,13 +1186,10 @@ doneLoadingEnemyBatch:
 		bne handlePlayerGotPowerUp	; if pickup is not ExtraLife, skip to next
 		
 		; Sound effect =================
-		jsr UnknownSoundSub2
-
-		jsr DoSomethingWithSound
+		WaitUntilSoundFinishes
+		UpdateSound
 	
-		lda #$06
-		sta soundIndex_8D
-		jsr PlaySFX
+	PlayThisSFX #$06
 		; ==============================
 
 		inc livesCounter_11
@@ -1227,13 +1200,9 @@ doneLoadingEnemyBatch:
 		bne handlePlayerGotHeart 
 
 		; Sound effect =================
-		jsr UnknownSoundSub2
-
-		jsr DoSomethingWithSound
-	
-		lda #$07
-		sta soundIndex_8D
-		jsr PlaySFX
+		WaitUntilSoundFinishes
+		UpdateSound
+		PlayThisSFX #$07
 		; ==============================
 
 		lda powerLevel_64
@@ -1241,7 +1210,7 @@ doneLoadingEnemyBatch:
 
 		bcc :+ 	; if didn't reach maximum power, continue to power increase
 				; else play sound cue and exit
-		jsr DoSomethingWithSound
+		UpdateSound
 	
 		jmp doneWithObjectCollision
 	
@@ -1254,13 +1223,9 @@ doneLoadingEnemyBatch:
 		bne handlePlayerGotSpeedUp
 
 		; Sound effect =================
-		jsr UnknownSoundSub2
-
-		jsr DoSomethingWithSound
-
-		lda #$07
-		sta soundIndex_8D
-		jsr PlaySFX
+		WaitUntilSoundFinishes
+		UpdateSound
+		PlayThisSFX #$07
 		; ==============================
 
 		jsr AddOneHeart
@@ -1271,12 +1236,9 @@ doneLoadingEnemyBatch:
 		bne handlePlayerGotMagicLamp
 
 		; Sound effect =================
-		jsr UnknownSoundSub2
-		jsr DoSomethingWithSound
-
-		lda #$07
-		sta soundIndex_8D
-		jsr PlaySFX
+		WaitUntilSoundFinishes
+		UpdateSound
+		PlayThisSFX #$07
 		; ==============================
 
 		lda #PLAYER_SPEED_FAST
@@ -1293,9 +1255,7 @@ doneLoadingEnemyBatch:
 		:
 
 		; Sound effect =================
-		lda #$0C
-		sta soundIndex_8D
-		jsr PlaySFX
+		PlayThisSFX #$0C
 		; ==============================
 
 		lda #MAGIC_LAMP_HEALTH_POINTS
@@ -1321,13 +1281,9 @@ doneLoadingEnemyBatch:
 	:
 	cmp #$1A
 	bne :+
-	jsr UnknownSoundSub2
-
-	jsr DoSomethingWithSound
- 
-	lda #$05
-	sta soundIndex_8D
-	jsr PlaySFX
+	WaitUntilSoundFinishes
+	UpdateSound
+	PlayThisSFX #$05
 
 	lda #$01
 	sta flagPlaySFX_8F
@@ -1368,9 +1324,8 @@ doneLoadingEnemyBatch:
 	cmp #$24
 	bne doneWithObjectCollision
 
-	lda #$09
-	sta soundIndex_8D
-	jsr InitializeSound
+	PlayThisSong #$09
+
 
 	lda #$08
 	clc
@@ -1756,8 +1711,8 @@ Data_at8BD7:
 	bne doneShooting
 	
 	; Sound effect =================
-	jsr $9C91; This is sound
-	jsr DoSomethingWithSound 
+	WaitUntilSoundFinishes
+	UpdateSound 
 	; ==============================
 	
 	beq :++
@@ -1767,10 +1722,8 @@ Data_at8BD7:
 	beq doneShooting
 	
 	:
-	lda #$03
-	sta soundIndex_8D
-	jsr PlaySFX
-	
+	PlayThisSFX #$03
+
 	doneShooting:
 		lda #$00
 		sta flagPlayerHasShot_62	;	clear flags
@@ -2852,9 +2805,7 @@ RegisterInput:
 	sta flagPPUControl_19
 	jsr RenderON
 	
-	lda #$0B
-	sta soundIndex_8D
-	jsr InitializeSound
+	PlayThisSong #$0B
 
 	loopPressANYButton:
 		lda input1_20
@@ -2866,7 +2817,7 @@ RegisterInput:
 		cmp inputPrev_22
 		beq :-
 	
-	jsr Sound_DontKnowWhatItDoes
+	StopPlaying
 
 	lda #$00
 	sta screenScrollX_29
@@ -2972,9 +2923,7 @@ RegisterInput:
 		sta PpuScroll_2005
 		
 		; play a sound effect
-		lda #$0A
-		sta soundIndex_8D
-		jsr PlaySFX
+		PlayThisSFX #$0A
 
 		: ; advance to next screen position
 		Add16 vramAddress_67, #1
@@ -2989,8 +2938,8 @@ RegisterInput:
 		bne loopLoadCredits
 	
 	; play another sound
-	jsr DoSomethingWithSound 
-
+	UpdateSound
+	
 	leaveEndCredits:
 	rts
 .endproc
@@ -3085,7 +3034,7 @@ PushAXY
 	lda PpuStatus_2002
 	inc frameCounter_12
 	lda frameCounter_12
-	and #63 				; every 62 frames, increase aliveTimer
+	and #63 				; $3F = every 62 frames, increase aliveTimer
 	bne :+
 	inc aliveTimer_14
 	inc frameCounter62_13
@@ -3131,7 +3080,7 @@ PushAXY
 	jsr PowerUpCheat
 
 	doUpdateSoundOnly:
-	jsr UpdateSoundAtVBlank
+	UpdateSoundDuringVBlank
 
 	PullAXY
 	RTI
@@ -3816,38 +3765,34 @@ Data_atA80A:
 
 	checkInputPressStart:
 	bit BUTTON_START
-	beq dontPause
+	beq exitPauseRoutine
+	
 	lda inputPrev_22
 	bit BUTTON_START
-	bne dontPause
+	bne exitPauseRoutine
+	
 	lda flagPause_1C
 	eor #$01
 	sta flagPause_1C
 	beq :+
 	
-	jsr Sound_DontKnowWhatItDoes
-	lda #$08
-	sta soundIndex_8D
-	jsr PlaySFX
+	StopPlaying
+	PlayThisSFX #$08
 
-	jmp dontPause
+	jmp exitPauseRoutine
+	
 	:
-
-	jsr DoSomethingWithSound 
+	UpdateSound 
 
 	lda flagUnknown_1A
 	beq :+
-	lda #$02
-	sta soundIndex_8D
-	jsr InitializeSound
+	PlayThisSong #$02
 	rts
 
 	:
-	lda #$01
-	sta soundIndex_8D
-	jsr InitializeSound
+	PlayThisSong #$01
 	
-	dontPause:
+	exitPauseRoutine:
 	rts
 .endproc
 ;

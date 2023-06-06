@@ -1,208 +1,12 @@
-; Game Configuration =================
-.define STARTING_LIVES			 $06
-.define STARTING_POWER			 $00
-.define PLAYER_SPEED_SLOW		 $02
-.define PLAYER_SPEED_FAST		 $03
-.define HEART_HEALTH_POINTS 	 $04
-.define MAGIC_LAMP_HEALTH_POINTS $50
-; ====================================
-
-; Engine Configuration ===============
-
-; Heart is object zero (not shuffled)
-.define HEART_HUD_Y		$D8
-.define HEART_OFFSCREEN $F8
-.define HEART_HUD_TILE	$81
-.define HEART_HUD_ATT	$01
-.define HEART_HUD_X		$38
-
-; Lives counter starts as object one (then is shuffled)
-.define LIVES_HUD_X		$C0
-.define LIVES_HUD_Y		$D8
-
-; Player starting position and stats
-.define PLAYER_START_X_Lo	$F2
-.define PLAYER_START_X_Hi	$FF
-.define PLAYER_START_Y_Lo	$70
-	
-; Other objects go after HEART
-.define FIRST_OBJECT_SLOT $04
-
-.define SHOT_OBJECT_START	$0C	;	12
-.define OBJECT_BYTE_SIZE	$06 ;	
-.define FREE_SHOT_SLOTS		$06	;	
-.define FREE_OBJECT_SLOTS	$20
-.define ENEMY_OBJECT_START	FREE_SHOT_SLOTS*OBJECT_BYTE_SIZE+SHOT_OBJECT_START
-
-.define VRAM_PALETTES_PAGE $3F
-
-.define BG_SCROLL_RATE	$02
-	; $01 every frame 		(60fps)
-	; $02 every other frame	(30fps) (original)
-	; $03 every two frames 	(15fps)
-
-.if BG_SCROLL_RATE = $01
-	; 27 if BG_SCROLL_RATE = 1
-	.define BG_SCROLL_LIMIT	 27
-.elseif BG_SCROLL_RATE = $02
-	; 14 if BG_SCROLL_RATE = 2 (original)
-	.define BG_SCROLL_LIMIT	 14
-.else 	
-	; 9  if BG_SCROLL_RATE = 3
-	.define BG_SCROLL_LIMIT	 9
-.endif
-; ====================================
-
-; using MESEN naming convention
-.define PpuControl_2000		$2000
-.define PpuMask_2001		$2001
-.define PpuStatus_2002		$2002
-.define OamAddr_2003		$2003
-.define PpuScroll_2005 		$2005
-.define PpuAddr_2006		$2006
-.define PpuData_2007		$2007
-.define Sq0Duty_4000		$4000
-.define Sq0Sweep_4001		$4001
-.define Sq0Timer_4002		$4002
-.define Sq0Length_4003		$4003
-.define Sq1Duty_4004		$4004
-.define Sq1Sweep_4005		$4005
-.define TrgLinear_4008		$4008
-.define NoiseVolume_400C	$400C
-.define SpriteDma_4014		$4014
-.define ApuStatus_4015		$4015
-.define Ctrl1_4016			$4016
-.define Ctrl2_FrameCtr_4017 $4017
-.define BankSwitching_FFF0 	$FFF0
-.define UpdateDuringVBlank_Flag2	$75
-
-
-; macro GetObjectsIndexTable_Y
-; Read the current stage index from currentStage_15
-; Calculates the correct index on the object data file:
-; Y(index) = (stage-1)*4
-; Clobbers A and Y
-.macro GetObjectsIndexTable_Y
-	ldy currentStage_15
-	dey
-	tya
-	asl A
-	asl A
-	tay
-.endmacro
-
-; macro Copy
-; Copy data from <source> to <destination>
-; Starts at an offset <begin> from <source>
-; Ends at an offset <end> from <source>
-; Clobbers A and Y
-.macro Copy source,destination,begin,end
-	ldy begin
-:
-	lda source,y
-	sta destination,y
-	iny
-	cpy end
-	bne :-
-.endmacro
-
-; macro Add16
-; 16-bit addition
-; Adds <value> to <address> and store the result at <address>
-.macro Add16 address, value
-	lda address+1
-	clc
-	adc value
-	sta address+1
-	lda address+0
-	adc #$00
-	sta address+0
-.endmacro
-
-; macro TurnOFF
-; Turns OFF a given flag
-.macro TurnOFF flag
-	and #(ALL1-flag)
-.endmacro
-
-; macro TurnON
-; Turns off a given flag
-.macro TurnON flag
-	ora #flag
-.endmacro
-
-; macro PushAXY
-; Pushes the registers A, X and Y, in this order, 
-; on the top of the stack
-.macro PushAXY
-	pha
-	txa
-	pha
-	tya
-	pha
-.endmacro
-
-; macro PullAXY
-; Pulls the registers A, X and Y, in reverse order, 
-; from the top of the stack
-.macro PullAXY
-	pla
-	tay
-	pla
-	tax
-	pla
-.endmacro
-
-; macro PushXY
-; Pushes the registers X and Y, in this order, 
-; on the top of the stack
-.macro PushXY
-	txa
-	pha
-	tya
-	pha
-.endmacro
-
-; macro PullXY
-; Pulls the registers X and Y, in reverse order, 
-; from the top of the stack
-.macro PullXY
-	pla
-	tay
-	pla
-	tax
-.endmacro
-
-; macro SpawnMultipleProjectiles
-; Spawn a given number of projectiles
-; from give address, using call
-.macro SpawnMultipleProjectiles address, number
-	txa
-	tay
-	ldx #$00
-	
-	:
-		lda address,X
-		sta projectileIndex_4A
-		jsr HandleSpawnProjectile_Y
-		inx
-		cpx #number
-		bne :-
-.endmacro
+.define DISABLE_SOUND 1
+.include "macros.asm"
+.include "defines.asm"
+.include "engine-config.asm"
 
 .segment "HEADER"
 .include "inesheader.inc"
 
 .segment "ZEROPAGE" ; LSB 0 - FF
-
-.define RAMPage_0	$0000
-.define RAMPage_1 	$0100
-.define RAMPage_2 	$0200
-.define RAMPage_3 	$0300
-.define RAMPage_4 	$0400
-.define RAMPage_5 	$0500
-.define RAMPage_6 	$0600
-.define RAMPage_7 	$0700
 
 ; $00
 ; $01
@@ -224,7 +28,7 @@
 ; $10
 .define livesCounter_11		$11 ; 5
 .define frameCounter_12		$12 ; 8
-.define frameCounter64_13	$13 ; 4
+.define frameCounter62_13	$13 ; 4
 .define aliveTimer_14		$14 ; 6
 .define currentStage_15		$15 ; 14 ; Stage Index 0(opening), 1, 2, 3, 4, and 5(ending)
 .define levelProgression_16	$16 ; 3
@@ -347,11 +151,11 @@
 ; $8A
 ; $8B
 ; $8C
-.define soundAddress_8D		$8D
-.define soundAddress_8E		$8E
-.define soundAddress_8F		$8F
+.define soundIndex_8D		$8D
+.define flagUpdateSoundAtVBlank_8E	$8E
+.define flagPlaySFX_8F		$8F
 
-.define apuStatusFlag_C9	$C9
+.define flagAPUStatus_C9	$C9
 .define bgPalette_E0		$E0 ; 4
 
 
@@ -367,8 +171,9 @@
 .define OBJ_ATT 	2
 .define OBJ_X 		3
 
-.define OAM_0200	$0200 ; Y
-
+; page 02
+.define OAM_0200	RAMPage_2 ; Y
+;.define someObjProperty_0200 	$0200 ; Y
 ;.define someObjProperty_0201 	$0201 ; Tile
 ;.define someObjProperty_0202 	$0202 ; Attribute
 ;.define someObjProperty_0203 	$0203 ; X
@@ -441,17 +246,6 @@
 .define objectHitBox_Top_Y_0704 	$0704	; maybe vertices of hit box
 .define objectHitBox_Bottom_Y_0705 	$0705	; maybe vertices of hit box
 
-.define BIT0	%00000001
-.define BIT1	%00000010
-.define BIT2	%00000100
-.define BIT3	%00001000
-.define BIT4	%00010000
-.define BIT5	%00100000
-.define BIT6	%01000000
-.define BIT7	%10000000
-.define ZERO    $00
-.define ALL1	$FF
-
 .segment "STARTUP"
 
 
@@ -483,9 +277,10 @@ BIT_7:	.byte BIT7
 HeartHUDData:
 .byte HEART_HUD_Y, HEART_HUD_TILE, HEART_HUD_ATT, HEART_HUD_X
 
+; 800C - 800F
 BankSequenceArray:
-.byte $01, $01, $01, $02; 800C - 800F
-;
+.byte Stage1Bank, Stage2Bank, Stage3Bank, Stage4Bank
+
 ; $8010
 ; Reset handler, called by reset interrupt
 HandleReset:
@@ -506,15 +301,13 @@ HandleReset:
 	jsr SetupAfterReset	
 	jsr InitializeObjectIndexStep
 
-	nop;
-	nop;
-	nop; jsr ResetSoundEngine
+	ResetSound
 
 	lda #$01 
 	sta flagGameMode_26
 
 	lda #$00 
-	TAX
+	tax
 	jsr LoadStage
 
 	lda #$01
@@ -539,18 +332,13 @@ HandleReset:
 	sta livesCounter_11
 	
 	lda #$00
-	sta soundAddress_8F
+	sta flagPlaySFX_8F
 	sta PpuScroll_2005
 	sta PpuScroll_2005
 	
 	jsr RenderON
 	
-	lda #$00
-	sta soundAddress_8D
-	
-	nop;
-	nop;
-	nop; jsr InitializeSound ; see sound engine
+	PlayThisSong #$00
 
 WaitForPressStart:
 	
@@ -570,16 +358,8 @@ WaitForPressStart:
 		cmp inputPrev_22
 		beq :-
 
-	nop;
-	nop;
-	nop;jsr Sound_DontKnowWhatItDoes
-
-	lda #$07
-	sta soundAddress_8D
-	
-	nop;
-	nop;
-	nop; jsr PlaySFX
+	StopPlaying
+	PlayThisSFX #$07
 	
 	lda #$00
 	sta currentStage_15
@@ -589,9 +369,7 @@ StartingNewStage:
 
 	jsr RenderingOFF
 
-	nop;
-	nop;
-	nop; jsr DoSomethingWithSound 
+	UpdateSound 
 
 	lda #$00
 	sta PpuControl_2000
@@ -645,7 +423,7 @@ StartingNewStage:
 	sta inputPrev_22
 	sta currentEnemyWave_5B
 	sta aliveTimer_14
-	sta frameCounter64_13
+	sta frameCounter62_13
 	
 	jsr InitializePlayer
 	jsr InitializeHUD_Lives
@@ -657,11 +435,7 @@ StartingNewStage:
 	
 	jsr RenderON
 
-	lda #$01
-	sta soundAddress_8D
-	nop;
-	nop;
-	nop; jsr InitializeSound
+	PlayThisSong #$01
 	
 	lda currentStage_15
 	cmp #$02
@@ -694,15 +468,13 @@ StartingNewStage:
 		jsr WaitAliveTime_A			; respawning the player
 		lda #$00
 		sta flagPlayerHit_1E
-		sta soundAddress_8F
+		sta flagPlaySFX_8F
 		jmp SetupNewLevel
 
 		skipPlayerHit:
 		lda livesCounter_11
 		bne skipSomethingImportant
-		nop;
-		nop;
-		nop; jsr Sound_DontKnowWhatItDoes
+		StopPlaying
 
 		jsr ShowGameOver_WaitAnyButtonPress
 		jsr PaletteFading
@@ -715,9 +487,7 @@ StartingNewStage:
 		skipSomethingImportant:
 		lda flagNextLevel_1B
 		beq dontAdvanceLevel
-		nop;
-		nop;
-		nop; jsr Sound_DontKnowWhatItDoes
+		StopPlaying
 
 		; Handles when a stage is cleared.
 		; Decides if the program has to 
@@ -812,20 +582,11 @@ StartingNewStage:
 		ldx #$30				; WHY? 
 		jsr ClearObjectsDescription; Clears page $04 of RAM
 	
-		nop;
-		nop;
-		nop; jsr Sound_DontKnowWhatItDoes
+		StopPlaying
 	
-		nop;
-		nop;
-		nop; jsr DoSomethingWithSound 
+		UpdateSound 
 	
-		lda #$02
-		sta soundAddress_8D
-
-		nop;
-		nop;
-		nop; jsr InitializeSound
+	PlayThisSong #$02
 
 		iny
 		lda (objectPtr_3A),Y
@@ -946,7 +707,7 @@ doneLoadingEnemyBatch:
 	lda (objectPtr_38),Y		; loads #4 byte of 10
 	sta objectHeight_0601,X	; stores #4 byte of 10
 	iny
-	lda (objectPtr_38),Y		; loads #5 byte of 10
+	lda (objectPtr_38),Y		; loads #5 byte of 10 - Health points
 	sta healthPoints_0603,X		; stores #5 byte of 10
 	iny
 	lda (objectPtr_38),Y		; loads #6 byte of 10
@@ -1371,18 +1132,12 @@ doneLoadingEnemyBatch:
 	
 	doALSOHandleObjCollision:
 	jsr HandleObjectCollision
-	lda soundAddress_8D
+	lda soundIndex_8D
 	cmp #$05
 	beq skipHandlingCollision
-	nop;
-	nop;
-	nop;	jsr DoSomethingWithSound 
-
-	lda #$04
-	sta soundAddress_8D
-	nop;
-	nop;
-	nop; jsr PlaySFX
+	
+	UpdateSound 
+	PlayThisSFX #$04
 
 	jmp skipHandlingCollision
 	
@@ -1431,19 +1186,10 @@ doneLoadingEnemyBatch:
 		bne handlePlayerGotPowerUp	; if pickup is not ExtraLife, skip to next
 		
 		; Sound effect =================
-		nop;
-		nop;
-		nop; jsr UnknownSoundSub2
-
-		nop;
-		nop;
-		nop; jsr DoSomethingWithSound
+		WaitUntilSoundFinishes
+		UpdateSound
 	
-		lda #$06
-		sta soundAddress_8D
-		nop;
-		nop;
-		nop; jsr PlaySFX
+	PlayThisSFX #$06
 		; ==============================
 
 		inc livesCounter_11
@@ -1454,19 +1200,9 @@ doneLoadingEnemyBatch:
 		bne handlePlayerGotHeart 
 
 		; Sound effect =================
-		nop;
-		nop;
-		nop; jsr UnknownSoundSub2
-
-		nop;
-		nop;
-		nop; jsr DoSomethingWithSound
-	
-		lda #$07
-		sta soundAddress_8D
-		nop;
-		nop;
-		nop; jsr PlaySFX
+		WaitUntilSoundFinishes
+		UpdateSound
+		PlayThisSFX #$07
 		; ==============================
 
 		lda powerLevel_64
@@ -1474,9 +1210,7 @@ doneLoadingEnemyBatch:
 
 		bcc :+ 	; if didn't reach maximum power, continue to power increase
 				; else play sound cue and exit
-		nop;
-		nop;
-		nop; jsr DoSomethingWithSound
+		UpdateSound
 	
 		jmp doneWithObjectCollision
 	
@@ -1489,19 +1223,9 @@ doneLoadingEnemyBatch:
 		bne handlePlayerGotSpeedUp
 
 		; Sound effect =================
-		nop;
-		nop;
-		nop; jsr UnknownSoundSub2
-
-		nop;
-		nop;
-		nop; jsr DoSomethingWithSound
-
-		lda #$07
-		sta soundAddress_8D
-		nop;
-		nop;
-		nop; jsr PlaySFX
+		WaitUntilSoundFinishes
+		UpdateSound
+		PlayThisSFX #$07
 		; ==============================
 
 		jsr AddOneHeart
@@ -1512,19 +1236,9 @@ doneLoadingEnemyBatch:
 		bne handlePlayerGotMagicLamp
 
 		; Sound effect =================
-		nop;
-		nop;
-		nop; jsr UnknownSoundSub2
-
-		nop;
-		nop;
-		nop; jsr DoSomethingWithSound
-
-		lda #$07
-		sta soundAddress_8D
-		nop;
-		nop;
-		nop; jsr PlaySFX
+		WaitUntilSoundFinishes
+		UpdateSound
+		PlayThisSFX #$07
 		; ==============================
 
 		lda #PLAYER_SPEED_FAST
@@ -1541,11 +1255,7 @@ doneLoadingEnemyBatch:
 		:
 
 		; Sound effect =================
-		lda #$0C
-		sta soundAddress_8D
-		nop;
-		nop;
-		nop; jsr PlaySFX
+		PlayThisSFX #$0C
 		; ==============================
 
 		lda #MAGIC_LAMP_HEALTH_POINTS
@@ -1571,22 +1281,12 @@ doneLoadingEnemyBatch:
 	:
 	cmp #$1A
 	bne :+
-	nop;
-	nop;
-	nop; jsr UnknownSoundSub2
-
-	nop;
-	nop;
-	nop; jsr DoSomethingWithSound
- 
-	lda #$05
-	sta soundAddress_8D
-	nop;
-	nop;
-	nop; jsr PlaySFX
+	WaitUntilSoundFinishes
+	UpdateSound
+	PlayThisSFX #$05
 
 	lda #$01
-	sta soundAddress_8F
+	sta flagPlaySFX_8F
 	lda #$03
 	bne SecondPart
 	
@@ -1624,11 +1324,8 @@ doneLoadingEnemyBatch:
 	cmp #$24
 	bne doneWithObjectCollision
 
-	lda #$09
-	sta soundAddress_8D
-	nop;
-	nop;
-	nop; jsr InitializeSound
+	PlayThisSong #$09
+
 
 	lda #$08
 	clc
@@ -1808,7 +1505,7 @@ Data_at8715:
 	sta someObjProperty_0504
 	sta someObjProperty_0505
 	sta aliveTimer_14
-	sta soundAddress_8D
+	sta soundIndex_8D
 
 	lda #$1A
 	sta someObjProperty_0302
@@ -2005,7 +1702,7 @@ Data_at8BD7:
 		lda #$00
 		jsr ShootArrow_A
 
-	lda soundAddress_8D
+	lda soundIndex_8D
 	cmp #$07
 	bne :+
 	
@@ -2014,12 +1711,8 @@ Data_at8BD7:
 	bne doneShooting
 	
 	; Sound effect =================
-	nop;
-	nop;
-	nop; jsr $9C91; This is sound
-	nop;
-	nop;
-	nop; jsr DoSomethingWithSound 
+	WaitUntilSoundFinishes
+	UpdateSound
 	; ==============================
 	
 	beq :++
@@ -2029,11 +1722,7 @@ Data_at8BD7:
 	beq doneShooting
 	
 	:
-	lda #$03
-	sta soundAddress_8D
-	nop; 
-	nop; 
-	nop; jsr PlaySFX
+	PlayThisSFX #$03
 	
 	doneShooting:
 		lda #$00
@@ -3115,12 +2804,8 @@ RegisterInput:
 	sta flagPPUControl_17
 	sta flagPPUControl_19
 	jsr RenderON
-	lda #$0B
-	sta soundAddress_8D
-	
-	nop;
-	nop;
-	nop;jsr InitializeSound
+
+		PlayThisSong #$0B
 
 	loopPressANYButton:
 		lda input1_20
@@ -3132,9 +2817,7 @@ RegisterInput:
 		cmp inputPrev_22
 		beq :-
 	
-	nop;
-	nop;
-	nop; jsr Sound_DontKnowWhatItDoes
+	StopPlaying
 
 	lda #$00
 	sta screenScrollX_29
@@ -3240,11 +2923,7 @@ RegisterInput:
 		sta PpuScroll_2005
 		
 		; play a sound effect
-		lda #$0A
-		sta soundAddress_8D
-		nop;
-		nop;
-		nop;jsr PlaySFX
+		PlayThisSFX #$0A
 
 		: ; advance to next screen position
 		Add16 vramAddress_67, #1
@@ -3259,9 +2938,7 @@ RegisterInput:
 		bne loopLoadCredits
 	
 	; play another sound
-	nop;
-	nop;
-	nop;jsr DoSomethingWithSound 
+	UpdateSound
 
 	leaveEndCredits:
 	rts
@@ -3291,7 +2968,7 @@ EndCreditsData:
 	lda #$02				; Waits 2 seconds
 	jsr WaitAliveTime_A		; before respawning the player
 	lda #$00
-	sta frameCounter64_13
+	sta frameCounter62_13
 	
 	; Wait for any button to be pressed before reseting.
 	;
@@ -3301,7 +2978,7 @@ EndCreditsData:
 	: ; Check for press
 	lda input1_20			; Load current button being pressed.
 	bne :+					; If pressed, skip forward.
-	lda frameCounter64_13	; else, check if 10 frames have passed.
+	lda frameCounter62_13	; else, check if 10 frames have passed.
 	cmp #$0A				; If so (10 frames since last check),
 	bne :-					; check for the first press again.
 	rts						; else (other frames), return.
@@ -3339,28 +3016,28 @@ Data_at9D22:
 PushAXY
 	lda updateDuringVBlank_0E
 	cmp #$57
-	beq doKeepUpdatingAtVBlank_from0E
+	beq :+
 	jmp doUpdateSoundOnly
 
-	doKeepUpdatingAtVBlank_from0E:
+	:
 	lda updateDuringVBlank_0F
 	cmp #$75
 	beq :+
 	jmp doUpdateSoundOnly
 
-	:	; Setup OAM DMA
-	lda #$00			; 
-	sta OamAddr_2003	; reset DMA pointer to begining of OAM
-	lda #>OAM_0200		; setup page number of OAM mirror in RAM
-	sta SpriteDma_4014	; trigger sprite DMA from RAM to OAM
+	:						; Setup OAM DMA
+	lda #$00			
+	sta OamAddr_2003		; reset DMA pointer to begining of OAM
+	lda #>OAM_0200			; setup page number of OAM mirror in RAM
+	sta SpriteDma_4014		; trigger sprite DMA from RAM to OAM
 
 	lda PpuStatus_2002
 	inc frameCounter_12
 	lda frameCounter_12
-	and #$3F				; every 62 frames, increase aliveTimer
+	and #63 				; $3F = every 62 frames, increase aliveTimer
 	bne :+
 	inc aliveTimer_14
-	inc frameCounter64_13
+	inc frameCounter62_13
 
 	:
 	lda flagNextLevel_1B
@@ -3403,9 +3080,7 @@ PushAXY
 	jsr PowerUpCheat
 
 	doUpdateSoundOnly:
-	nop;
-	nop;
-	nop; jsr UpdateSoundAtVBlank
+	UpdateSoundDuringVBlank
 
 	PullAXY
 	RTI
@@ -4090,50 +3765,34 @@ Data_atA80A:
 
 	checkInputPressStart:
 	bit BUTTON_START
-	beq dontPause
+	beq exitPauseRoutine
+	
 	lda inputPrev_22
 	bit BUTTON_START
-	bne dontPause
+	bne exitPauseRoutine
+	
 	lda flagPause_1C
 	eor #$01
 	sta flagPause_1C
 	beq :+
 	
-	nop;
-	nop;
-	nop;	jsr Sound_DontKnowWhatItDoes
+	StopPlaying
+	PlayThisSFX #$08
 
-	lda #$08
-	sta soundAddress_8D
+	jmp exitPauseRoutine
 	
-	nop;
-	nop;
-	nop;jsr PlaySFX
-
-	jmp dontPause
 	:
-
-	nop;
-	nop;
-	nop; jsr DoSomethingWithSound 
+		UpdateSound 
 
 	lda flagUnknown_1A
 	beq :+
-	lda #$02
-	sta soundAddress_8D
-	nop;
-	nop;
-	nop; jsr InitializeSound
+	PlayThisSong #$02
 	rts
 
 	:
-	lda #$01
-	sta soundAddress_8D
-	nop;
-	nop;
-	nop; jsr InitializeSound
+	PlayThisSong #$01
 	
-	dontPause:
+	exitPauseRoutine:
 	rts
 .endproc
 ;

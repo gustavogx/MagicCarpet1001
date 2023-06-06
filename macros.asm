@@ -110,3 +110,84 @@
 		cpx #number
 		bne :-
 .endmacro
+
+; Sound Engine Macros =====================
+
+.macro PlayThisSFX index
+.if DISABLE_SOUND = 1
+	lda index
+	sta soundIndex_8D
+	nop
+	nop
+	nop
+.else
+	lda index
+	sta soundIndex_8D
+	jsr PlaySFX
+.endif
+.endmacro
+
+.macro PlayThisSong index
+.if DISABLE_SOUND = 1
+	lda index
+	sta soundIndex_8D
+	nop
+	nop
+	nop
+.else
+	lda index
+	sta soundIndex_8D	
+	jsr PlaySong
+.endif
+.endmacro
+
+.macro StopPlaying
+.if DISABLE_SOUND = 1
+	nop
+	nop
+	nop
+.else
+	jsr TurnSoundOff
+.endif
+.endmacro
+
+.macro ResetSound
+.if DISABLE_SOUND = 1
+	nop
+	nop
+	nop
+.else
+	jsr ResetSoundEngine
+.endif
+.endmacro
+
+.macro UpdateSound
+.if DISABLE_SOUND = 1
+	nop
+	nop
+	nop
+.else
+	jsr DoSomethingWithSound
+.endif
+.endmacro
+
+.macro UpdateSoundDuringVBlank
+.if DISABLE_SOUND = 1
+	nop
+	nop
+	nop
+.else
+	jsr UpdateSoundAtVBlank
+.endif
+.endmacro
+
+.macro WaitUntilSoundFinishes
+.if DISABLE_SOUND = 1
+	nop
+	nop
+	nop
+.else
+	jsr WaitUntilSoundFinished
+.endif
+.endmacro
+

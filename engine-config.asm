@@ -3,7 +3,7 @@
 .define STARTING_POWER			 $00
 .define PLAYER_SPEED_SLOW		 $02
 .define PLAYER_SPEED_FAST		 $03
-.define HEART_HEALTH_POINTS 	 $54
+.define HEART_HEALTH_POINTS 	 $04
 .define MAGIC_LAMP_HEALTH_POINTS $50
 ; ====================================
 

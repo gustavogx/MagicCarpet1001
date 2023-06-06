@@ -1,3 +1,8 @@
+.define PLS1 	BIT0
+.define PLS2 	BIT1
+.define TRI 	BIT2
+.define DMC 	BIT3
+
 ; $9815
 .proc UpdateSoundAtVBlank
 	lda flagUpdateSoundAtVBlank_8E  
@@ -105,7 +110,7 @@
 	txa
 	tay
 	lsr A    
-	jsr UnknownSoundSub0
+	jsr UnknownSoundSub
 	tya
 	tax
 	lsr A    
@@ -154,7 +159,7 @@
 	txa
 	pha
 	lsr A    
-	jsr UpdateAPUStatus0
+	jsr UpdateAPUStatus
 	pla
 	tax
 	lda #$01 
@@ -189,13 +194,15 @@
 	lda #$F0 
 	and flagSound_70 
 	bne :+
-	lda #$00 
+	
+	lda #ZERO
 	sta ApuStatus_4015
-	sta $C9  
+	sta flagAPUStatus_C9
+
 	jmp skipToThis_1
 
 	:
-	lda $C9  
+	lda flagAPUStatus_C9  
 	sta ApuStatus_4015
 	jmp skipToThis_1
 
@@ -462,8 +469,8 @@
 ;
 ; $9AC7
 .proc UnknownSub3
-	CLC
-	ADC $7A,X
+	clc
+	adc $7A,X
 	sta $7A,X
 	bcc :+
 	inc $7B,X
@@ -482,12 +489,12 @@
 .endproc
 ;
 ; $9ADA
-.proc UnknownSoundSub0
+.proc UnknownSoundSub
 	cmp #$04 
 	bcs :+
 	tax
 	lda $9DB4,X
-	and $C9  
+	and flagAPUStatus_C9  
 	sta ApuStatus_4015
 	rts
 
@@ -498,27 +505,27 @@
 	and flagSound_70 
 	beq :+
 	lda $9DB4,X
-	and $C9  
+	and flagAPUStatus_C9  
 	rts
 
 	; Turn On Sound based on data from $9DB4
 	; x	: offset from $9DB4
 	:
 	lda $9DB4,X
-	and $C9
+	and flagAPUStatus_C9
 	sta ApuStatus_4015
 	rts
 .endproc
 ;
 ; $9B01
-.proc UpdateAPUStatus0
+.proc UpdateAPUStatus
 	cmp #$04 
 	bcs :+
 	tax
 	lda $9DB8,X
-	ora $C9  
+	ora flagAPUStatus_C9  
 	sta ApuStatus_4015
-	sta $C9  
+	sta flagAPUStatus_C9  
 	rts
 
 	:
@@ -528,26 +535,22 @@
 	and flagSound_70 
 	beq :+
 	lda $9DB8,X
-	ora $C9  
-	sta $C9  
+	ora flagAPUStatus_C9  
+	sta flagAPUStatus_C9  
 	rts
 
 	:
 	lda $9DB8,X
-	ora $C9  
+	ora flagAPUStatus_C9  
 	sta ApuStatus_4015
-	sta $C9  
+	sta flagAPUStatus_C9  
 	rts
 .endproc
 ;
 ; $9B2E
-; SoundRoutine(Y)
 .proc ResetSoundEngine
-	pha
-	txa
-	pha
-	tya
-	pha
+
+	PushAXY
 	lda #$00 
 	ldy #$00 
 	:
@@ -575,24 +578,20 @@
 	lda #$8F 
 	sta Sq0Duty_4000  
 	sta Sq1Duty_4004  
-	lda #$0F 
-	sta ApuStatus_4015
-	sta $C9  
-	pla
-	tay
-	pla
-	tax
-	pla
+	
+	lda #(PLS1+PLS2+TRI+DMC)
+	sta ApuStatus_4015			; enable all channels
+	sta flagAPUStatus_C9  
+
+	PullAXY
 	rts
 .endproc
 ;
 ; $9B74
-.proc InitializeSound
-	pha
-	txa
-	pha
-	tya
-	pha
+.proc PlaySong
+	
+	PushAXY
+	
 	lda #$01 
 	sta flagUpdateSoundAtVBlank_8E  
 	lda flagSound_70 
@@ -605,34 +604,31 @@
 
 	ldx #$00
 	:
-	tya
-	pha
-	txa
-	pha
-	tax
-	lda #$FF 
-	sta $94,X
-	lda $9E84,Y
-	jsr UnknownSoundSub6
-	pla
-	tax
-	pla
-	tay
-	iny
-	inx
-	cpx #$04 
-	bne :-
+		tya
+		pha
+		txa
+		pha
+		tax
+		lda #$FF 
+		sta $94,X
+		lda $9E84,Y
+		jsr UnknownSoundSub6
+		pla
+		tax
+		pla
+		tay
+		iny
+		inx
+		cpx #$04 
+		bne :-
 	
 	lda #$0F 
 	sta ApuStatus_4015
-	sta $C9  
+	sta flagAPUStatus_C9  
 	lda #$00 
 	sta flagUpdateSoundAtVBlank_8E  
-	pla
-	tay
-	pla
-	tax
-	pla
+	
+	PullAXY
 	rts
 .endproc
 ;
@@ -750,7 +746,7 @@ SecondPart:
 
 	lda #$0F 
 	sta ApuStatus_4015
-	sta $C9  
+	sta flagAPUStatus_C9  
 	
 	lda #$00 
 	sta flagUpdateSoundAtVBlank_8E  
@@ -808,96 +804,96 @@ SecondPart:
 .endproc
 ;
 ; $9C91
-.proc UnknownSoundSub2	;	Called from main.asm
+.proc WaitUntilSoundFinished	;	Called from main.asm
 	pha
+
 	:
-	lda flagSound_70 
-	and #$0F 
-	bne :-
+		lda flagSound_70 
+		and #$0F 
+		bne :-
+
 	pla
 	rts
 .endproc
 ;
 ; $9C9A
 .proc DoSomethingWithSound
-	pha
-	txa
-	pha
-	tya
-	pha
+
+	PushAXY
+
 	lda flagSound_70 
 	and #$F0 
 	sta flagSound_70 
-	lda #$FF 
+	
+	lda #$FF	
 	ldx #$00 
 	loopZeroOut_90_to_93:    
-	sta $90,X
-	inx
-	cpx #$04 
-	bne loopZeroOut_90_to_93 
+		sta $90,X
+		inx
+		cpx #$04 
+		bne loopZeroOut_90_to_93 
+
 	lda flagSound_70 
 	and #$F0 
 	bne skipZeroingVolume    
+
 	lda #$00 
 	sta Sq0Duty_4000  
 	sta Sq1Duty_4004  
 	sta TrgLinear_4008
 	sta NoiseVolume_400C     
-	jmp $9CEB
+	jmp doneWithThis
+
 	skipZeroingVolume:
 	ldy #$00 
-	loopLoadThreeBytesSoundRegisters:
-	lda $0098,Y
-	sta Sq0Duty_4000,Y
-	lda $009C,Y
-	sta Sq1Duty_4004,Y
-	lda $00A0,Y
-	sta TrgLinear_4008,Y     
-	lda $00A4,Y
-	sta NoiseVolume_400C,Y   
-	iny
-	cpy #$03 
-	bne loopLoadThreeBytesSoundRegisters
-	lda $C9  
+	:
+		lda $0098,Y
+		sta Sq0Duty_4000,Y
+		lda $009C,Y
+		sta Sq1Duty_4004,Y
+		lda $00A0,Y
+		sta TrgLinear_4008,Y     
+		lda $00A4,Y
+		sta NoiseVolume_400C,Y   
+		iny
+		cpy #$03 
+		bne :-
+	
+	lda flagAPUStatus_C9  
 	sta ApuStatus_4015
-	pla
-	tay
-	pla
-	tax
-	pla
+
+	doneWithThis:
+	PullAXY
 	rts
 .endproc
+
 ; $9CF1
-.proc Sound_DontKnowWhatItDoes
-	pha
-	txa
-	pha
-	tya
-	pha
-	lda #$00 
-	sta ApuStatus_4015
-	sta $C9  
+.proc TurnSoundOff
+
+	PushAXY
+
+	lda #ZERO
+	sta ApuStatus_4015		; mute all channels
+
+	sta flagAPUStatus_C9  
 	lda flagSound_70 
 	and #$0F 
 	sta flagSound_70 
+
 	lda #$FF 
 	ldx #$04
-
 	:
-	sta $90,X
-	inx
-	cpx #$08 
-	bne :-
+		sta $90,X
+		inx
+		cpx #$08 
+		bne :-
 
 	lda #$00 
 	sta Sq0Duty_4000  
 	sta Sq1Duty_4004  
 	sta TrgLinear_4008
 	sta NoiseVolume_400C     
-	pla
-	tay
-	pla
-	tax
-	pla
+
+	PullAXY
 	rts
 .endproc
