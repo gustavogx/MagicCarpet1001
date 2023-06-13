@@ -2946,7 +2946,29 @@ RegisterInput:
 ;
 ; $9718
 EndCreditsData:
-.incbin "rom-prg/stages/EndCredits.bin"
+.addr EndingText_9724, EndingText_9733
+.addr EndingText_974F, EndingText_976B
+.addr EndingText_9785, EndingText_97A3
+
+EndingText_9724:
+.byte $20, $6d, "STAFF       ", $FF
+
+EndingText_9733:
+.byte $21, $06, "PROGRAM  BY  PATRICK     ", $FF
+
+EndingText_974F:
+.byte $21, $86, "GRAPHIC  BY  JULIA       ", $FF
+
+EndingText_976B:
+.byte $22, $08, "MUSIC  BY  RUTH        ", $FF
+
+EndingText_9785:
+.byte $22, $a4, "SPECIAL  THANKS  MARTINO    ", $FF
+
+EndingText_97A3:
+.byte $23, $4c, "THE END", $FF
+
+;.incbin "rom-prg/stages/EndCredits.bin"
 ;
 ; $97AD
 .proc ShowGameOver_WaitAnyButtonPress
