@@ -1,4 +1,4 @@
-.define DISABLE_SOUND 1
+.define DISABLE_SOUND 0
 .include "macros.asm"
 .include "defines.asm"
 .include "engine-config.asm"
@@ -2946,6 +2946,7 @@ RegisterInput:
 ;
 ; $9718
 EndCreditsData:
+
 .addr EndingText_9724, EndingText_9733
 .addr EndingText_974F, EndingText_976B
 .addr EndingText_9785, EndingText_97A3
@@ -2963,7 +2964,7 @@ EndingText_976B:
 .byte $22, $08, "MUSIC  BY  RUTH        ", $FF
 
 EndingText_9785:
-.byte $22, $a4, "SPECIAL  THANKS  MARTINO    ", $FF
+.byte $22, $a4, "SPECIAL THANKS  MARTINO    ", $FF
 
 EndingText_97A3:
 .byte $23, $4c, "THE END", $FF
