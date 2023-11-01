@@ -877,7 +877,7 @@ SecondPart:
 
 	sta flagAPUStatus_C9  
 	lda flagSound_70 
-	and #$0F 
+	and #%00001111
 	sta flagSound_70 
 
 	lda #$FF 
@@ -888,7 +888,7 @@ SecondPart:
 		cpx #$08 
 		bne :-
 
-	lda #$00 
+	lda #ZERO
 	sta Sq0Duty_4000  
 	sta Sq1Duty_4004  
 	sta TrgLinear_4008
