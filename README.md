@@ -8,4 +8,6 @@ However, what most people don't know is that this game was actually released on 
 
 What you are seeing here is probably the only copy of its source code... until now.
 
-My objective is simple: since this is a simple game, people can use it to learn NES game programming. 
+I disassembled the original ROM and commented (most) of the code. The exception is the sound engine.
+
+I used this source code to learn about NES game programming and I am making it public so other people can do the same :)
