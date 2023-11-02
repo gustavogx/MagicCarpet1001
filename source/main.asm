@@ -127,15 +127,15 @@ vramAddress_67:			.res 2	; $67 ; 3
 
 flagSound_70:			.res 1	; $70
 .res 1 ; $71
-.res 1 ; $72
+soundEngineArray_72: 	.res 1 	; $72
 .res 1 ; $73
 .res 1 ; $74
 .res 1 ; $75
-.res 1 ; $76
+soundEngine_76:			.res 1 ; $76
 .res 1 ; $77
 .res 1 ; $78
 .res 1 ; $79
-.res 1 ; $7A
+soundEngineAddrList_7A:	.res 1 ; $7A
 .res 1 ; $7B
 .res 1 ; $7C
 .res 1 ; $7D
@@ -144,29 +144,70 @@ flagSound_70:			.res 1	; $70
 
 .res 1 ; $80
 .res 1 ; $81
-.res 1 ; $82
-.res 1 ; $83
+soundEngine_82:			.res 1 ; $82
+soundEngine_83:			.res 1 ; $83
 .res 1 ; $84
 .res 1 ; $85
 .res 1 ; $86
 .res 1 ; $87
 .res 1 ; $88
 .res 1 ; $89
-.res 1 ; $8A
-.res 1 ; $8B
-.res 1 ; $8C
+soundEngineAddress_8A:	.res 2 ; $8A $8B
+; $8B
+soundEngine_8C: 		.res 1 ; $8C
 soundIndex_8D:			.res 1	; $8D
 flagUpdateSoundAtVBlank_8E:	.res 1	; $8E
 flagPlaySFX_8F:			.res 1	; $8F
 
-.res 16 ; $90
+soundEngine_90:		.res 1 ; $90
+.res 1 ; $91
+.res 1 ; $92
+.res 1 ; $93
+soundEngine_94:		.res 1 ; $94
+.res 1 ; $95
+.res 1 ; $96
+.res 1 ; $97
+square0Duty_98:		.res 1 ; $98
+square0Sweep_99:	.res 1 ; $98
+square0Timer_9A:	.res 1 ; $9A
+square0Length_9B:	.res 1 ; $9A
+square1Duty_9C:		.res 1 ; $9C
+square1Sweep_9D:	.res 1 ; $9D
+square1Timer_9E:	.res 1 ; $9E
+square1Length_9F:	.res 1 ; $9F
 
-.res 16 ; $A0
 
-.res 16 ; $B0
+triangleLinear_A0:	.res 3 ; $A0
+.res 1 ; $A3
+noiseVolume_A4:	.res 3 ; $A4
+.res 1 ; $A7
+soundEngineAddr_A8:	.res 2 ; $A8
+; $A9
+.res 1 ; $AA
+.res 1 ; $AB
+.res 1 ; $AC
+.res 1 ; $AD
+.res 1 ; $AE
+.res 1 ; $AF
 
-.res 1 ; $C0
-.res 1 ; $C1
+.res 1 ; $B0
+.res 1 ; $B1
+.res 1 ; $B2
+.res 1 ; $B3
+.res 1 ; $B4
+.res 1 ; $B5
+.res 1 ; $B6
+.res 1 ; $B7
+soundEngineAddr_B8:	.res 2 ; $B8 $B9
+.res 1 ; $BA
+.res 1 ; $BB
+.res 1 ; $BC
+.res 1 ; $BD
+.res 1 ; $BE
+.res 1 ; $BF
+
+soundEngine_C0: .res 1 ; $C0
+soundEngine_C1:	.res 1 ; $C1
 .res 1 ; $C2
 .res 1 ; $C3
 .res 1 ; $C4
@@ -3064,6 +3105,12 @@ Data_at9DB4:
 
 Data_at9E84:
 .incbin "rom-prg/sound/sound-data-at9E84.bin"
+
+Data_at9EB4:
+.incbin "rom-prg/sound/sound-data-at9EB4.bin"
+
+Data_at9ED6:
+.incbin "rom-prg/sound/sound-data-at9ED6.bin"
 ;
 ; =====================================================
 ;

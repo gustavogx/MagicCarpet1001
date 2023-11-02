@@ -3,7 +3,7 @@
 .define TRI 	BIT2
 .define DMC 	BIT3
 
-; $9815
+; square0Duty_9815
 .proc UpdateSoundAtVBlank
 	lda flagUpdateSoundAtVBlank_8E  
 	beq :+
@@ -12,20 +12,20 @@
 
 	ldx #$00 
 	lda #$01 
-	sta $8C
+	sta soundEngine_8C
 	
 	ReplaceMeLabel_S5: 
 	txa
 	pha
-	lda $8C  
+	lda soundEngine_8C  
 	and flagSound_70 
 	bne :+
 	jmp skipToThis_1	
 	:
 
-	lda $72,X
+	lda soundEngineArray_72,X
 	beq :+
-	dec $72,X
+	dec soundEngineArray_72,X
 	jmp skipToThis_1	
 	:
 
@@ -34,12 +34,12 @@
 	tax
 	
 	ReplaceMeLabel_S1:
-	lda ($7A,X)
+	lda (soundEngineAddrList_7A,X)
 	and #$80 
 	bne skipToThis_2
 	txa
 	pha
-	lda ($7A,X)
+	lda (soundEngineAddrList_7A,X)
 	asl A    
 	tay
 	jsr SquareWave0
@@ -53,11 +53,11 @@
 	tya
 	tax
 	ldy #$01 
-	lda ($8A),Y
+	lda (soundEngineAddress_8A),Y
 	tay
 	dey
 	tya
-	sta $72,X
+	sta soundEngineArray_72,X
 	pla
 	tax
 	lda #$02 
@@ -65,14 +65,14 @@
 	jmp skipToThis_1
 
 	skipToThis_2:
-	lda ($7A,X)
+	lda (soundEngineAddrList_7A,X)
 	cmp #$80 
 	bne :+
 	jsr UnknownSub4
 	txa
 	pha
 	ldy #$01 
-	lda ($8A),Y
+	lda (soundEngineAddress_8A),Y
 	asl A    
 	tay
 	jsr SquareWave0_1
@@ -83,17 +83,17 @@
 	jmp ReplaceMeLabel_S1
 
 	:
-	lda ($7A,X)
+	lda (soundEngineAddrList_7A,X)
 	
 	Compare89:
-	cmp #$89 
+	cmp #(BIT7 | BIT3 | BIT0) ;$89 
 	bne Compare81
 	
 	jsr UnknownSub4
 	txa
 	pha
 	ldy #$01 
-	lda ($8A),Y
+	lda (soundEngineAddress_8A),Y
 	asl A    
 	tay
 	jsr SquareWave0_2
@@ -104,7 +104,7 @@
 	jmp ReplaceMeLabel_S1
 
 	Compare81:
-	cmp #$81 
+	cmp #(BIT7 | BIT0) ;$81
 	bne Compare82
 
 	txa
@@ -119,11 +119,11 @@
 	tya
 	tax
 	ldy #$01 
-	lda ($8A),Y
+	lda (soundEngineAddress_8A),Y
 	tay
 	dey
 	tya
-	sta $72,X
+	sta soundEngineArray_72,X
 	txa
 	asl A    
 	tax
@@ -132,7 +132,7 @@
 	jmp skipToThis_1
 	
 	Compare82:
-	cmp #$82 
+	cmp #(BIT7 | BIT1) ;soundEngine_82
 	bne Compare83
 	txa
 	lsr A    
@@ -141,11 +141,11 @@
 	tya
 	tax
 	ldy #$01 
-	lda ($8A),Y
+	lda (soundEngineAddress_8A),Y
 	tay
 	dey
 	tya
-	sta $72,X
+	sta soundEngineArray_72,X
 	txa
 	asl A    
 	tax
@@ -154,7 +154,7 @@
 	jmp skipToThis_1
 
 	Compare83:
-	cmp #$83 
+	cmp #(BIT7 | BIT1 | BIT0) ;soundEngine_83
 	bne Compare86
 	txa
 	pha
@@ -167,7 +167,7 @@
 	jmp ReplaceMeLabel_S1
 
 	Compare86:
-	cmp #$86 
+	cmp #(BIT7 | BIT2 | BIT1) ;$86 
 	bne Compare84
 	txa
 	cmp #$07 
@@ -178,14 +178,14 @@
 	ldy #$00
 
 	loop_S1:
-		lda $0098,Y
+		lda square0Duty_98,Y
 		and #$F6 
 		sta Sq0Duty_4000,Y
-		lda $009C,Y
+		lda square1Duty_9C,Y
 		sta Sq1Duty_4004,Y
-		lda $00A0,Y
+		lda triangleLinear_A0,Y
 		sta TrgLinear_4008,Y     
-		lda $00A4,Y
+		lda noiseVolume_A4,Y
 		sta NoiseVolume_400C,Y   
 		iny
 		cpy #$02 
@@ -207,25 +207,25 @@
 	jmp skipToThis_1
 
 	ReplaceMeLabel_S2:
-	lda $B8,X
-	sta $7A,X
-	lda $B9,X
-	sta $7B,X
+	lda soundEngineAddr_B8,X
+	sta soundEngineAddrList_7A,X
+	lda soundEngineAddr_B8+1,X
+	sta soundEngineAddrList_7A+1,X
 	jmp ReplaceMeLabel_S1
 
 	Compare84:
-	cmp #$84 
+	cmp #(BIT7 | BIT2) ;$84
 	bne Compare85
 
 	txa
 	tay
 	lsr A    
 	tax
-	lda $90,X
+	lda soundEngine_90,X
 	cmp #$00 
 	bne ReplaceMeLabel_S3
 	lda #$FF 
-	sta $90,X
+	sta soundEngine_90,X
 	tya
 	tax
 	lda #$04 
@@ -238,52 +238,52 @@
 	lsr A    
 	tay
 	jsr UnknownSub4
-	lda $0090,Y
+	lda soundEngine_90,Y
 	cmp #$FF 
 	bne ReplaceMeLabel_S4
 	tya
 	tax
 	ldy #$01 
-	lda ($8A),Y
-	sta $90,X
+	lda (soundEngineAddress_8A),Y
+	sta soundEngine_90,X
 	txa
 	asl A    
 	tax
-	lda $8A  
-	sta $A8,X
-	lda $8B  
-	sta $A9,X
+	lda soundEngineAddress_8A  
+	sta soundEngineAddr_A8,X
+	lda soundEngineAddress_8A+1  
+	sta soundEngineAddr_A8+1,X
 	
 	ReplaceMeLabel_S4:
 	txa
 	lsr A    
 	tax
-	dec $90,X
+	dec soundEngine_90,X
 	txa
 	asl A    
 	tax
 	ldy #$02 
-	lda ($8A),Y
-	sta $7A,X
+	lda (soundEngineAddress_8A),Y
+	sta soundEngineAddrList_7A,X
 	ldy #$03 
-	lda ($8A),Y
-	sta $7B,X
+	lda (soundEngineAddress_8A),Y
+	sta soundEngineAddrList_7A+1,X
 	jmp ReplaceMeLabel_S1
 
 	Compare85:
-	cmp #$85 
+	cmp #(BIT7 | BIT2 | BIT0) ;$85
 	bne skipToThis_1
 
-	lda $A8,X
-	sta $7A,X
-	lda $A9,X
-	sta $7B,X
+	lda soundEngineAddr_A8,X
+	sta soundEngineAddrList_7A,X
+	lda soundEngineAddr_A8+1,X
+	sta soundEngineAddrList_7A+1,X
 	jmp ReplaceMeLabel_S1
 
 	skipToThis_1:
-	lda $8C  
+	lda soundEngine_8C  
 	asl A    
-	sta $8C  
+	sta soundEngine_8C  
 	pla
 	tax
 	inx
@@ -295,7 +295,7 @@
 	rts
 .endproc
 ;
-; $99C3
+; square0Sweep_99C3
 .proc SquareWave0
 	txa
 	cmp #$07 
@@ -327,9 +327,9 @@
 	pla
 	tay
 	lda Data_at9D22+0,Y
-	sta $9A,X
+	sta square0Timer_9A,X
 	lda Data_at9D22+1,Y
-	sta $9B,X
+	sta square0Length_9B,X
 	rts
 
 	:
@@ -341,10 +341,10 @@
 	tay
 	lda Data_at9D22+0,Y
 	sta Sq0Timer_4002,X
-	sta $9A,X
+	sta square0Timer_9A,X
 	lda Data_at9D22+1,Y
 	sta Sq0Length_4003,X     
-	sta $9B,X
+	sta square0Length_9B,X
 	rts
 
 .endproc
@@ -381,9 +381,9 @@
 	pla
 	tay
 	lda Data_at9DB4+8,Y
-	sta $98,X
+	sta square0Duty_98,X
 	lda Data_at9DB4+9,Y
-	sta $99,X
+	sta square0Sweep_99,X
 	rts
 
 	:
@@ -395,10 +395,10 @@
 	tay
 	lda Data_at9DB4+8,Y
 	sta Sq0Duty_4000,X
-	sta $98,X
+	sta square0Duty_98,X
 	lda Data_at9DB4+9,Y
 	sta Sq0Sweep_4001,X
-	sta $99,X
+	sta square0Sweep_99,X
 	rts
 .endproc
 ;
@@ -436,13 +436,13 @@
 	pla
 	tay
 	lda Data_at9DB4+8,Y
-	sta $98,X  
+	sta square0Duty_98,X  
 	lda Data_at9DB4+9,Y
-	sta $99,X  
+	sta square0Sweep_99,X  
 	lda Data_at9DB4+10,Y
-	sta $9A,X  
+	sta square0Timer_9A,X  
 	lda Data_at9DB4+11,Y
-	sta $9B,X  
+	sta square0Length_9B,X  
 	rts
 
 	:
@@ -454,26 +454,26 @@
 	tay
 	lda Data_at9DB4+8,Y
 	sta Sq0Duty_4000,X
-	sta $98,X
+	sta square0Duty_98,X
 	lda Data_at9DB4+9,Y
 	sta Sq0Sweep_4001,X
-	sta $99,X
+	sta square0Sweep_99,X
 	lda Data_at9DB4+10,Y
 	sta Sq0Timer_4002,X
-	sta $9A,X
+	sta square0Timer_9A,X
 	lda Data_at9DB4+11,Y
 	sta Sq0Length_4003,X     
-	sta $9B,X
+	sta square0Length_9B,X
 	rts
 .endproc
 ;
 ; $9AC7
 .proc UnknownSub3
 	clc
-	adc $7A,X
-	sta $7A,X
+	adc soundEngineAddrList_7A,X
+	sta soundEngineAddrList_7A,X
 	bcc :+
-	inc $7B,X
+	inc soundEngineAddrList_7A+1,X
 	
 	:
 	rts
@@ -481,10 +481,10 @@
 ;
 ; $9AD1
 .proc UnknownSub4
-	lda $7A,X  
-	sta $8A    
-	lda $7B,X  
-	sta $8B    
+	lda soundEngineAddrList_7A,X  
+	sta soundEngineAddress_8A    
+	lda soundEngineAddrList_7A+1,X  
+	sta soundEngineAddress_8A+1    
 	rts
 .endproc
 ;
@@ -560,7 +560,7 @@
 	bne :-
 	ldy #$08 
 	:
-	sta $0090,Y ;  
+	sta soundEngine_90,Y ;  
 	iny
 	cpy #$47 
 	bne :-
@@ -571,7 +571,7 @@
 	lda #$FF 
 	ldy #$00 
 	:
-	sta $0090,Y ;
+	sta soundEngine_90,Y ;
 	iny
 	cpy #$08 
 	bne :-
@@ -610,8 +610,8 @@
 		pha
 		tax
 		lda #$FF 
-		sta $94,X
-		lda $9E84,Y
+		sta soundEngine_94,X
+		lda Data_at9E84,Y
 		jsr UnknownSoundSub6
 		pla
 		tax
@@ -653,13 +653,13 @@ SecondPart:
 	cpx #$FF 
 	bne :+
 	tay
-	ldx $9ED6,Y
+	ldx Data_at9ED6,Y
 	
 	:
 	asl A    
 	tay
 	lda #$00 
-	sta $76,X
+	sta soundEngine_76,X
 	txa
 	asl A    
 	pha
@@ -678,12 +678,12 @@ SecondPart:
 	sta flagSound_70 
 	pla
 	tax
-	lda $9EB4,Y
-	sta $C0,X
-	sta $82,X
-	lda $9EB5,Y
-	sta $C1,X
-	sta $83,X
+	lda Data_at9EB4+0,Y
+	sta soundEngine_C0,X
+	sta soundEngine_82,X
+	lda Data_at9EB4+1,Y
+	sta soundEngine_C1,X
+	sta soundEngine_83,X
 	rts
 .endproc
 ;
@@ -732,8 +732,8 @@ SecondPart:
 		txa
 		pha
 		lda #$FF 
-		sta $90,X
-		lda $9E84,Y
+		sta soundEngine_90,X
+		lda Data_at9E84,Y
 		jsr UnknownSoundSub4
 		pla
 		tax
@@ -781,25 +781,25 @@ SecondPart:
 	cpx #$FF 
 	bne :+
 	tay
-	ldx $9ED6,Y
+	ldx Data_at9ED6,Y
 	
 	:
 	asl A    
 	tay
 	lda #$00 
-	sta $72,X
+	sta soundEngineArray_72,X
 	lda Data_at9DB4+4,X
 	ora flagSound_70 
 	sta flagSound_70 
 	txa
 	asl A    
 	tax
-	lda $9EB4,Y
-	sta $B8,X
-	sta $7A,X
-	lda $9EB5,Y
-	sta $B9,X
-	sta $7B,X
+	lda Data_at9EB4+0,Y
+	sta soundEngineAddr_B8,X
+	sta soundEngineAddrList_7A,X
+	lda Data_at9EB4+1,Y
+	sta soundEngineAddr_B8+1,X
+	sta soundEngineAddrList_7A+1,X
 	rts
 .endproc
 ;
@@ -828,7 +828,7 @@ SecondPart:
 	lda #$FF	
 	ldx #$00 
 	loopZeroOut_90_to_93:    
-		sta $90,X
+		sta soundEngine_90,X
 		inx
 		cpx #$04 
 		bne loopZeroOut_90_to_93 
@@ -847,13 +847,13 @@ SecondPart:
 	skipZeroingVolume:
 	ldy #$00 
 	:
-		lda $0098,Y
+		lda square0Duty_98,Y
 		sta Sq0Duty_4000,Y
-		lda $009C,Y
+		lda square1Duty_9C,Y
 		sta Sq1Duty_4004,Y
-		lda $00A0,Y
+		lda triangleLinear_A0,Y
 		sta TrgLinear_4008,Y     
-		lda $00A4,Y
+		lda noiseVolume_A4,Y
 		sta NoiseVolume_400C,Y   
 		iny
 		cpy #$03 
@@ -883,7 +883,7 @@ SecondPart:
 	lda #$FF 
 	ldx #$04
 	:
-		sta $90,X
+		sta soundEngine_90,X
 		inx
 		cpx #$08 
 		bne :-
