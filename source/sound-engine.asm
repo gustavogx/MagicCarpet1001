@@ -316,7 +316,7 @@
 	and #$07 
 	lsr A    
 	tay
-	lda $9DB8,Y
+	lda Data_at9DB4+4,Y
 	and flagSound_70 
 	beq :+
 
@@ -357,9 +357,9 @@
 
 	asl A    
 	tax
-	lda $9DBC,Y
+	lda Data_at9DB4+8,Y
 	sta Sq0Duty_4000,X
-	lda $9DBD,Y
+	lda Data_at9DB4+9,Y
 	sta Sq0Sweep_4001,X
 	rts
 
@@ -370,7 +370,7 @@
 	and #$07 
 	lsr A    
 	tay
-	lda $9DB8,Y
+	lda Data_at9DB4+4,Y
 	and flagSound_70 
 	beq :+
 
@@ -380,9 +380,9 @@
 	tax
 	pla
 	tay
-	lda $9DBC,Y
+	lda Data_at9DB4+8,Y
 	sta $98,X
-	lda $9DBD,Y
+	lda Data_at9DB4+9,Y
 	sta $99,X
 	rts
 
@@ -393,10 +393,10 @@
 	tax
 	pla
 	tay
-	lda $9DBC,Y
+	lda Data_at9DB4+8,Y
 	sta Sq0Duty_4000,X
 	sta $98,X
-	lda $9DBD,Y
+	lda Data_at9DB4+9,Y
 	sta Sq0Sweep_4001,X
 	sta $99,X
 	rts
@@ -409,13 +409,13 @@
 	bcs :+
 	asl A    
 	tax
-	lda $9DBC,Y
+	lda Data_at9DB4+8,Y
 	sta Sq0Duty_4000,X
-	lda $9DBD,Y
+	lda Data_at9DB4+9,Y
 	sta Sq0Sweep_4001,X
-	lda $9DBE,Y
+	lda Data_at9DB4+10,Y
 	sta Sq0Timer_4002,X
-	lda $9DBF,Y
+	lda Data_at9DB4+11,Y
 	sta Sq0Length_4003,X     
 	rts
 
@@ -426,7 +426,7 @@
 	and #$07   
 	lsr A
 	tay
-	lda $9DB8,Y
+	lda Data_at9DB4+4,Y
 	and flagSound_70    
 	beq :+
 	tya
@@ -435,13 +435,13 @@
 	tax
 	pla
 	tay
-	lda $9DBC,Y
+	lda Data_at9DB4+8,Y
 	sta $98,X  
-	lda $9DBD,Y
+	lda Data_at9DB4+9,Y
 	sta $99,X  
-	lda $9DBE,Y
+	lda Data_at9DB4+10,Y
 	sta $9A,X  
-	lda $9DBF,Y
+	lda Data_at9DB4+11,Y
 	sta $9B,X  
 	rts
 
@@ -452,16 +452,16 @@
 	tax
 	pla
 	tay
-	lda $9DBC,Y
+	lda Data_at9DB4+8,Y
 	sta Sq0Duty_4000,X
 	sta $98,X
-	lda $9DBD,Y
+	lda Data_at9DB4+9,Y
 	sta Sq0Sweep_4001,X
 	sta $99,X
-	lda $9DBE,Y
+	lda Data_at9DB4+10,Y
 	sta Sq0Timer_4002,X
 	sta $9A,X
-	lda $9DBF,Y
+	lda Data_at9DB4+11,Y
 	sta Sq0Length_4003,X     
 	sta $9B,X
 	rts
@@ -493,7 +493,7 @@
 	cmp #$04 
 	bcs :+
 	tax
-	lda $9DB4,X
+	lda Data_at9DB4,X
 	and flagAPUStatus_C9  
 	sta ApuStatus_4015
 	rts
@@ -501,17 +501,17 @@
 	:
 	and #$03 
 	tax
-	lda $9DB8,X
+	lda Data_at9DB4+4,X
 	and flagSound_70 
 	beq :+
-	lda $9DB4,X
+	lda Data_at9DB4,X
 	and flagAPUStatus_C9  
 	rts
 
-	; Turn On Sound based on data from $9DB4
-	; x	: offset from $9DB4
+	; Turn On Sound based on data from Data_at9DB4
+	; x	: offset from Data_at9DB4
 	:
-	lda $9DB4,X
+	lda Data_at9DB4,X
 	and flagAPUStatus_C9
 	sta ApuStatus_4015
 	rts
@@ -522,7 +522,7 @@
 	cmp #$04 
 	bcs :+
 	tax
-	lda $9DB8,X
+	lda Data_at9DB4+4,X
 	ora flagAPUStatus_C9  
 	sta ApuStatus_4015
 	sta flagAPUStatus_C9  
@@ -531,16 +531,16 @@
 	:
 	and #$03 
 	tax
-	lda $9DB8,X
+	lda Data_at9DB4+4,X
 	and flagSound_70 
 	beq :+
-	lda $9DB8,X
+	lda Data_at9DB4+4,X
 	ora flagAPUStatus_C9  
 	sta flagAPUStatus_C9  
 	rts
 
 	:
-	lda $9DB8,X
+	lda Data_at9DB4+4,X
 	ora flagAPUStatus_C9  
 	sta ApuStatus_4015
 	sta flagAPUStatus_C9  
@@ -560,7 +560,7 @@
 	bne :-
 	ldy #$08 
 	:
-	sta $0090,Y
+	sta $0090,Y ;  
 	iny
 	cpy #$47 
 	bne :-
@@ -571,7 +571,7 @@
 	lda #$FF 
 	ldy #$00 
 	:
-	sta $0090,Y
+	sta $0090,Y ;
 	iny
 	cpy #$08 
 	bne :-
@@ -788,7 +788,7 @@ SecondPart:
 	tay
 	lda #$00 
 	sta $72,X
-	lda $9DB8,X
+	lda Data_at9DB4+4,X
 	ora flagSound_70 
 	sta flagSound_70 
 	txa

@@ -7,156 +7,184 @@
 .include "inesheader.inc"
 
 .segment "ZEROPAGE" ; LSB 0 - FF
+.res 1 ; $00
+.res 1 ; $01
+.res 1 ; $02
+.res 1 ; $03
+.res 1 ; $04
+.res 1 ; $05
+.res 1 ; $06
+.res 1 ; $07
+.res 1 ; $08
+.res 1 ; $09
+.res 1 ; $0a
+.res 1 ; $0b
+var_0C:	.res 1 ; $0c
+var_0D:	.res 1 ; $0d
+updateDuringVBlank_0E:	.res 1 ; $0e
+updateDuringVBlank_0F:	.res 1 ; $0f
+.res 1 ; $10
+livesCounter_11:		.res 1	; $11 ; 5
+frameCounter_12:		.res 1	; $12 ; 8
+frameCounter62_13:		.res 1	; $13 ; 4
+aliveTimer_14:			.res 1	; $14 ; 6
+currentStage_15:		.res 1	; $15 ; 14 ; Stage Index 0(opening), 1, 2, 3, 4, and 5(ending)
+levelProgression_16:	.res 1	; $16 ; 3
+flagPPUControl_17:		.res 1	; $17 ; 8
+flagPPUMask_18:			.res 1	; $18 ; 6
+flagPPUControl_19:		.res 1	; $19 ; 10
+flagUnknown_1A:			.res 1	; $1A ; 5
+flagNextLevel_1B:		.res 1	; $1B ; 6
+flagPause_1C:			.res 1	; $1C ; 4
+.res 1
+flagPlayerHit_1E:		.res 1	; $1E ; 3
+flagUnknown_1F:			.res 1	; $1F ; 2
 
-; $00
-; $01
-; $02
-; $03
-; $04
-; $05
-; $06
-; $07
-; $08
-; $09
-; $0A
-; $0B
-.define var_0C				$0C ; 4
-.define var_0D				$0D ; 3
-.define updateDuringVBlank_0E	$0E ; 3
-.define updateDuringVBlank_0F	$0F ; 3
+input1_20	:			.res 1	; $20 ; 17
+.res 1 ; $21
+inputPrev_22:			.res 1	; $22 ; 11
+.res 1 ; $23
+.res 1 ; $24
+.res 1 ; $25
+flagGameMode_26:		.res 1	; $26 ; 4
+frameScrollAt_27:		.res 1	; $27 ; 2
+frameScrollCtr_28:		.res 1	; $28 ; 3
+screenScrollX_29:		.res 1	; $29 ; 7
+var_2A:					.res 1	; $2A	; 3
+var_2B:					.res 1	; $2B	; 4
+enemySetSize_2C:		.res 1	; $2C	; 4
+var_2D:					.res 1	; $2D	; 4
+flagGenDrop_2E:			.res 1	; $2E	; 4
+.res 1 ; $2F
 
-; $10
-.define livesCounter_11		$11 ; 5
-.define frameCounter_12		$12 ; 8
-.define frameCounter62_13	$13 ; 4
-.define aliveTimer_14		$14 ; 6
-.define currentStage_15		$15 ; 14 ; Stage Index 0(opening), 1, 2, 3, 4, and 5(ending)
-.define levelProgression_16	$16 ; 3
-.define flagPPUControl_17	$17 ; 8
-.define flagPPUMask_18		$18 ; 6
-.define flagPPUControl_19	$19 ; 10
-.define flagUnknown_1A		$1A ; 5
-.define flagNextLevel_1B	$1B ; 6
-.define flagPause_1C		$1C ; 4
-; $1D
-.define flagPlayerHit_1E	$1E ; 3
-.define flagUnknown_1F		$1F ; 2
-
-.define input1_20			$20 ; 17
-; $21
-.define inputPrev_22		$22 ; 11
-; $23
-; $24
-; $25
-.define flagGameMode_26		$26 ; 4
-.define frameScrollAt_27	$27 ; 2
-.define frameScrollCtr_28	$28 ; 3
-.define screenScrollX_29	$29 ; 7
-.define var_2A				$2A	; 3
-.define var_2B				$2B	; 4
-.define enemySetSize_2C				$2C	; 4
-.define var_2D				$2D	; 4
-.define flagGenDrop_2E		$2E	; 4
-; $2F
-
-; $30
-; $31
-.define addressPtr_32		$32 ; 32 (word address)
+.res 1 ; $30
+.res 1 ; $31
+addressPtr_32:			.res 2	; $32 ; 32 (word address)
 ; $33 low byte of $32
-.define objectPtr_34		$34 ; 14 (word address); object address in rom
+objectPtr_34:			.res 2	; $34 ; 14 (word address); object address in rom
 ; $35 low byte of $34
-.define objectPtr_36		$36 ; 10 (word address)
+objectPtr_36:			.res 2	; $36 ; 10 (word address)
 ; $37 low byte of $37
-.define objectPtr_38		$38 ; 14 (word address)
+objectPtr_38:			.res 2	; $38 ; 14 (word address)
 ; $39 low byte of $38
-.define objectPtr_3A		$3A ; 13 (word address)
+objectPtr_3A:			.res 2	; $3A ; 13 (word address)
 ; $3B low byte of $3A
-.define counter_W_3C		$3C ; 2
-.define var_3D				$3D	; 3
-.define oamAddressPtr_3E	$3E ; 6 (word address)
+counter_W_3C:			.res 1	; $3C ; 2
+var_3D:					.res 1	; $3D	; 3
+oamAddressPtr_3E:		.res 2	; $3E ; 6 (word address)
 ; $3F low byte of $3E
 
-.define var_40				$40	; 5
-.define var_41				$41 ; 5
-.define tile_Y_Lo_42		$42	; 7
-.define tile_Y_Hi_43		$43 ; 6
-.define var_44				$44 ; 2
-.define counter_H_45		$45 ; 2
-.define tile_X_Lo_46		$46 ; 6 
-.define tile_X_Hi_47		$47	; 7
-.define var_48				$48 ; 2
-.define var_49				$49 ; 4
-.define projectileIndex_4A				$4A ; 7
-.define velocityCarry_4B				$4B ; 5
-.define velocityComponent_4C				$4C ; 6
-.define iterator_3D				$4D ; 6
-.define flagLoadShots_4E	$4E ; 3
-.define var_4F				$4F ; 2
+var_40:					.res 1	; $40	; 5
+var_41:					.res 1	; $41 ; 5
+tile_Y_Lo_42:			.res 1	; $42	; 7
+tile_Y_Hi_43:			.res 1	; $43 ; 6
+var_44:					.res 1	; $44 ; 2
+counter_H_45:			.res 1	; $45 ; 2
+tile_X_Lo_46:			.res 1	; $46 ; 6 
+tile_X_Hi_47:			.res 1	; $47	; 7
+var_48:					.res 1	; $48 ; 2
+var_49:					.res 1	; $49 ; 4
+projectileIndex_4A:		.res 1	; $4A ; 7
+velocityCarry_4B:		.res 1	; $4B ; 5
+velocityComponent_4C:	.res 1	; $4C ; 6
+iterator_4D:			.res 1	; $4D ; 6
+flagLoadShots_4E:		.res 1	; $4E ; 3
+var_4F:					.res 1	; $4F ; 2
 
-.define var_50				$50 ; 4
-.define var_51				$51 ; 4
-.define var_52				$52 ; 4
-; $53
-.define var_54				$54 ; 6 ; object loading property
-.define var_55				$55 ; 5 ; object loading property
-.define var_56				$56 ; 5 ; object loading property
-.define var_57				$57 ; 5 ; object loading property
-.define objectType_58		$58 ; 5
-.define objIndexStep_59		$59 ; 5 ; it is either +6 or -6
-.define var_5A				$5A ; 3
-.define currentEnemyWave_5B	$5B ; 3
-.define nextEnemyWave_5C	$5C ; 5
-; $5D
-.define var_5E				$5E ; 2
-.define objectIndex_5F		$5F ; 9
+var_50:					.res 1	; $50 ; 4
+var_51:					.res 1	; $51 ; 4
+var_52:					.res 1	; $52 ; 4
+.res 1 ; $53
+var_54:					.res 1	; $54 ; 6 ; object loading property
+var_55:					.res 1	; $55 ; 5 ; object loading property
+var_56:					.res 1	; $56 ; 5 ; object loading property
+var_57:					.res 1	; $57 ; 5 ; object loading property
+objectType_58:			.res 1	; $58 ; 5
+objIndexStep_59:		.res 1	; $59 ; 5 ; it is either +6 or -6
+var_5A:					.res 1	; $5A ; 3
+currentEnemyWave_5B:	.res 1	; $5B ; 3
+nextEnemyWave_5C:		.res 1	; $5C ; 5
+.res 1 ; $5D
+var_5E:					.res 1	; $5E ; 2
+objectIndex_5F:			.res 1	; $5F ; 9
 
-.define arrowsFlying_60		$60 ; 7
-; $61
-.define flagPlayerHasShot_62 $62 ; 3
-; $63
-.define powerLevel_64		$64 ; 10
-; $65
-.define speedLevel_66		$66 ; 6
-.define vramAddress_67		$67 ; 3
+arrowsFlying_60:		.res 1	; $60 ; 7
+.res 1 ; $61
+flagPlayerHasShot_62:	.res 1 ; $62 ; 3
+.res 1 ; $63
+powerLevel_64:			.res 1	; $64 ; 10
+.res 1 ; $65
+speedLevel_66:			.res 1	; $66 ; 6
+vramAddress_67:			.res 2	; $67 ; 3
 ; $68 low byte of $67
-; $69
+.res 1 ; $69
+.res 1 ; $6a
+.res 1 ; $6b
+.res 1 ; $6c
+.res 1 ; $6d
+.res 1 ; $6e
+.res 1 ; $6f
 
-.define flagSound_70		$70
-; $71
-; $72
-; $73
-; $74
-; $75
-; $76
-; $77
-; $78
-; $79
-; $7A
-; $7B
-; $7C
-; $7D
-; $7E
-; $7F
+flagSound_70:			.res 1	; $70
+.res 1 ; $71
+.res 1 ; $72
+.res 1 ; $73
+.res 1 ; $74
+.res 1 ; $75
+.res 1 ; $76
+.res 1 ; $77
+.res 1 ; $78
+.res 1 ; $79
+.res 1 ; $7A
+.res 1 ; $7B
+.res 1 ; $7C
+.res 1 ; $7D
+.res 1 ; $7E
+.res 1 ; $7F
 
-; $80
-; $81
-; $82
-; $83
-; $84
-; $85
-; $86
-; $87
-; $88
-; $89
-; $8A
-; $8B
-; $8C
-.define soundIndex_8D		$8D
-.define flagUpdateSoundAtVBlank_8E	$8E
-.define flagPlaySFX_8F		$8F
+.res 1 ; $80
+.res 1 ; $81
+.res 1 ; $82
+.res 1 ; $83
+.res 1 ; $84
+.res 1 ; $85
+.res 1 ; $86
+.res 1 ; $87
+.res 1 ; $88
+.res 1 ; $89
+.res 1 ; $8A
+.res 1 ; $8B
+.res 1 ; $8C
+soundIndex_8D:			.res 1	; $8D
+flagUpdateSoundAtVBlank_8E:	.res 1	; $8E
+flagPlaySFX_8F:			.res 1	; $8F
 
-.define flagAPUStatus_C9	$C9
-.define bgPalette_E0		$E0 ; 4
+.res 16 ; $90
+
+.res 16 ; $A0
+
+.res 16 ; $B0
+
+.res 1 ; $C0
+.res 1 ; $C1
+.res 1 ; $C2
+.res 1 ; $C3
+.res 1 ; $C4
+.res 1 ; $C5
+.res 1 ; $C6
+.res 1 ; $C7
+.res 1 ; $C8
+flagAPUStatus_C9:		.res 1	; $C9
+.res 1 ; $CA
+.res 1 ; $CB
+.res 1 ; $CC
+.res 1 ; $CD
+.res 1 ; $CE
+.res 1 ; $CF
+
+.res 16 ; $D0
+
+paletteRAM_E0:			.res 32	; $E0 ; 4
 
 
 .segment "SPRITES" ; LSB 0 - FF
@@ -756,11 +784,11 @@ doneLoadingEnemyBatch:
 	lda #$00
 	sta var_5A
 	lda #$06
-	sta iterator_3D
+	sta iterator_4D
 	
 	loopCheckCollisions:
 
-		ldx iterator_3D
+		ldx iterator_4D
 		lda object_Attrib_1_0404,X
 		bit BIT_4
 		beq :++
@@ -838,10 +866,10 @@ doneLoadingEnemyBatch:
 		jsr HandleEnemyIA_Shooting_X
 	
 		doneCheckingPlayerCollision:
-		lda iterator_3D
+		lda iterator_4D
 		clc
 		adc #$06
-		sta iterator_3D
+		sta iterator_4D
 		cmp #$F0
 		beq :+
 		jmp loopCheckCollisions
@@ -2471,20 +2499,20 @@ LivesGraphicData:
 ; $949D
 ; LoadPaletteIntoRAM_A_Y
 ; Loads 16 colors from addressPtr_32, with offset Y
-; Stores into RAM address bgPalette_E0, with offset A
-; 	A : 	offset from bgPalette_E0  (address high byte)
+; Stores into RAM address paletteRAM_E0, with offset A
+; 	A : 	offset from paletteRAM_E0  (address high byte)
 ;	Y : 	offset from addressPtr_32 (address word)
 .proc LoadPaletteIntoRAM_A_Y
 	tax
 	clc
 	adc #$10
-	sta iterator_3D
+	sta iterator_4D
 	:
 		lda (addressPtr_32),Y
-		sta bgPalette_E0,X 
+		sta paletteRAM_E0,X 
 		iny
 		inx
-		cpx iterator_3D
+		cpx iterator_4D
 		bne :-
 	rts
 .endproc
@@ -2752,7 +2780,7 @@ RegisterInput:
 		sta PpuAddr_2006
 		stx PpuAddr_2006
 		:
-			lda bgPalette_E0,X
+			lda paletteRAM_E0,X
 			sta PpuData_2007
 			inx
 			cpx #$20
@@ -2765,14 +2793,14 @@ RegisterInput:
 		sta PpuScroll_2005
 		ldx #$00
 		loopDarkenONETone:
-			lda bgPalette_E0,X
+			lda paletteRAM_E0,X
 			sec
 			sbc #$10
 			bcs paletteDidNotUnderflow
 			lda #$0F
 			
 			paletteDidNotUnderflow:
-			sta bgPalette_E0,X
+			sta paletteRAM_E0,X
 			inx
 			cpx #$20
 			bne loopDarkenONETone
@@ -3026,12 +3054,19 @@ Data_at97F5:
 .segment "SOUNDENGINE"
 .include "sound-engine.asm"
 
-;.res 1293
+; Sound data
 
-; $9D22 data
 Data_at9D22:
-.incbin "rom-prg/sound/sound-data-at9D32.bin"
+.incbin "rom-prg/sound/sound-data-at9D22.bin"
 
+Data_at9DB4:
+.incbin "rom-prg/sound/sound-data-at9DB4.bin"
+
+Data_at9E84:
+.incbin "rom-prg/sound/sound-data-at9E84.bin"
+;
+; =====================================================
+;
 .segment "CODEBLOCK2"
 ;
 ; $A3AC
