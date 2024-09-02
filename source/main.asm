@@ -8,14 +8,15 @@
 .define STAGE_SONG 		$01; 01 Stage song
 .define BOSS_SONG 		$02; 02 Boss song
 .define ARROW_SHOT_SFX 	$03; 03 Arrow shot SFX
-.define ENEMY DEATH_SFX $04; 04 Enemy death SFX
-.define PLAYER_SHOT_SFX $05; 05 Player death SFX
+.define ENEMY_DEATH_SFX $04; 04 Enemy death SFX
+.define PLAYER_DEATH_SFX $05; 05 Player death SFX
 .define EXTRA_LIFE_SFX 	$06; 06 Extra life SFX
 .define GAME_START_SFX 	$07; 07 Game Start / Item grab SFX
 .define GAME_PAUSE_SFX 	$08; 08 Pause
 .define BOSS_DEATH_SFX 	$09; 09 Boss death SFX
 .define ENEMY_HIT_SFX 	$0A; 0A Enemy hit SFX
 .define ENDING_SONG 	$0B; 0B Ending song
+.define MAGIC_LAMP_SFX 	$0C; 0C Magic Lamp SFX
 
 .segment "HEADER"
 .include "inesheader.inc"
@@ -47,7 +48,7 @@ levelProgression_16:	.res 1	; $16 ; 3
 flagPPUControl_17:		.res 1	; $17 ; 8
 flagPPUMask_18:			.res 1	; $18 ; 6
 flagPPUControl_19:		.res 1	; $19 ; 10
-flagUnknown_1A:			.res 1	; $1A ; 5
+flagBossFight_1A:		.res 1	; $1A ; 5
 flagNextLevel_1B:		.res 1	; $1B ; 6
 flagPause_1C:			.res 1	; $1C ; 4
 .res 1
@@ -454,7 +455,7 @@ WaitForPressStart:
 		beq :-
 
 	StopPlaying
-	PlaySoundOnce #$07
+	PlaySoundOnce #GAME_START_SFX
 	
 	lda #$00
 	sta currentStage_15
@@ -524,9 +525,9 @@ StartingNewStage:
 	jsr InitializeHUD_Lives
 	jsr TriggerNextLevel
 	
-	lda #ZERO
+	lda #FALSE
 	sta flagNextLevel_1B
-	sta flagUnknown_1A
+	sta flagBossFight_1A
 	
 	jsr RenderON
 
@@ -638,7 +639,7 @@ StartingNewStage:
 	lda ObjectsData_A885+1,Y	; hi-byte of stage's enemy data
 	sta objectPtr_34+1
 
-	lda currentEnemyWave_5B	; index for current enemy batch
+	lda currentEnemyWave_5B		; index for current enemy batch
 	asl A
 	tay
 	lda (objectPtr_34),Y		; lo-byte of current enemy batch
@@ -668,20 +669,20 @@ StartingNewStage:
 		cpx #$F0 				; no slot available to load object
 		bcs doneLooping			; exit if no free slot found
 		
-		lda (objectPtr_3A),Y	; read #1 byte of object descriptor
-		cmp #$F8				; check for control character $F8 = STAGE BOSS
+		lda (objectPtr_3A),Y	; read object type
+		cmp #$F8				; this is a STAGE_BOSS $F8
 		bne :+					; if not, skip ahead
 
-		lda #BIT0				; if control $F8 was found
-		sta flagUnknown_1A		; set this flag to %0000 0001
+		lda #TRUE				; if STAGE_BOSS
+		sta flagBossFight_1A	; set this flag TRUE
 		ldx #$30				; WHY? 
 		jsr ClearObjectsDescription; Clears page $04 of RAM
 	
-		StopPlaying
-	
+		; Stage Boss Song===============
+		StopPlaying	
 		ResetSoundEngine 
-	
-	PlaySoundForever #BOSS_SONG
+		PlaySoundForever #BOSS_SONG
+		; ==============================
 
 		iny
 		lda (objectPtr_3A),Y
@@ -727,7 +728,7 @@ StartingNewStage:
 		; no control character found. 
 		; loading enemy
 		: 
-		sta objectType_58			 	; #1 byte of object file
+		sta objectType_58		; #1 byte of object file
 		iny
 		lda (objectPtr_3A),Y
 		sta var_54				; X position, #2 byte of object file
@@ -1101,7 +1102,7 @@ doneLoadingEnemyBatch:
 	
 	:
 	sta healthPoints_0603,X
-	lda flagUnknown_1A
+	lda flagBossFight_1A
 	bne :+
 	clc
 	lda object_X_Lo_0400,X
@@ -1231,8 +1232,10 @@ doneLoadingEnemyBatch:
 	cmp #$05
 	beq skipHandlingCollision
 
+	; Sound effect =================
 	ResetSoundEngine 
-	PlaySoundOnce #$04
+	PlaySoundOnce #ENEMY_DEATH_SFX
+	; ==============================
 
 	jmp skipHandlingCollision
 	
@@ -1245,12 +1248,29 @@ doneLoadingEnemyBatch:
 .endproc
 ;
 ; $854C
+.define OBJTYPE_ARROW		$06
+
+.define OBJTYPE_ENEMY		$1F
+.define OBJTYPE_PLAYER		$1A
+
+.define OBJTYPE_EXTRA_LIFE  $28
+.define OBJTYPE_POWERUP		$29
+.define OBJTYPE_HEART		$2A
+.define OBJTYPE_SPEEDUP		$2B
+.define OBJTYPE_MAGIC_LAMP	$2C
+
+.define SPAWNTYPE_NOTHING	$00
+.define SPAWNTYPE_PUFF		$02
+.define SPAWNTYPE_PLAYERDEATH $03
+
+.define OBJPROP_CAN_COLLIDE	BIT_6
 ; Checks if object with index in X hit something important.
 ; X = 0 is the player
 .proc HandleObjectCollision
+	
 	PushXY
 	lda object_Attrib_2_0405,X		; Object status flags
-	bit BIT_6						; check if the object is tangible (flag 6)
+	bit OBJPROP_CAN_COLLIDE			; check if the object is tangible (flag 6)
 	bne :+							; if TANGIBLE (can collide), continue
 	jmp doneWithObjectCollision		; else exit
 	
@@ -1259,7 +1279,7 @@ doneLoadingEnemyBatch:
 	bne :+							; this is useless, skips nothing at all
 									; could be replaced by nop nop
 	:
-	cmp #$06 ; BIT1+BIT2 maybe?		; Check if pickup collision happened.
+	cmp #OBJTYPE_ARROW				; Check if object is an arrow shot.
 	bne handlePickups				; if it did, continue to handlePickups
 	
 	lda arrowsFlying_60				; else, check if arrowsFlying_60 is zero
@@ -1267,153 +1287,157 @@ doneLoadingEnemyBatch:
 	dec arrowsFlying_60				; else, decrease arrowsFlying_60 and then go to secondPart
 	
 	:
-	lda #$00						
-	jmp SecondPart
+	lda #SPAWNTYPE_NOTHING					
+	jmp handleSpawnDeathAnimation
 
 	handlePickups:
 
-	; Pickups section
-	; Detecting if the player has collected a power up.
+		; Pickups section
+		; Detecting if the player has collected a power up.
 
-	handlePlayerGotExtraLife:
+		handlePlayerGotExtraLife:
 
-		cmp #$28	
-		bne handlePlayerGotPowerUp	; if pickup is not ExtraLife, skip to next
+			cmp #OBJTYPE_EXTRA_LIFE
+			bne handlePlayerGotPowerUp	; if pickup is not ExtraLife, skip to next
+			
+			; Sound effect =================
+			WaitUntilSoundFinishes
+			ResetSoundEngine	
+			PlaySoundOnce #EXTRA_LIFE_SFX
+			; ==============================
+
+			inc livesCounter_11
+			jmp doneWithObjectCollision
+
+		handlePlayerGotPowerUp:
+			cmp #OBJTYPE_POWERUP ; $29	
+			bne handlePlayerGotHeart 
+
+			; Sound effect =================
+			WaitUntilSoundFinishes
+			ResetSoundEngine
+			PlaySoundOnce #GAME_START_SFX
+			; ==============================
+
+			lda powerLevel_64
+			cmp #$04
+
+			bcc :+ 	; if didn't reach maximum power, continue to power increase
+					; else play sound cue and exit
+			ResetSoundEngine
 		
-		; Sound effect =================
-		WaitUntilSoundFinishes
-		ResetSoundEngine
-	
-		PlaySoundOnce #$06
-		; ==============================
+			jmp doneWithObjectCollision
+		
+			:
+			inc powerLevel_64
+			jmp doneWithObjectCollision
+		
+		handlePlayerGotHeart:
+			cmp #OBJTYPE_HEART ; $2A	
+			bne handlePlayerGotSpeedUp
 
-		inc livesCounter_11
-		jmp doneWithObjectCollision
+			; Sound effect =================
+			WaitUntilSoundFinishes
+			ResetSoundEngine
+			PlaySoundOnce #GAME_START_SFX
+			; ==============================
 
-	handlePlayerGotPowerUp:
-		cmp #$29	;	BIT0+BIT3+BIT5
-		bne handlePlayerGotHeart 
+			jsr AddOneHeart
+			jmp doneWithObjectCollision
+		
+		handlePlayerGotSpeedUp:
+			cmp #OBJTYPE_SPEEDUP; $2B
+			bne handlePlayerGotMagicLamp
 
-		; Sound effect =================
-		WaitUntilSoundFinishes
-		ResetSoundEngine
-		PlaySoundOnce #$07
-		; ==============================
+			; Sound effect =================
+			WaitUntilSoundFinishes
+			ResetSoundEngine
+			PlaySoundOnce #GAME_START_SFX
+			; ==============================
 
-		lda powerLevel_64
-		cmp #$04
+			lda #PLAYER_SPEED_FAST
+			sta speedLevel_66
+			jmp doneWithObjectCollision
+		
+		handlePlayerGotMagicLamp:
+			cmp #OBJTYPE_MAGIC_LAMP; $2C
+			bne doneWithPickups
 
-		bcc :+ 	; if didn't reach maximum power, continue to power increase
-				; else play sound cue and exit
-		ResetSoundEngine
-	
-		jmp doneWithObjectCollision
-	
-		:
-		inc powerLevel_64
-		jmp doneWithObjectCollision
-	
-	handlePlayerGotHeart:
-		cmp #$2A	;	BIT1+BIT3+BIT5
-		bne handlePlayerGotSpeedUp
+			lda object_X_Hi_0401,X			; check if Magic Lamp is not offscreen
+			beq :+							; if not, continue forward
+			jmp doneWithObjectCollision		; else (is offscreen), break.
+			:
 
-		; Sound effect =================
-		WaitUntilSoundFinishes
-		ResetSoundEngine
-		PlaySoundOnce #$07
-		; ==============================
+			; Sound effect =================
+			PlaySoundOnce #MAGIC_LAMP_SFX
+			; ==============================
 
-		jsr AddOneHeart
-		jmp doneWithObjectCollision
-	
-	handlePlayerGotSpeedUp:
-		cmp #$2B	;	BIT0+BIT1+BIT3+BIT5
-		bne handlePlayerGotMagicLamp
+			lda #MAGIC_LAMP_HEALTH_POINTS
+			sta healthPoints_0603
+			lda #<Data_at8BBD
+			sta someObjProperty_0501
+			lda #>Data_at8BBD
+			sta someObjProperty_0502
+			lda #$00
+			sta someObjProperty_0503
+			sta someObjProperty_0504
+			sta someObjProperty_0505
+			lda #HEART_HUD_Y
+			sta OAM_0200
 
-		; Sound effect =================
-		WaitUntilSoundFinishes
-		ResetSoundEngine
-		PlaySoundOnce #$07
-		; ==============================
-
-		lda #PLAYER_SPEED_FAST
-		sta speedLevel_66
-		jmp doneWithObjectCollision
-	
-	handlePlayerGotMagicLamp:
-		cmp #$2C
-		bne doneWithPickups
-
-		lda object_X_Hi_0401,X			; check if Magic Lamp is not offscreen
-		beq :+							; if not, continue forward
-		jmp doneWithObjectCollision		; else (is offscreen), break.
-		:
-
-		; Sound effect =================
-		PlaySoundOnce #$0C
-		; ==============================
-
-		lda #MAGIC_LAMP_HEALTH_POINTS
-		sta healthPoints_0603
-		lda #<Data_at8BBD
-		sta someObjProperty_0501
-		lda #>Data_at8BBD
-		sta someObjProperty_0502
-		lda #$00
-		sta someObjProperty_0503
-		sta someObjProperty_0504
-		sta someObjProperty_0505
-		lda #HEART_HUD_Y
-		sta OAM_0200
-		jmp doneWithObjectCollision
-	
-	doneWithPickups:
-	cmp #$1F
-	bne :+
-	lda #$02
-	bne SecondPart
+			jmp doneWithObjectCollision
+		
+		doneWithPickups:
+		
+		cmp #OBJTYPE_ENEMY ; $1F
+		bne :+
+		
+		lda #SPAWNTYPE_PUFF ; $02
+		bne handleSpawnDeathAnimation
 	
 	:
-	cmp #$1A
+	cmp #OBJTYPE_PLAYER; $1A
 	bne :+
-	WaitUntilSoundFinishes
-	ResetSoundEngine
-	PlaySoundOnce #$05
+		WaitUntilSoundFinishes
+		ResetSoundEngine
+		PlaySoundOnce #PLAYER_DEATH_SFX
 
-	lda #$01
-	sta flagPlaySFX_8F
-	lda #$03
-	bne SecondPart
+		lda #TRUE
+		sta flagPlaySFX_8F
+		lda #SPAWNTYPE_PLAYERDEATH ; $03
+		bne handleSpawnDeathAnimation
 	
 	:
-	cmp #$32
+	cmp #(BIT1|BIT4|BIT5); $32
 	bne :+
+
 	lda #$04
-	bne SecondPart
+	bne handleSpawnDeathAnimation
 	
 	:
-	cmp #$33
+	cmp #(BIT0|BIT1|BIT4|BIT5); $33
 	bne :+
+
 	lda #$05
-	bne SecondPart
+	bne handleSpawnDeathAnimation
 	
 	:
 	cmp #$34
 	bne :+
 	lda #$06
-	bne SecondPart
+	bne handleSpawnDeathAnimation
 	
 	:
 	cmp #$35
 	bne :+
 	lda #$07
-	bne SecondPart
+	bne handleSpawnDeathAnimation
 	
 	:
 	cmp #$36
 	bne :+
 	lda #$0C
-	bne SecondPart
+	bne handleSpawnDeathAnimation
 	
 	:
 	cmp #$24
@@ -1427,10 +1451,10 @@ doneLoadingEnemyBatch:
 	adc currentStage_15
 	sbc #$00
 	
-	SecondPart:
+	handleSpawnDeathAnimation:
 		sta objectType_58
 		lda object_Attrib_1_0404,X
-		and #BIT5
+		and #BIT5 ; check if this object spawns another?
 		beq doneWithObjectCollision
 
 		clc
@@ -1490,10 +1514,10 @@ doneLoadingEnemyBatch:
 	asl A
 	asl A
 	tay
-	lda Data_at8715+0,Y
-	sta someObjProperty_0501,X
-	lda Data_at8715+1,Y
-	sta someObjProperty_0502,X
+	lda Data_at8715+0,Y			; object VX table address
+	sta someObjProperty_0501,X	; object VX table address
+	lda Data_at8715+1,Y			; object VY table address
+	sta someObjProperty_0502,X  ; object VY table address
 	lda Data_at8715+2,Y
 	sta someObjProperty_0602,X
 	lda Data_at8715+3,Y
@@ -2029,7 +2053,7 @@ Data_at8D45:
 	jsr ShootAtPlayer_X
 	
 	:
-	lda flagUnknown_1A
+	lda flagBossFight_1A
 	beq :+
 	jsr HandleBossAnimation_Shooting
 	
@@ -3915,7 +3939,7 @@ Data_atA80A:
 	:
 	ResetSoundEngine 
 
-	lda flagUnknown_1A
+	lda flagBossFight_1A
 	beq :+
 	PlaySoundForever #BOSS_SONG
 	rts
