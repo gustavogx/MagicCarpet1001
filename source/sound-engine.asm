@@ -548,7 +548,7 @@
 .endproc
 ;
 ; $9B2E
-.proc ResetSoundEngine
+.proc StartSoundEngine
 
 	PushAXY
 	lda #$00 
@@ -588,14 +588,14 @@
 .endproc
 ;
 ; $9B74
-.proc PlaySong
+.proc PlaySoundForever
 	
 	PushAXY
 	
-	lda #$01 
+	lda #TRUE
 	sta flagUpdateSoundAtVBlank_8E  
 	lda flagSound_70 
-	and #$0F 
+	and #LOWER 
 	sta flagSound_70 
 	lda soundIndex_8D  
 	asl A    
@@ -604,19 +604,13 @@
 
 	ldx #$00
 	:
-		tya
-		pha
-		txa
-		pha
+		PushYX
 		tax
 		lda #$FF 
 		sta soundEngine_94,X
 		lda Data_at9E84,Y
 		jsr UnknownSoundSub6
-		pla
-		tax
-		pla
-		tay
+		PullYX
 		iny
 		inx
 		cpx #$04 
@@ -688,7 +682,7 @@ SecondPart:
 .endproc
 ;
 ; $9BFA
-.proc PlaySFX
+.proc PlaySoundOnce
 
 	PushAXY
 	lda flagPlaySFX_8F 
@@ -817,12 +811,12 @@ SecondPart:
 .endproc
 ;
 ; $9C9A
-.proc DoSomethingWithSound
+.proc ResetSoundEngine
 
 	PushAXY
 
 	lda flagSound_70 
-	and #$F0 
+	and #UPPER 
 	sta flagSound_70 
 	
 	lda #$FF	

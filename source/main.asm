@@ -384,7 +384,7 @@ HandleReset:
 	jsr SetupAfterReset	
 	jsr InitializeObjectIndexStep
 
-	ResetSound
+	StartSoundEngine
 
 	lda #$01 
 	sta flagGameMode_26
@@ -421,7 +421,7 @@ HandleReset:
 	
 	jsr RenderON
 	
-	PlayForever #OPENING_SONG
+	PlaySoundForever #OPENING_SONG
 	; 00 Opening song
 	; 01 Stage song
 	; 02 Boss song
@@ -454,7 +454,7 @@ WaitForPressStart:
 		beq :-
 
 	StopPlaying
-	PlayOnce #$07
+	PlaySoundOnce #$07
 	
 	lda #$00
 	sta currentStage_15
@@ -464,7 +464,7 @@ StartingNewStage:
 
 	jsr RenderingOFF
 
-	UpdateSound 
+	ResetSoundEngine 
 
 	lda #$00
 	sta PpuControl_2000
@@ -530,7 +530,7 @@ StartingNewStage:
 	
 	jsr RenderON
 
-	PlayForever #STAGE_SONG
+	PlaySoundForever #STAGE_SONG
 	
 	lda currentStage_15
 	cmp #$02
@@ -679,9 +679,9 @@ StartingNewStage:
 	
 		StopPlaying
 	
-		UpdateSound 
+		ResetSoundEngine 
 	
-	PlayForever #BOSS_SONG
+	PlaySoundForever #BOSS_SONG
 
 		iny
 		lda (objectPtr_3A),Y
@@ -1231,8 +1231,8 @@ doneLoadingEnemyBatch:
 	cmp #$05
 	beq skipHandlingCollision
 
-	UpdateSound 
-	PlayOnce #$04
+	ResetSoundEngine 
+	PlaySoundOnce #$04
 
 	jmp skipHandlingCollision
 	
@@ -1282,9 +1282,9 @@ doneLoadingEnemyBatch:
 		
 		; Sound effect =================
 		WaitUntilSoundFinishes
-		UpdateSound
+		ResetSoundEngine
 	
-		PlayOnce #$06
+		PlaySoundOnce #$06
 		; ==============================
 
 		inc livesCounter_11
@@ -1296,8 +1296,8 @@ doneLoadingEnemyBatch:
 
 		; Sound effect =================
 		WaitUntilSoundFinishes
-		UpdateSound
-		PlayOnce #$07
+		ResetSoundEngine
+		PlaySoundOnce #$07
 		; ==============================
 
 		lda powerLevel_64
@@ -1305,7 +1305,7 @@ doneLoadingEnemyBatch:
 
 		bcc :+ 	; if didn't reach maximum power, continue to power increase
 				; else play sound cue and exit
-		UpdateSound
+		ResetSoundEngine
 	
 		jmp doneWithObjectCollision
 	
@@ -1319,8 +1319,8 @@ doneLoadingEnemyBatch:
 
 		; Sound effect =================
 		WaitUntilSoundFinishes
-		UpdateSound
-		PlayOnce #$07
+		ResetSoundEngine
+		PlaySoundOnce #$07
 		; ==============================
 
 		jsr AddOneHeart
@@ -1332,8 +1332,8 @@ doneLoadingEnemyBatch:
 
 		; Sound effect =================
 		WaitUntilSoundFinishes
-		UpdateSound
-		PlayOnce #$07
+		ResetSoundEngine
+		PlaySoundOnce #$07
 		; ==============================
 
 		lda #PLAYER_SPEED_FAST
@@ -1350,7 +1350,7 @@ doneLoadingEnemyBatch:
 		:
 
 		; Sound effect =================
-		PlayOnce #$0C
+		PlaySoundOnce #$0C
 		; ==============================
 
 		lda #MAGIC_LAMP_HEALTH_POINTS
@@ -1377,8 +1377,8 @@ doneLoadingEnemyBatch:
 	cmp #$1A
 	bne :+
 	WaitUntilSoundFinishes
-	UpdateSound
-	PlayOnce #$05
+	ResetSoundEngine
+	PlaySoundOnce #$05
 
 	lda #$01
 	sta flagPlaySFX_8F
@@ -1419,7 +1419,7 @@ doneLoadingEnemyBatch:
 	cmp #$24
 	bne doneWithObjectCollision
 
-	PlayForever #BOSS_DEATH_SFX
+	PlaySoundForever #BOSS_DEATH_SFX
 
 
 	lda #$08
@@ -1807,7 +1807,7 @@ Data_at8BD7:
 	
 	; Sound effect =================
 	WaitUntilSoundFinishes
-	UpdateSound 
+	ResetSoundEngine 
 	; ==============================
 	
 	beq :++
@@ -1817,7 +1817,7 @@ Data_at8BD7:
 	beq doneShooting
 	
 	:
-	PlayOnce #$03
+	PlaySoundOnce #$03
 
 	doneShooting:
 		lda #$00
@@ -2900,7 +2900,7 @@ RegisterInput:
 	sta flagPPUControl_19
 	jsr RenderON
 	
-	PlayForever #ENDING_SONG
+	PlaySoundForever #ENDING_SONG
 
 	loopPressANYButton:
 		lda input1_20
@@ -3018,7 +3018,7 @@ RegisterInput:
 		sta PpuScroll_2005
 		
 		; play a sound effect
-		PlayOnce #$0A
+		PlaySoundOnce #$0A
 
 		: ; advance to next screen position
 		Add16 vramAddress_67, #1
@@ -3033,7 +3033,7 @@ RegisterInput:
 		bne loopLoadCredits
 	
 	; play another sound
-	UpdateSound
+	ResetSoundEngine
 	
 	leaveEndCredits:
 	rts
@@ -3908,20 +3908,20 @@ Data_atA80A:
 	beq :+
 	
 	StopPlaying
-	PlayOnce #$08
+	PlaySoundOnce #$08
 
 	jmp exitPauseRoutine
 	
 	:
-	UpdateSound 
+	ResetSoundEngine 
 
 	lda flagUnknown_1A
 	beq :+
-	PlayForever #BOSS_SONG
+	PlaySoundForever #BOSS_SONG
 	rts
 
 	:
-	PlayForever #STAGE_SONG
+	PlaySoundForever #STAGE_SONG
 	
 	exitPauseRoutine:
 	rts

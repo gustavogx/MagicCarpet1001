@@ -84,6 +84,16 @@
 	pha
 .endmacro
 
+; macro PushYX
+; Pushes the registers Y and X, in this order, 
+; on the top of the stack
+.macro PushYX
+	tya
+	pha
+	txa
+	pha
+.endmacro
+
 ; macro PullXY
 ; Pulls the registers X and Y, in reverse order, 
 ; from the top of the stack
@@ -92,6 +102,16 @@
 	tay
 	pla
 	tax
+.endmacro
+
+; macro PullYX
+; Pulls the registers Y and X, in reverse order, 
+; from the top of the stack
+.macro PullYX
+	pla
+	tax
+	pla
+	tay
 .endmacro
 
 ; macro SpawnMultipleProjectiles
@@ -113,7 +133,7 @@
 
 ; Sound Engine Macros =====================
 
-.macro PlayOnce index
+.macro PlaySoundOnce index
 .if DISABLE_SOUND = 1
 	lda index
 	sta soundIndex_8D
@@ -123,11 +143,11 @@
 .else
 	lda index
 	sta soundIndex_8D
-	jsr PlaySFX
+	jsr PlaySoundOnce
 .endif
 .endmacro
 
-.macro PlayForever index
+.macro PlaySoundForever index
 .if DISABLE_SOUND = 1
 	lda index
 	sta soundIndex_8D
@@ -137,7 +157,7 @@
 .else
 	lda index
 	sta soundIndex_8D	
-	jsr PlaySong
+	jsr PlaySoundForever
 .endif
 .endmacro
 
@@ -151,23 +171,23 @@
 .endif
 .endmacro
 
-.macro ResetSound
+.macro StartSoundEngine
+.if DISABLE_SOUND = 1
+	nop
+	nop
+	nop
+.else
+	jsr StartSoundEngine
+.endif
+.endmacro
+
+.macro ResetSoundEngine
 .if DISABLE_SOUND = 1
 	nop
 	nop
 	nop
 .else
 	jsr ResetSoundEngine
-.endif
-.endmacro
-
-.macro UpdateSound
-.if DISABLE_SOUND = 1
-	nop
-	nop
-	nop
-.else
-	jsr DoSomethingWithSound
 .endif
 .endmacro
 

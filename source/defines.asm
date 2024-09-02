@@ -39,5 +39,10 @@
 .define BIT5	%00100000
 .define BIT6	%01000000
 .define BIT7	%10000000
-.define ZERO    $00
+.define ZERO	$00
 .define ALL1	$FF
+
+.define TRUE	$01
+.define FALSE	$00
+.define LOWER	%00001111
+.define UPPER	%11110000
