@@ -113,7 +113,7 @@
 
 ; Sound Engine Macros =====================
 
-.macro PlayThisSFX index
+.macro PlayOnce index
 .if DISABLE_SOUND = 1
 	lda index
 	sta soundIndex_8D
@@ -127,7 +127,7 @@
 .endif
 .endmacro
 
-.macro PlayThisSong index
+.macro PlayForever index
 .if DISABLE_SOUND = 1
 	lda index
 	sta soundIndex_8D

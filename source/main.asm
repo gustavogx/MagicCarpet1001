@@ -3,6 +3,20 @@
 .include "defines.asm"
 .include "engine-config.asm"
 
+; song names
+.define OPENING_SONG 	$00; 00 Opening song
+.define STAGE_SONG 		$01; 01 Stage song
+.define BOSS_SONG 		$02; 02 Boss song
+.define ARROW_SHOT_SFX 	$03; 03 Arrow shot SFX
+.define ENEMY DEATH_SFX $04; 04 Enemy death SFX
+.define PLAYER_SHOT_SFX $05; 05 Player death SFX
+.define EXTRA_LIFE_SFX 	$06; 06 Extra life SFX
+.define GAME_START_SFX 	$07; 07 Game Start / Item grab SFX
+.define GAME_PAUSE_SFX 	$08; 08 Pause
+.define BOSS_DEATH_SFX 	$09; 09 Boss death SFX
+.define ENEMY_HIT_SFX 	$0A; 0A Enemy hit SFX
+.define ENDING_SONG 	$0B; 0B Ending song
+
 .segment "HEADER"
 .include "inesheader.inc"
 
@@ -70,18 +84,18 @@ objectPtr_38:			.res 2	; $38 ; 14 (word address)
 objectPtr_3A:			.res 2	; $3A ; 13 (word address)
 ; $3B low byte of $3A
 counter_W_3C:			.res 1	; $3C ; 2
-var_3D:					.res 1	; $3D	; 3
+var_3D:					.res 1	; $3D ; 3
 oamAddressPtr_3E:		.res 2	; $3E ; 6 (word address)
 ; $3F low byte of $3E
 
-var_40:					.res 1	; $40	; 5
+var_40:					.res 1	; $40 ; 5
 var_41:					.res 1	; $41 ; 5
-tile_Y_Lo_42:			.res 1	; $42	; 7
+tile_Y_Lo_42:			.res 1	; $42 ; 7
 tile_Y_Hi_43:			.res 1	; $43 ; 6
 var_44:					.res 1	; $44 ; 2
 counter_H_45:			.res 1	; $45 ; 2
 tile_X_Lo_46:			.res 1	; $46 ; 6 
-tile_X_Hi_47:			.res 1	; $47	; 7
+tile_X_Hi_47:			.res 1	; $47 ; 7
 var_48:					.res 1	; $48 ; 2
 var_49:					.res 1	; $49 ; 4
 projectileIndex_4A:		.res 1	; $4A ; 7
@@ -407,7 +421,19 @@ HandleReset:
 	
 	jsr RenderON
 	
-	PlayThisSong #$00
+	PlayForever #OPENING_SONG
+	; 00 Opening song
+	; 01 Stage song
+	; 02 Boss song
+	; 03 Arrow shot SFX
+	; 04 Enemy death SFX
+	; 05 Player death SFX
+	; 06 Extra life SFX
+	; 07 Game Start / Item grab SFX
+	; 08 Pause
+	; 09 Boss death SFX (played as SONG for looping)
+	; 0A Enemy hit SFX
+	; 0B Ending song
 
 WaitForPressStart:
 	
@@ -428,7 +454,7 @@ WaitForPressStart:
 		beq :-
 
 	StopPlaying
-	PlayThisSFX #$07
+	PlayOnce #$07
 	
 	lda #$00
 	sta currentStage_15
@@ -504,7 +530,7 @@ StartingNewStage:
 	
 	jsr RenderON
 
-	PlayThisSong #$01
+	PlayForever #STAGE_SONG
 	
 	lda currentStage_15
 	cmp #$02
@@ -655,7 +681,7 @@ StartingNewStage:
 	
 		UpdateSound 
 	
-	PlayThisSong #$02
+	PlayForever #BOSS_SONG
 
 		iny
 		lda (objectPtr_3A),Y
@@ -1206,7 +1232,7 @@ doneLoadingEnemyBatch:
 	beq skipHandlingCollision
 
 	UpdateSound 
-	PlayThisSFX #$04
+	PlayOnce #$04
 
 	jmp skipHandlingCollision
 	
@@ -1258,7 +1284,7 @@ doneLoadingEnemyBatch:
 		WaitUntilSoundFinishes
 		UpdateSound
 	
-	PlayThisSFX #$06
+		PlayOnce #$06
 		; ==============================
 
 		inc livesCounter_11
@@ -1271,7 +1297,7 @@ doneLoadingEnemyBatch:
 		; Sound effect =================
 		WaitUntilSoundFinishes
 		UpdateSound
-		PlayThisSFX #$07
+		PlayOnce #$07
 		; ==============================
 
 		lda powerLevel_64
@@ -1294,7 +1320,7 @@ doneLoadingEnemyBatch:
 		; Sound effect =================
 		WaitUntilSoundFinishes
 		UpdateSound
-		PlayThisSFX #$07
+		PlayOnce #$07
 		; ==============================
 
 		jsr AddOneHeart
@@ -1307,7 +1333,7 @@ doneLoadingEnemyBatch:
 		; Sound effect =================
 		WaitUntilSoundFinishes
 		UpdateSound
-		PlayThisSFX #$07
+		PlayOnce #$07
 		; ==============================
 
 		lda #PLAYER_SPEED_FAST
@@ -1324,7 +1350,7 @@ doneLoadingEnemyBatch:
 		:
 
 		; Sound effect =================
-		PlayThisSFX #$0C
+		PlayOnce #$0C
 		; ==============================
 
 		lda #MAGIC_LAMP_HEALTH_POINTS
@@ -1352,7 +1378,7 @@ doneLoadingEnemyBatch:
 	bne :+
 	WaitUntilSoundFinishes
 	UpdateSound
-	PlayThisSFX #$05
+	PlayOnce #$05
 
 	lda #$01
 	sta flagPlaySFX_8F
@@ -1393,7 +1419,7 @@ doneLoadingEnemyBatch:
 	cmp #$24
 	bne doneWithObjectCollision
 
-	PlayThisSong #$09
+	PlayForever #BOSS_DEATH_SFX
 
 
 	lda #$08
@@ -1791,7 +1817,7 @@ Data_at8BD7:
 	beq doneShooting
 	
 	:
-	PlayThisSFX #$03
+	PlayOnce #$03
 
 	doneShooting:
 		lda #$00
@@ -2874,7 +2900,7 @@ RegisterInput:
 	sta flagPPUControl_19
 	jsr RenderON
 	
-	PlayThisSong #$0B
+	PlayForever #ENDING_SONG
 
 	loopPressANYButton:
 		lda input1_20
@@ -2992,7 +3018,7 @@ RegisterInput:
 		sta PpuScroll_2005
 		
 		; play a sound effect
-		PlayThisSFX #$0A
+		PlayOnce #$0A
 
 		: ; advance to next screen position
 		Add16 vramAddress_67, #1
@@ -3882,7 +3908,7 @@ Data_atA80A:
 	beq :+
 	
 	StopPlaying
-	PlayThisSFX #$08
+	PlayOnce #$08
 
 	jmp exitPauseRoutine
 	
@@ -3891,11 +3917,11 @@ Data_atA80A:
 
 	lda flagUnknown_1A
 	beq :+
-	PlayThisSong #$02
+	PlayForever #BOSS_SONG
 	rts
 
 	:
-	PlayThisSong #$01
+	PlayForever #STAGE_SONG
 	
 	exitPauseRoutine:
 	rts
