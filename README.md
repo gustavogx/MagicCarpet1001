@@ -10,4 +10,10 @@ What you are seeing here is probably the only copy of its source code... until n
 
 I disassembled the original ROM and commented (most) of the code. The exception is the sound engine.
 
-I used this source code to learn about NES game programming and I am making it public so other people can do the same :)
+I used this source code to improve my NES programming skills and I am making it public so other people can do the same :)
+
+TODO LIST:
+
+- Remove duplicated data files.
+- Interpret and comment the sound engine.
+- Interpret and comment a few unknown routines in the main game.

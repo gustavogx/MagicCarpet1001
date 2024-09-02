@@ -1,6 +1,8 @@
-; The offset used to read from this list, stored in var_58
-; is the first byte in each file. 
-; The address itself is stored in otherObjPtr_38
+; The offset used to read from this list, 
+; stored in objectType_58, is the first byte in each file. 
+
+; The address itself is stored in objectPtr_38
+
 .addr Data_atAF06
 .addr Data_atAF12
 .addr Data_atAF1E
