@@ -285,7 +285,7 @@ paletteRAM_E0:			.res 32	; $E0 ; 4
 ;						 |||+------- 4: 
 ;						 ||+-------- 5: Player can shoot
 ;						 |+--------- 6:
-;						 +---------- 7: Object is valid
+;						 +---------- 7: Object is valid OR? flag if object has unresolved collision
 
 .define object_Attrib_2_0405 $0405 ; #2 of 10-byte file (flags) BIT6 = can collide
 ; object_Attrib_2_0405   7654 3210
@@ -861,22 +861,20 @@ doneLoadingEnemyBatch:
 		bit BIT_4
 		beq :++
 
-		jsr HandleObjectCollision
-		lda someObjProperty_0303,X
-		cmp #$02
-		bne :+
+			jsr HandleObjectCollision
+			lda someObjProperty_0303,X
+			cmp #$02
+			bne :+
 
-		lda #$FF
-		sta flagPlayerHit_1E
-		lda #$00
-		sta someObjProperty_0303,X
-	
-		:
-		jmp doneCheckingPlayerCollision
-
+				lda #$FF
+				sta flagPlayerHit_1E
+				lda #$00
+				sta someObjProperty_0303,X		
+			:
+			jmp doneCheckingPlayerCollision
 		:
 		lda object_Attrib_1_0404,X
-		bpl doneCheckingPlayerCollision
+		bpl doneCheckingPlayerCollision		; test BIT_7 for unresolved collision
 
 		lda object_X_Hi_0401,X
 		beq :+
@@ -949,6 +947,8 @@ doneLoadingEnemyBatch:
 .endproc
 ;
 ; $8369
+; Populate the Player's data ($0702-05) 
+; with its hitbox's vertices coordinates.
 .proc CalculatePlayerHitBox
 
 	lda object_X_Lo_0400			; get player's X position
@@ -1264,9 +1264,10 @@ doneLoadingEnemyBatch:
 .define SPAWNTYPE_PLAYERDEATH $03
 
 .define OBJPROP_CAN_COLLIDE	BIT_6
-; Checks if object with index in X hit something important.
-; X = 0 is the player
+
 .proc HandleObjectCollision
+; Checks if object with index X collided with something important.
+; 	X = 0 is the player
 	
 	PushXY
 	lda object_Attrib_2_0405,X		; Object status flags
@@ -1320,7 +1321,7 @@ doneLoadingEnemyBatch:
 			; ==============================
 
 			lda powerLevel_64
-			cmp #$04
+			cmp #PLAYER_MAX_POWER
 
 			bcc :+ 	; if didn't reach maximum power, continue to power increase
 					; else play sound cue and exit

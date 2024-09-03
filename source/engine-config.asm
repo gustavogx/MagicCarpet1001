@@ -4,6 +4,7 @@
 .define PLAYER_SPEED_SLOW		 $02
 .define PLAYER_SPEED_FAST		 $03
 .define HEART_HEALTH_POINTS 	 $04
+.define PLAYER_MAX_POWER		 $04
 .define MAGIC_LAMP_HEALTH_POINTS $50
 ; ====================================
 
@@ -28,11 +29,14 @@
 ; Other objects go after HEART
 .define FIRST_OBJECT_SLOT $04
 
+; Player's shots slots
 .define SHOT_OBJECT_START	$0C	;	12
-.define OBJECT_BYTE_SIZE	$06 ;	
-.define FREE_SHOT_SLOTS		$06	;	
-.define FREE_OBJECT_SLOTS	$20
+.define OBJECT_BYTE_SIZE	$06 ;	 6
+.define FREE_SHOT_SLOTS		$06	;	 6
 .define ENEMY_OBJECT_START	FREE_SHOT_SLOTS*OBJECT_BYTE_SIZE+SHOT_OBJECT_START
+
+; Enemy slots
+.define FREE_OBJECT_SLOTS	$20 ;	20
 
 .define VRAM_PALETTES_PAGE $3F
 
