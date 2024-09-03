@@ -49,7 +49,7 @@
 	; $02 every other frame	(30fps) (original)
 	; $03 every two frames 	(15fps)
 
-.if BG_SCROLL_RATE = $02
+.if BG_SCROLL_RATE = $01
 	; 27 if BG_SCROLL_RATE = 1
 	.define BG_SCROLL_LIMIT	 27
 .elseif BG_SCROLL_RATE = $02

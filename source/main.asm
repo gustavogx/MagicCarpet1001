@@ -104,16 +104,16 @@ velocityCarry_4B:		.res 1	; $4B ; 5
 velocityComponent_4C:	.res 1	; $4C ; 6
 iterator_4D:			.res 1	; $4D ; 6
 flagLoadShots_4E:		.res 1	; $4E ; 3
-hitboxXRight_4F:					.res 1	; $4F ; 2
+hitboxXRight_4F:		.res 1	; $4F ; 2
 
-hitboxXLeft_50:					.res 1	; $50 ; 4
-hitboxYBottom_51:					.res 1	; $51 ; 4
-hitboxYTop_52:					.res 1	; $52 ; 4
+hitboxXLeft_50:			.res 1	; $50 ; 4
+hitboxYBottom_51:		.res 1	; $51 ; 4
+hitboxYTop_52:			.res 1	; $52 ; 4
 .res 1 ; $53
-var_54:					.res 1	; $54 ; 6 ; object loading property
-var_55:					.res 1	; $55 ; 5 ; object loading property
-var_56:					.res 1	; $56 ; 5 ; object loading property
-var_57:					.res 1	; $57 ; 5 ; object loading property
+new_X_Lo_54:			.res 1	; $54 ; 5 ; used by SpawnObject and SpawnEnemy
+new_X_Hi_55:			.res 1	; $55 ; 5 ; object loading property
+new_Y_Lo_56:			.res 1	; $56 ; 5 ; object loading property
+new_Y_Hi_57:			.res 1	; $57 ; 5 ; object loading property
 objectType_58:			.res 1	; $58 ; 5
 objIndexStep_59:		.res 1	; $59 ; 5 ; it is either +6 or -6
 var_5A:					.res 1	; $5A ; 3
@@ -734,17 +734,17 @@ StartingNewStage:
 		sta objectType_58		; #1 byte of object file
 		iny
 		lda (objectPtr_3A),Y
-		sta var_54				; X position, #2 byte of object file
+		sta new_X_Lo_54				; X position, #2 byte of object file
 		iny
 		lda (objectPtr_3A),Y
-		sta var_55				; #3 byte of object file
+		sta new_X_Hi_55				; #3 byte of object file
 		iny
 		lda (objectPtr_3A),Y
-		sta var_56				; Y position, #4 byte of object file
+		sta new_Y_Lo_56				; Y position, #4 byte of object file
 		iny
 		lda (objectPtr_3A),Y
-		sta var_57				; #5 byte of object file
-		jsr LoadEnemyType		; Use's objectType_58 to load the specific enemy type
+		sta new_Y_Hi_57				; #5 byte of object file
+		jsr SpawnEnemy		; Use's objectType_58 to load the specific enemy type
 		iny
 		jmp loopYLoadObject
 
@@ -762,7 +762,7 @@ doneLoadingEnemyBatch:
 .endproc
 ;
 ; $822F
-.proc LoadEnemyType
+.proc SpawnEnemy
 	tya
 	pha
 
@@ -776,7 +776,7 @@ doneLoadingEnemyBatch:
 	sta objectPtr_34+1
 
 	; objectType_58 holds the index (address offset) for a given enemy's data
-	lda objectType_58					; this was the FIRST byte loaded from the object file
+	lda objectType_58			; this was the FIRST byte loaded from the object file
 	asl A						; multiply by 2 since address are WORDs (2 bytes)
 	tay
 	lda (objectPtr_34),Y		; lo-byte of a given enemy data
@@ -801,10 +801,10 @@ doneLoadingEnemyBatch:
 	sta object_Attrib_2_0405,X	; store #2 byte of 10
 	iny
 	lda (objectPtr_38),Y		; loads #3 byte of 10
-	sta objectWidth_0600,X	; stores #3 byte of 10
+	sta objectWidth_0600,X		; stores #3 byte of 10
 	iny
 	lda (objectPtr_38),Y		; loads #4 byte of 10
-	sta objectHeight_0601,X	; stores #4 byte of 10
+	sta objectHeight_0601,X		; stores #4 byte of 10
 	iny
 	lda (objectPtr_38),Y		; loads #5 byte of 10 - Health points
 	sta healthPoints_0603,X		; stores #5 byte of 10
@@ -825,13 +825,13 @@ doneLoadingEnemyBatch:
 	sta someObjProperty_0700,X	; stores #10 byte of 10
 	sta someObjProperty_0300,X	; stores #10 byte of 10
 	
-	lda var_54
+	lda new_X_Lo_54
 	sta object_X_Lo_0400,X 	; X position, #2 byte of object file
-	lda var_55
+	lda new_X_Hi_55
 	sta object_X_Hi_0401,X	; #3 byte of object file
-	lda var_56
+	lda new_Y_Lo_56
 	sta object_Y_Lo_0402,X	; Y position, #4 byte of object file
-	lda var_57
+	lda new_Y_Hi_57
 	sta object_Y_Hi_0403,X	; #5 byte of object file
 	
 	lda #$00
@@ -841,7 +841,7 @@ doneLoadingEnemyBatch:
 	sta someObjProperty_0303,X	; zero out 
 
 	lda #BIT7
-	sta object_Attrib_1_0404,X ; Object Control Flags(?)
+	sta object_Attrib_1_0404,X ; Set as VALID OBJECT
 	pla
 	tay
 	rts
@@ -1293,7 +1293,7 @@ doneLoadingEnemyBatch:
 	
 	:
 	lda #SPAWNTYPE_NOTHING					
-	jmp handleSpawnDeathAnimation
+	jmp handleDespawning
 
 	handlePickups:
 
@@ -1398,7 +1398,7 @@ doneLoadingEnemyBatch:
 		bne :+
 		
 		lda #SPAWNTYPE_PUFF ; $02
-		bne handleSpawnDeathAnimation
+		bne handleDespawning
 	
 	:
 	cmp #OBJTYPE_PLAYER; $1A
@@ -1410,39 +1410,39 @@ doneLoadingEnemyBatch:
 		lda #TRUE
 		sta flagPlaySFX_8F
 		lda #SPAWNTYPE_PLAYERDEATH ; $03
-		bne handleSpawnDeathAnimation
+		bne handleDespawning
 	
 	:
 	cmp #(BIT1|BIT4|BIT5); $32
 	bne :+
 
 	lda #$04
-	bne handleSpawnDeathAnimation
+	bne handleDespawning
 	
 	:
 	cmp #(BIT0|BIT1|BIT4|BIT5); $33
 	bne :+
 
 	lda #$05
-	bne handleSpawnDeathAnimation
+	bne handleDespawning
 	
 	:
 	cmp #$34
 	bne :+
 	lda #$06
-	bne handleSpawnDeathAnimation
+	bne handleDespawning
 	
 	:
 	cmp #$35
 	bne :+
 	lda #$07
-	bne handleSpawnDeathAnimation
+	bne handleDespawning
 	
 	:
 	cmp #$36
 	bne :+
 	lda #$0C
-	bne handleSpawnDeathAnimation
+	bne handleDespawning
 	
 	:
 	cmp #$24
@@ -1456,30 +1456,33 @@ doneLoadingEnemyBatch:
 	adc currentStage_15
 	sbc #$00
 	
-	handleSpawnDeathAnimation:
-		sta objectType_58
+	handleDespawning:
+		sta objectType_58			; death animation index
+		
 		lda object_Attrib_1_0404,X
 		and #BIT5 ; check if this object spawns another?
 		beq doneWithObjectCollision
 
 		clc
 		lda object_X_Lo_0400,X
-		sta var_54
+		sta new_X_Lo_54
 		lda object_X_Hi_0401,X
-		adc #$00
-		sta var_55
+		adc #$00					; there's no adc before. this is pointless
+		sta new_X_Hi_55
 		clc
 		lda object_Y_Lo_0402,X
-		sta var_56
+		sta new_Y_Lo_56
 		lda object_Y_Hi_0403,X
-		adc #$00
-		sta var_57
+		adc #$00					; there's no adc before. this is pointless
+		sta new_Y_Hi_57
 		jsr SpawnObject
 
 	doneWithObjectCollision:
+
 		PullXY
-		lda #$00
+		lda #ZERO
 		sta object_Attrib_1_0404,X
+
 	rts
 .endproc
 ;
@@ -1508,9 +1511,11 @@ doneLoadingEnemyBatch:
 ; $86A9
 ; Load object objectType_58 from ROM to an empty slot X
 .proc SpawnObject
+	
 	jsr FindFreeObjectSlot_rX
 	cpx #$F0
 	bcc :+
+	
 	rts
 	
 	:
@@ -1535,13 +1540,13 @@ doneLoadingEnemyBatch:
 	sta someObjProperty_0302,X
 	lda Data_at8715+7,Y
 	sta someObjProperty_0303,X
-	lda var_54
+	lda new_X_Lo_54
 	sta object_X_Lo_0400,X
-	lda var_55
+	lda new_X_Hi_55
 	sta object_X_Hi_0401,X
-	lda var_56
+	lda new_Y_Lo_56
 	sta object_Y_Lo_0402,X
-	lda var_57
+	lda new_Y_Hi_57
 	sta object_Y_Hi_0403,X
 	lda #$00
 	sta someObjProperty_0503,X
@@ -1551,14 +1556,15 @@ doneLoadingEnemyBatch:
 	sta someObjProperty_0300,X
 	sta someObjProperty_0301,X
 	lda #BIT7
-	sta object_Attrib_1_0404,X
+	sta object_Attrib_1_0404,X ; Set VALID OBJECT
+
 	rts
 .endproc
 ;
 ; $8715
 ; Object type table?
 Data_at8715:
-.include "objects_IdentifyMe.inc"
+.include "despawn_objects.inc"
 ;
 ; $8AEA
 .proc GenerateDrop ; Generate a random drop
@@ -3335,6 +3341,8 @@ Data_at9ED6:
 ; $A46F
 ; HandleObjectsUpdates
 ; This routine updates every object of the game, every VBlank time.
+; THIS IS BAD PROGRAMING!
+; This routine doesn't fit during vblank.
 .proc HandleObjectsUpdates
 
 	lda #FIRST_OBJECT_SLOT		; Configuration constant
@@ -3637,7 +3645,7 @@ Data_at9ED6:
 		sta var_44  				; store W in temp variable
 		iny							; next value
 		lda (addressPtr_32),Y		; reads	object HEIGHT in pixels
-		sta objectHeight_0601,X	; store HEIGHT in pixels
+		sta objectHeight_0601,X		; store HEIGHT in pixels
 		lsr A						; divide by 8 (get size in tiles)
 		lsr A
 		lsr A
