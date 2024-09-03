@@ -9,8 +9,12 @@
 ; ====================================
 
 ; Engine Configuration ===============
+.define ENEMY_WAVES_TO_FIRST	$0A
+.define ENEMY_WAVES_TRIGGER		$FA
+.define ENEMY_WAVES_TO_NEXT		$F0
+.define ENEMY_WAVES_STEP		$01
 
-; Heart is object zero (not shuffled)
+; Heart is object zero (never shuffled)
 .define HEART_HUD_Y		$D8
 .define HEART_OFFSCREEN $F8
 .define HEART_HUD_TILE	$81
@@ -45,7 +49,7 @@
 	; $02 every other frame	(30fps) (original)
 	; $03 every two frames 	(15fps)
 
-.if BG_SCROLL_RATE = $01
+.if BG_SCROLL_RATE = $02
 	; 27 if BG_SCROLL_RATE = 1
 	.define BG_SCROLL_LIMIT	 27
 .elseif BG_SCROLL_RATE = $02

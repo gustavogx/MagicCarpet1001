@@ -85,7 +85,7 @@ objectPtr_38:			.res 2	; $38 ; 14 (word address)
 objectPtr_3A:			.res 2	; $3A ; 13 (word address)
 ; $3B low byte of $3A
 counter_W_3C:			.res 1	; $3C ; 2
-var_3D:					.res 1	; $3D ; 3
+beingUpdated_3D:					.res 1	; $3D ; 3
 oamAddressPtr_3E:		.res 2	; $3E ; 6 (word address)
 ; $3F low byte of $3E
 
@@ -104,11 +104,11 @@ velocityCarry_4B:		.res 1	; $4B ; 5
 velocityComponent_4C:	.res 1	; $4C ; 6
 iterator_4D:			.res 1	; $4D ; 6
 flagLoadShots_4E:		.res 1	; $4E ; 3
-var_4F:					.res 1	; $4F ; 2
+hitboxXRight_4F:					.res 1	; $4F ; 2
 
-var_50:					.res 1	; $50 ; 4
-var_51:					.res 1	; $51 ; 4
-var_52:					.res 1	; $52 ; 4
+hitboxXLeft_50:					.res 1	; $50 ; 4
+hitboxYBottom_51:					.res 1	; $51 ; 4
+hitboxYTop_52:					.res 1	; $52 ; 4
 .res 1 ; $53
 var_54:					.res 1	; $54 ; 6 ; object loading property
 var_55:					.res 1	; $55 ; 5 ; object loading property
@@ -287,7 +287,7 @@ paletteRAM_E0:			.res 32	; $E0 ; 4
 ;						 |+--------- 6:
 ;						 +---------- 7: Object is valid OR? flag if object has unresolved collision
 
-.define object_Attrib_2_0405 $0405 ; #2 of 10-byte file (flags) BIT6 = can collide
+.define object_Attrib_2_0405 $0405 ; #2 of 10-byte file (flags) 
 ; object_Attrib_2_0405   7654 3210
 ; 						 |||| |||+-- 0:
 ;						 |||| ||+--- 1: Enemy is part of a set
@@ -297,6 +297,9 @@ paletteRAM_E0:			.res 32	; $E0 ; 4
 ;						 ||+-------- 5:
 ;						 |+--------- 6: Obj can collide
 ;						 +---------- 7:
+.define OBJPROP_PARTOF_SET 	BIT_1
+.define OBJPROP_STAGE_BOSS	BIT_4
+.define OBJPROP_CAN_COLLIDE	BIT_6
 
 ; page 05
 .define someObjProperty_0500 $0500
@@ -511,7 +514,7 @@ StartingNewStage:
 	sta flagPPUControl_17
 	sta flagPPUControl_19
 	
-	lda #$0A
+	lda #ENEMY_WAVES_TO_FIRST
 	sta nextEnemyWave_5C
 	
 	lda #$00
@@ -624,7 +627,7 @@ StartingNewStage:
 ; If timer larger than or equal to $FA, spawn new batch.
 .proc LoadEnemyBatch
 	lda nextEnemyWave_5C 		; count down until next batch load
-	cmp #$FA					; will load next batch if counter >= $FA 
+	cmp #ENEMY_WAVES_TRIGGER	; will load next batch if counter >= $FA 
 	bcs :+						; continue if it is time to load
 	jmp doneLoadingEnemyBatch	; exit 
 
@@ -751,7 +754,7 @@ doneLooping:
 
 	lda nextEnemyWave_5C
 	clc
-	adc #$F0
+	adc #ENEMY_WAVES_TO_NEXT
 	sta nextEnemyWave_5C
 
 doneLoadingEnemyBatch:
@@ -1045,19 +1048,19 @@ doneLoadingEnemyBatch:
 	
 	:
 	lda object_Attrib_2_0405,Y	; object flags
-	bit BIT_6					; test for BIT 6: object can collide
+	bit OBJPROP_CAN_COLLIDE		; test for BIT 6: object can collide
 	bne :+						; if flag set, continue
 	jmp DoneWithThis			; if not, break
 	
 	:	; flag 6 is set: object has collision enabled
 	lda objectHitBox_Left_X_0702,Y ;
-	sta var_4F
+	sta hitboxXRight_4F
 	lda objectHitBox_Right_X_0703,Y
-	sta var_50
+	sta hitboxXLeft_50
 	lda objectHitBox_Top_Y_0704,Y
-	sta var_51
+	sta hitboxYBottom_51
 	lda objectHitBox_Bottom_Y_0705,Y
-	sta var_52
+	sta hitboxYTop_52
 	
 	ldx #$30
 	AnotherCheckAndLeave:
@@ -1079,15 +1082,15 @@ doneLoadingEnemyBatch:
 	
 	: ; $843B
 	lda objectHitBox_Left_X_0702,X
-	cmp var_50
+	cmp hitboxXLeft_50
 	bcs StartLeaving
-	lda var_4F
+	lda hitboxXRight_4F
 	cmp objectHitBox_Right_X_0703,X
 	bcs StartLeaving
 	lda objectHitBox_Top_Y_0704,X
-	cmp var_52
+	cmp hitboxYTop_52
 	bcs StartLeaving
-	lda var_51
+	lda hitboxYBottom_51
 	cmp objectHitBox_Bottom_Y_0705,X
 	bcs StartLeaving
 	lda healthPoints_0603,X
@@ -1183,67 +1186,70 @@ doneLoadingEnemyBatch:
 ;
 ; $84E2
 .proc UnknownSub9
-	PushXY
-	lda object_Attrib_2_0405,X
-	bit BIT_4					; object collided with enemy?
-	bne :+						; if YES set, continue below
-	jmp doHandleObjCollision	; if NOT, skip to uniary-collision
-	
 
+	PushXY
+
+	lda object_Attrib_2_0405,X
+	bit OBJPROP_STAGE_BOSS		; object is a TODO! NOT BOSS
+	bne :+						; if YES set, continue below
+		jmp doHandleObjCollision	; if NOT, skip to uniary-collision
+	
 	:  
 	bit BIT_0					
 	beq :+						
 
-	lda var_2B
-	beq doHandleObjCollision
-	sec
-	sbc #$01
-	sta var_2B
-	cmp #$01
-	bne doALSOHandleObjCollision
-	sta flagGenDrop_2E
-	jsr GenerateDrop
-	jmp doHandleObjCollision
+		lda var_2B
+		beq doHandleObjCollision
+		sec
+		sbc #$01
+		sta var_2B
+		cmp #$01
+		bne doALSOHandleObjCollision
+		sta flagGenDrop_2E
+		jsr GenerateDrop
+		jmp doHandleObjCollision
 	
-	:  ; Enemy set (may spawn a drop)
-	bit BIT_1					; enemy is part of set?
+	:  
+	bit OBJPROP_PARTOF_SET		; enemy is part of set?
 	beq :+						; if not, break.
 
-	lda enemySetSize_2C
-	beq doHandleObjCollision
-	sec
-	sbc #$01
-	sta enemySetSize_2C
-	cmp #$01
-	bne doALSOHandleObjCollision
-	sta flagGenDrop_2E			; if an enemy set was completed, generate a drop
-	jsr GenerateDrop
-	jmp doHandleObjCollision
+		lda enemySetSize_2C
+		beq doHandleObjCollision
+		sec
+		sbc #$01
+		sta enemySetSize_2C
+		cmp #$01
+		bne doALSOHandleObjCollision
+		
+		sta flagGenDrop_2E			; if an enemy set was completed, generate a drop
+		jsr GenerateDrop
+		jmp doHandleObjCollision
 	
 	:
 	bit BIT_3
 	beq doALSOHandleObjCollision
-	cpy #$00
-	bne skipHandlingCollision
+		cpy #$00
+		bne skipHandlingCollision
 	
 	doALSOHandleObjCollision:
-	jsr HandleObjectCollision
-	lda soundIndex_8D
-	cmp #$05
-	beq skipHandlingCollision
+		jsr HandleObjectCollision
+		lda soundIndex_8D
+		cmp #$05
+		beq skipHandlingCollision
 
-	; Sound effect =================
-	ResetSoundEngine 
-	PlaySoundOnce #ENEMY_DEATH_SFX
-	; ==============================
+		; Sound effect =================
+		ResetSoundEngine 
+		PlaySoundOnce #ENEMY_DEATH_SFX
+		; ==============================
 
-	jmp skipHandlingCollision
+		jmp skipHandlingCollision
 	
 	doHandleObjCollision:
-	jsr HandleObjectCollision
+		jsr HandleObjectCollision
 
 	skipHandlingCollision:
 	PullXY
+
 	rts
 .endproc
 ;
@@ -1262,8 +1268,6 @@ doneLoadingEnemyBatch:
 .define SPAWNTYPE_NOTHING	$00
 .define SPAWNTYPE_PUFF		$02
 .define SPAWNTYPE_PLAYERDEATH $03
-
-.define OBJPROP_CAN_COLLIDE	BIT_6
 
 .proc HandleObjectCollision
 ; Checks if object with index X collided with something important.
@@ -1922,10 +1926,10 @@ Data_at8BD7:
 	sta object_Y_Hi_0403,X
 	sta healthPoints_0603,X
 
-	lda #BIT6					; set attribute
+	lda #BIT6					; SET COLLISION ON
 	sta object_Attrib_2_0405,X
 
-	lda #BIT7					; set attribute
+	lda #BIT7					; VALID OBJECT
 	sta object_Attrib_1_0404,X
 	
 	rts
@@ -2215,7 +2219,7 @@ Data_at8E3F:
 
 	lda #$01
 	sta someObjProperty_0602,X
-	lda #$60
+	lda #(BIT5+BIT6)
 	sta object_Attrib_2_0405,X
 	lda #$04
 	sta objectWidth_0600,X
@@ -3169,77 +3173,85 @@ Data_at9ED6:
 ;
 ; $A3AC
 .proc HandleVBlank
-PushAXY
+
+	PushAXY
+	
 	lda updateDuringVBlank_0E
 	cmp #$57
 	beq :+
+	
 	jmp doUpdateSoundOnly
 
 	:
-	lda updateDuringVBlank_0F
-	cmp #$75
-	beq :+
-	jmp doUpdateSoundOnly
+		lda updateDuringVBlank_0F
+		cmp #$75
+		beq :+
+
+		jmp doUpdateSoundOnly
 
 	:						; Setup OAM DMA
-	lda #$00			
-	sta OamAddr_2003		; reset DMA pointer to begining of OAM
-	lda #>OAM_0200			; setup page number of OAM mirror in RAM
-	sta SpriteDma_4014		; trigger sprite DMA from RAM to OAM
+		lda #$00			
+		sta OamAddr_2003		; reset DMA pointer to begining of OAM
+		lda #>OAM_0200			; setup page number of OAM mirror in RAM
+		sta SpriteDma_4014		; trigger sprite DMA from RAM to OAM
 
-	lda PpuStatus_2002
-	inc frameCounter_12
-	lda frameCounter_12
-	and #63 				; $3F = every 62 frames, increase aliveTimer
-	bne :+
-	inc aliveTimer_14
-	inc frameCounter62_13
+		lda PpuStatus_2002
+		inc frameCounter_12
+		lda frameCounter_12
+		and #63 				; $3F = every 62 frames, increase aliveTimer
+		bne :+
+
+		inc aliveTimer_14
+		inc frameCounter62_13
 
 	:
-	lda flagNextLevel_1B
-	bne doLevelTransition
-	ldy currentStage_15
-	bne dontLevelTransition
+		lda flagNextLevel_1B
+		bne doLevelTransition
+		ldy currentStage_15
+		bne dontLevelTransition
 
 	doLevelTransition:
-	jsr ReadControl_1
-	jmp doUpdateSoundOnly
+		jsr ReadControl_1
+		jmp doUpdateSoundOnly
 
 	dontLevelTransition:
-	lda flagPause_1C
-	beq gameNotPaused
-	jsr HandleControllerInputs
+		lda flagPause_1C
+		beq gameNotPaused
 
-	jmp doUpdateSoundOnly
+		jsr HandleControllerInputs
+		jmp doUpdateSoundOnly
 
 	gameNotPaused:
-	jsr HandleScrollingControl
-	lda screenScrollX_29
-	sta PpuScroll_2005
-	lda #$00
-	sta PpuScroll_2005
-	lda flagPPUControl_19
-	sta PpuControl_2000
+		jsr HandleScrollingControl
+		lda screenScrollX_29
+		sta PpuScroll_2005
+		lda #$00
+		sta PpuScroll_2005
+		lda flagPPUControl_19
+		sta PpuControl_2000
 	
-	lda frameCounter_12
-	and #$01 				; Checking if this is an ODD frame
-	bne :+					; Skip if ODD
-	dec nextEnemyWave_5C	; Decrement the counter for next enemy batch on EVEN frames
+		lda frameCounter_12
+		and #$01 				; Checking if this is an ODD frame
+		bne :+					; Skip if ODD
+
+		dec nextEnemyWave_5C	; Decrement the counter for next enemy batch on EVEN frames
+
+	:
+		lda var_5E
+		beq :+
+
+		jsr HandleControllerInputs
+		jsr HandleObjectsUpdates
 	
 	:
-	lda var_5E
-	beq :+
-	jsr HandleControllerInputs
-	jsr HandleObjects
-	
-	:
-	jsr PowerUpCheat
+		jsr PowerUpCheat
 
 	doUpdateSoundOnly:
-	UpdateSoundDuringVBlank
+		UpdateSoundDuringVBlank
 
 	PullAXY
-	RTI
+	
+	rti
 .endproc
 ;
 ; $A424
@@ -3294,10 +3306,10 @@ PushAXY
 .proc UnusedFunction1
 	
 	:
-	jsr UnusedFunction2
-	bit someObjProperty_0100
-	dex
-	bne :-
+		jsr UnusedFunction2
+		bit someObjProperty_0100
+		dex
+		bne :-
 	rts
 .endproc
 ;
@@ -3305,375 +3317,401 @@ PushAXY
 .proc UnusedFunction2
 	txa
 	pha
+
 	ldx #$00
 	:
 	inx
 	cpx #$0F
 	bne :-
+	
 	pla
 	tax
 	tax
+	
 	rts
+
 .endproc
 ;
 ; $A46F
-; HandleObjects
+; HandleObjectsUpdates
 ; This routine updates every object of the game, every VBlank time.
-.proc HandleObjects
+.proc HandleObjectsUpdates
+
 	lda #FIRST_OBJECT_SLOT		; Configuration constant
 	sta oamAddressPtr_3E		; Store first OAM address
 	
 	lda objectIndex_5F			; Object index, initialized with $00
-	sta var_3D					; Store current object index
+	sta beingUpdated_3D			; Store current object index
 	
 	BeginHere:
-	ldx objectIndex_5F			; load object index into X
-	lda object_Attrib_1_0404,X	; check if object should be handled
-	bmi :+						; if negative, handle object
-	jmp UpdateObjectIndex		; else move forward.
+		ldx objectIndex_5F			; load object index into X
+		lda object_Attrib_1_0404,X	; check if object should be handled
+		bmi :+						; if negative, handle object
+		
+		jmp UpdateObjectIndex		; else move forward.
 	
 	:
-	ldy someObjProperty_0504,X
-	beq :+
-	dec someObjProperty_0504,X
-	dec someObjProperty_0503,X
-	jmp ReplaceMeLabel_2
+		ldy someObjProperty_0504,X
+		beq :+
+		
+		dec someObjProperty_0504,X
+		dec someObjProperty_0503,X
+		jmp ReplaceMeLabel_2
 	
 	:
-	lda someObjProperty_0501,X
-	sta objectPtr_36+0
-	lda someObjProperty_0502,X
-	sta objectPtr_36+1
-	ldy someObjProperty_0503,X
+		lda someObjProperty_0501,X
+		sta objectPtr_36+0
+		lda someObjProperty_0502,X
+		sta objectPtr_36+1
+		ldy someObjProperty_0503,X
 	
 	ReplaceMeLabel_7:
-	lda (objectPtr_36),Y ; reads which object to load
-	bmi :+				 ; if index is negative, skip ahead
-	jmp RetrieveObject   ; if index is positive, will load
+		lda (objectPtr_36),Y ; reads which object to load
+		bmi :+				 ; if index is negative, skip ahead
+		
+		jmp RetrieveObject   ; if index is positive, will load
 	
 	:
-	asl A
-	bmi ReplaceMeLabel_1
-	lsr A
-	sbc #$00
-	sta someObjProperty_0504,X
+		asl A
+		bmi ReplaceMeLabel_1
+		lsr A
+		sbc #$00
+		sta someObjProperty_0504,X
 	
 	ReplaceMeLabel_2:
-	lda object_Attrib_2_0405,X
-	bpl ReplaceMeLabel_4
-	lda var_0C
-	bpl :+
-	lda #$FF
-	bne :++
+		lda object_Attrib_2_0405,X
+		bpl ReplaceMeLabel_4
+		lda var_0C
+		bpl :+
+
+		lda #$FF
+		bne :++
 	
 	:
-	lda #$00
+		lda #$00
 	
 	:
-	sta tile_X_Hi_47
-	lda var_0C
-	clc
-	adc object_X_Lo_0400,X
-	sta object_X_Lo_0400,X
-	sta var_40
-	lda tile_X_Hi_47
-	adc object_X_Hi_0401,X
-	sta object_X_Hi_0401,X
-	sta var_41
-	lda var_0D
-	bpl :+
-	lda #$FF
-	bne :++
+		sta tile_X_Hi_47
+		lda var_0C
+		clc
+		adc object_X_Lo_0400,X
+		sta object_X_Lo_0400,X
+		sta var_40
+		lda tile_X_Hi_47
+		adc object_X_Hi_0401,X
+		sta object_X_Hi_0401,X
+		sta var_41
+		lda var_0D
+		bpl :+
+
+		lda #$FF
+		bne :++
 	
 	:
-	lda #$00
+		lda #$00
 	
 	:
-	sta var_49
-	lda var_0D
-	clc
-	adc object_Y_Lo_0402,X
-	sta object_Y_Lo_0402,X
-	sta tile_Y_Lo_42
-	lda var_49
-	adc object_Y_Hi_0403,X
-	sta object_Y_Hi_0403,X
-	sta tile_Y_Hi_43
-	jmp ReplaceMeLabel_5
+		sta var_49
+		lda var_0D
+		clc
+		adc object_Y_Lo_0402,X
+		sta object_Y_Lo_0402,X
+		sta tile_Y_Lo_42
+		lda var_49
+		adc object_Y_Hi_0403,X
+		sta object_Y_Hi_0403,X
+		sta tile_Y_Hi_43
+		jmp ReplaceMeLabel_5
 	
 	ReplaceMeLabel_4:
-	lda object_X_Lo_0400,X
-	sta var_40
-	lda object_X_Hi_0401,X
-	sta var_41
-	lda object_Y_Lo_0402,X
-	sta tile_Y_Lo_42
-	lda object_Y_Hi_0403,X
-	sta tile_Y_Hi_43
+		lda object_X_Lo_0400,X
+		sta var_40
+		lda object_X_Hi_0401,X
+		sta var_41
+		lda object_Y_Lo_0402,X
+		sta tile_Y_Lo_42
+		lda object_Y_Hi_0403,X
+		sta tile_Y_Hi_43
 	
 	ReplaceMeLabel_5:
-	inc someObjProperty_0503,X
-	lda someObjProperty_0701,X
-	tax
-	lda Data_atA895+0,X
-	sta addressPtr_32+0
-	lda Data_atA895+1,X
-	sta addressPtr_32+1
-	ldx objectIndex_5F
-	jmp ReplaceMeLabel_6
+		inc someObjProperty_0503,X
+		lda someObjProperty_0701,X
+		tax
+		lda Data_atA895+0,X
+		sta addressPtr_32+0
+		lda Data_atA895+1,X
+		sta addressPtr_32+1
+		ldx objectIndex_5F
+		jmp ReplaceMeLabel_6
 	
 	ReplaceMeLabel_1:
-	asl A
-	bmi loopTest
-	dec someObjProperty_0505,X
-	lda someObjProperty_0505,X
-	bne :+
-	iny
-	iny
-	jmp ReplaceMeLabel_7
+		asl A
+		bmi loopTest
+		dec someObjProperty_0505,X
+		lda someObjProperty_0505,X
+		bne :+
+		iny
+		iny
+		jmp ReplaceMeLabel_7
 	
 	:
-	bpl loop
-	lda (objectPtr_36),Y
-	and #$1F
-	sta someObjProperty_0505,X
-	
-	loop:
-		iny
+		bpl loop
+
 		lda (objectPtr_36),Y
-		tay
-		lda (objectPtr_36),Y
-		jmp RetrieveObject
+		and #(BIT4+LOWER)
+		sta someObjProperty_0505,X
 		
-		loopTest:
-		cmp #$F8
-		beq loop
+		loop:
+			iny
+			lda (objectPtr_36),Y
+			tay
+			lda (objectPtr_36),Y
+			jmp RetrieveObject
+			
+			loopTest:
+			cmp #$F8
+			beq loop
+		
 		asl A
 		bmi :+
-	
-	lsr A
-	lsr A
-	lsr A
-	and #$0F
-	lda object_Attrib_1_0404,X
-	ora #$08
-	sta object_Attrib_1_0404,X
-	jmp UpdateObjectIndex
-	
-	:
-	lda someObjProperty_0303,X
-	cmp #$03
-	bne :+
-	beq :++
+
+		lsr A
+		lsr A
+		lsr A
+		and #$0F
+		lda object_Attrib_1_0404,X
+		ora #$08
+		sta object_Attrib_1_0404,X
+		jmp UpdateObjectIndex
 	
 	:
-	cmp #$04
-	bne :++
-	lda #$01
-	sta flagNextLevel_1B
+		lda someObjProperty_0303,X
+		cmp #$03
+		bne :+
+		beq :++
 	
 	:
-	lda #$00
-	sta someObjProperty_0302,X
-	sta someObjProperty_0303,X
+		cmp #$04
+		bne :++
+		lda #$01
+		sta flagNextLevel_1B
 	
 	:
-	cmp #$05
-	bne :+ 
-	jsr Copy_5BytesPage05_FromEnd_ToBeginning
-	jmp :++
+		lda #$00
+		sta someObjProperty_0302,X
+		sta someObjProperty_0303,X
 	
 	:
-	lda #$10
-	sta object_Attrib_1_0404,X
+		cmp #$05
+		bne :+ 
+		jsr Copy_5BytesPage05_FromEnd_ToBeginning
+		jmp :++
 	
 	:
-	jmp UpdateObjectIndex
+		lda #$10
+		sta object_Attrib_1_0404,X
+	
+	:
+		jmp UpdateObjectIndex
 	
 	RetrieveObject:				; A holds index for object to be loaded
-	asl A						; index is doubled since addresses are 16bit (double stride)
-	sta someObjProperty_0701,X 	; store obj index
-	tax							; start using index as X offset
-	lda Data_atA895+0,X 		; Data_atA895 is the animation frames book.
-	sta addressPtr_32+0
-	lda Data_atA895+1,X
-	sta addressPtr_32+1 		; Now addressPtr_32 points to the animation frame
-	iny
-	ldx objectIndex_5F
-	lda object_Attrib_2_0405,X
-	bpl :+
-	lda (objectPtr_36),Y
-	clc
-	adc var_0C
-	jmp :++
+		asl A						; index is doubled since addresses are 16bit (double stride)
+		sta someObjProperty_0701,X 	; store obj index
+		tax							; start using index as X offset
+		lda Data_atA895+0,X 		; Data_atA895 is the animation frames book.
+		sta addressPtr_32+0
+		lda Data_atA895+1,X
+		sta addressPtr_32+1 		; Now addressPtr_32 points to the animation frame
+		iny
+		ldx objectIndex_5F
+		lda object_Attrib_2_0405,X
+		bpl :+
+
+		lda (objectPtr_36),Y
+		clc
+		adc var_0C
+		jmp :++
 	
 	:
 	lda (objectPtr_36),Y
 	
 	:
-	sta tile_X_Lo_46
-	bpl :+
-	lda #$FF
-	bne :++
+		sta tile_X_Lo_46
+		bpl :+
+
+		lda #$FF
+		bne :++
 	
 	:
-	lda #$00
+		lda #$00
 	
 	:
-	sta tile_X_Hi_47
-	lda tile_X_Lo_46
-	clc
-	adc object_X_Lo_0400,X
-	sta object_X_Lo_0400,X
-	sta var_40
-	lda tile_X_Hi_47
-	adc object_X_Hi_0401,X
-	sta object_X_Hi_0401,X
-	sta var_41
-	iny
-	lda object_Attrib_2_0405,X
-	bpl :+
-	lda (objectPtr_36),Y
-	clc
-	adc var_0D
-	jmp :++
+		sta tile_X_Hi_47
+		lda tile_X_Lo_46
+		clc
+		adc object_X_Lo_0400,X
+		sta object_X_Lo_0400,X
+		sta var_40
+		lda tile_X_Hi_47
+		adc object_X_Hi_0401,X
+		sta object_X_Hi_0401,X
+		sta var_41
+		iny
+		lda object_Attrib_2_0405,X
+		bpl :+
+
+		lda (objectPtr_36),Y
+		clc
+		adc var_0D
+		jmp :++
 	
 	:
-	lda (objectPtr_36),Y
+		lda (objectPtr_36),Y
 	
 	:
-	sta var_48
-	bpl :+
-	lda #$FF
-	bne :++
+		sta var_48
+		bpl :+
+	
+		lda #$FF
+		bne :++
 	
 	:
-	lda #$00
+		lda #$00
 	
 	:
-	sta var_49
-	lda var_48
-	clc
-	adc object_Y_Lo_0402,X
-	sta object_Y_Lo_0402,X
-	sta tile_Y_Lo_42
-	lda var_49
-	adc object_Y_Hi_0403,X
-	sta object_Y_Hi_0403,X
-	sta tile_Y_Hi_43
-	iny
-	tya
-	sta someObjProperty_0503,X
+		sta var_49
+		lda var_48
+		clc
+		adc object_Y_Lo_0402,X
+		sta object_Y_Lo_0402,X
+		sta tile_Y_Lo_42
+		lda var_49
+		adc object_Y_Hi_0403,X
+		sta object_Y_Hi_0403,X
+		sta tile_Y_Hi_43
+		iny
+		tya
+		sta someObjProperty_0503,X
 	
 	ReplaceMeLabel_6:
-	lda object_Attrib_1_0404,X
-	and #BIT5
-	bne :+
-	jmp UpdateObjectIndex
+		lda object_Attrib_1_0404,X
+		and #BIT5
+		bne :+
+
+		jmp UpdateObjectIndex
 	
 	:
-	lda object_Attrib_2_0405,X
-	and #(BIT3+BIT4)
-	beq :+
-	lda frameCounter_12
-	and #(BIT0+BIT1)
-	bne :+
-	dec someObjProperty_0300,X
-	lda someObjProperty_0300,X
-	bne :+
-	lda object_Attrib_1_0404,X
-	ora #BIT3
-	sta object_Attrib_1_0404,X
+		lda object_Attrib_2_0405,X
+		and #(BIT3+BIT4)
+		beq :+
+
+		lda frameCounter_12
+		and #(BIT0+BIT1)
+		bne :+
+
+		dec someObjProperty_0300,X
+		lda someObjProperty_0300,X
+		bne :+
+
+		lda object_Attrib_1_0404,X
+		ora #BIT3
+		sta object_Attrib_1_0404,X
 	
 	; loads a frame of animation
 	; X indexes the object
 	; Y indexes the byte being loaded
 	:				
-	ldy #$00			  ; starts from first tile
-	lda (addressPtr_32),Y ; reads object WIDTH in pixels
-	bpl :+				  ; if positive, continue
-	jmp ReplaceMeLabel_8  ; if negative, do something else
+		ldy #$00			  ; starts from first tile
+		lda (addressPtr_32),Y ; reads object WIDTH in pixels
+		bpl :+				  ; if positive, continue
+
+		jmp ReplaceMeLabel_8  ; if negative, do something else
 	
 	:
-	sta objectWidth_0600,X	; stores WIDTH in pixels
-	lsr A						; divide by 8 (get size in tiles)
-	lsr A
-	lsr A
-	clc		
-	adc #$01					; add 1
-	sta var_44  				; store W in temp variable
-	iny							; next value
-	lda (addressPtr_32),Y		; reads	object HEIGHT in pixels
-	sta objectHeight_0601,X	; store HEIGHT in pixels
-	lsr A						; divide by 8 (get size in tiles)
-	lsr A
-	lsr A
-	clc
-	adc #$01					; add 1
-	sta counter_H_45			; store H in temp variable
-	iny							; next value
-	ldx oamAddressPtr_3E		; loads next OAM free address
+		sta objectWidth_0600,X	; stores WIDTH in pixels
+		lsr A						; divide by 8 (get size in tiles)
+		lsr A
+		lsr A
+		clc		
+		adc #$01					; add 1
+		sta var_44  				; store W in temp variable
+		iny							; next value
+		lda (addressPtr_32),Y		; reads	object HEIGHT in pixels
+		sta objectHeight_0601,X	; store HEIGHT in pixels
+		lsr A						; divide by 8 (get size in tiles)
+		lsr A
+		lsr A
+		clc
+		adc #$01					; add 1
+		sta counter_H_45			; store H in temp variable
+		iny							; next value
+		ldx oamAddressPtr_3E		; loads next OAM free address
 	
 	ReplaceMeLabel_11:
-	lda var_44
-	sta counter_W_3C			; counts tiles in X
-	lda var_40					; X position LO
-	sta tile_X_Lo_46
-	lda var_41					; X position HI
-	sta tile_X_Hi_47
+		lda var_44
+		sta counter_W_3C			; counts tiles in X
+		lda var_40					; X position LO
+		sta tile_X_Lo_46
+		lda var_41					; X position HI
+		sta tile_X_Hi_47
 	
 	
 	loopLoadFrameTiles:			; load frame tiles
-	lda (addressPtr_32),Y		; load tile index
-	beq :+						; if tile $00 (blank), skip
-	lda tile_X_Hi_47			; check X HI
-	bne :++						; break if X HI not zero
-	lda tile_Y_Hi_43			; check Y HI
-	bne :++						; break if Y HI not zero
-	lda (addressPtr_32),Y 		; load tile index
-	sta OAM_0200+OBJ_TILE,X		; store tile index in OAM
-	lda tile_Y_Lo_42			; load tile Y position from RAM
-	sta OAM_0200+OBJ_Y,X		; store tile Y position in OAM 
-	iny							; next value
-	lda (addressPtr_32),Y		; load tile attributes
-	sta OAM_0200+OBJ_ATT,X		; store tile attributes in OAM
-	lda tile_X_Lo_46			; load tile X position from RAM
-	sta OAM_0200+OBJ_X,X		; store tile X position in OAM
-	txa
-	clc
-	adc #$04					; 4-byte stride in OAM
-	beq ReplaceMeLabel_9		; break if overflow
-	tax	
+		lda (addressPtr_32),Y		; load tile index
+		beq :+						; if tile $00 (blank), skip
+
+		lda tile_X_Hi_47			; check X HI
+		bne :++						; break if X HI not zero
+
+		lda tile_Y_Hi_43			; check Y HI
+		bne :++						; break if Y HI not zero
+
+		lda (addressPtr_32),Y 		; load tile index
+		sta OAM_0200+OBJ_TILE,X		; store tile index in OAM
+		lda tile_Y_Lo_42			; load tile Y position from RAM
+		sta OAM_0200+OBJ_Y,X		; store tile Y position in OAM 
+		iny							; next value
+		lda (addressPtr_32),Y		; load tile attributes
+		sta OAM_0200+OBJ_ATT,X		; store tile attributes in OAM
+		lda tile_X_Lo_46			; load tile X position from RAM
+		sta OAM_0200+OBJ_X,X		; store tile X position in OAM
+		txa
+		clc
+		adc #$04					; 4-byte stride in OAM
+		beq ReplaceMeLabel_9		; break if overflow
+		tax	
 	
 	; also arive here if found a blank tile
 	:
-	iny						; next value
-	dec counter_W_3C		; decrement W counter
-	beq :++					; break if end-of-line
-	lda tile_X_Lo_46		
-	adc #$08
-	sta tile_X_Lo_46		; step 8 pixels in X
-	bcc loopLoadFrameTiles	; loop if less than $FF
-	inc tile_X_Hi_47		; add carry to X_HI
-	jmp loopLoadFrameTiles  ; loop
+		iny						; next value
+		dec counter_W_3C		; decrement W counter
+		beq :++					; break if end-of-line
+
+		lda tile_X_Lo_46		
+		adc #$08
+		sta tile_X_Lo_46		; step 8 pixels in X
+		bcc loopLoadFrameTiles	; loop if less than $FF
+		inc tile_X_Hi_47		; add carry to X_HI
+		jmp loopLoadFrameTiles  ; loop
 	
 	:
-	iny
-	jmp :--
+		iny
+		jmp :--
 	
 	: ; end-of-line
-	dec counter_H_45		; decrement H counter
-	beq :+					; break if end-of-file
-	lda tile_Y_Lo_42		
-	clc
-	adc #$08
-	sta tile_Y_Lo_42		; step 8 pixels in Y
-	bcc ReplaceMeLabel_11	; if not overflow, loop to next frame
-	inc tile_Y_Hi_43		; if overflow, add to Y HI
-	jmp ReplaceMeLabel_11	; loop to next frame
+		dec counter_H_45		; decrement H counter
+		beq :+					; break if end-of-file
+
+		lda tile_Y_Lo_42		
+		clc
+		adc #$08
+		sta tile_Y_Lo_42		; step 8 pixels in Y
+		bcc ReplaceMeLabel_11	; if not overflow, loop to next frame
+		inc tile_Y_Hi_43		; if overflow, add to Y HI
+		jmp ReplaceMeLabel_11	; loop to next frame
 	
 	:
-	stx oamAddressPtr_3E	; stores next OAM free address
+		stx oamAddressPtr_3E	; stores next OAM free address
 	
 	UpdateObjectIndex:
 		lda objectIndex_5F
@@ -3681,67 +3719,71 @@ PushAXY
 		adc objIndexStep_59
 		cmp #$F0			; Check if 240 (40 objects)
 		bcc :++
+	
 		beq :+
+	
 		lda #$EA
 		bne :++
 		
-		:
+	:
 		lda #$00
 		
-		:	; 
+	:
 		sta objectIndex_5F
-		cmp var_3D
+		cmp beingUpdated_3D
 		beq ReplaceMeLabel_12
 		jmp BeginHere
 	
 	ReplaceMeLabel_8:
-	ldx oamAddressPtr_3E
-	lda var_41
-	bne UpdateObjectIndex
-	lda tile_Y_Hi_43
-	bne UpdateObjectIndex
-	lda tile_Y_Lo_42
-	sta OAM_0200+OBJ_Y,X
-	iny
-	lda (addressPtr_32),Y
-	sta OAM_0200+OBJ_TILE,X
-	iny
-	lda (addressPtr_32),Y
-	sta OAM_0200+OBJ_ATT,X
-	lda var_40
-	sta OAM_0200+OBJ_X,X
-	txa
-	clc
-	adc #$04
-	beq ReplaceMeLabel_9
-	sta oamAddressPtr_3E
-	jmp UpdateObjectIndex
+		ldx oamAddressPtr_3E
+		lda var_41
+		bne UpdateObjectIndex
+		lda tile_Y_Hi_43
+		bne UpdateObjectIndex
+		lda tile_Y_Lo_42
+		sta OAM_0200+OBJ_Y,X
+		iny
+		lda (addressPtr_32),Y
+		sta OAM_0200+OBJ_TILE,X
+		iny
+		lda (addressPtr_32),Y
+		sta OAM_0200+OBJ_ATT,X
+		lda var_40
+		sta OAM_0200+OBJ_X,X
+		txa
+		clc
+		adc #$04
+		beq ReplaceMeLabel_9
+		sta oamAddressPtr_3E
+		jmp UpdateObjectIndex
 	
 	ReplaceMeLabel_12:
-	ldx oamAddressPtr_3E
-	cpx #$00
-	beq ReplaceMeLabel_9
-	lda #$00
+		ldx oamAddressPtr_3E
+		cpx #$00
+		beq ReplaceMeLabel_9
+		lda #$00
 	
 	:
-	sta OAM_0200,X
-	inx
-	bne :-
+		sta OAM_0200,X
+		inx
+		bne :-
 	
 	ReplaceMeLabel_9:
-	lda objectIndex_5F
-	cmp var_3D
-	bne :+
+		lda objectIndex_5F
+		cmp beingUpdated_3D
+		bne :+
 
 	; reverse the indexing
-	lda #$00				
-	sta objectIndex_5F		; reset object index
-	sec
-	sbc objIndexStep_59		; convert +6 into -6
-	sta objIndexStep_59
+		lda #$00				
+		sta objectIndex_5F		; reset object index
+		sec
+		sbc objIndexStep_59		; convert +6 into -6
+		sta objIndexStep_59
 
 	:
+
 	rts
+
 .endproc
 ;
 ; $A709
