@@ -342,24 +342,32 @@ paletteRAM_E0:			.res 32	; $E0 ; 4
 ; This is done this way so flags can be tested
 ; with the BIT instruction, which does not
 ; have an immediate mode (can't be tested with a constant)
-BIT_0:	.byte BIT0
-BIT_1:	.byte BIT1
-BIT_2:	.byte BIT2
-BIT_3:	.byte BIT3
-BIT_4:	.byte BIT4
-BIT_5:	.byte BIT5
-BIT_6:	.byte BIT6
-BIT_7:	.byte BIT7
+BIT_0:	.byte FLAG_0
+BIT_1:	.byte FLAG_1
+BIT_2:	.byte FLAG_2
+BIT_3:	.byte FLAG_3
+BIT_4:	.byte FLAG_4
+BIT_5:	.byte FLAG_5
+BIT_6:	.byte FLAG_6
+BIT_7:	.byte FLAG_7
 
-.define BUTTON_RIGHT	BIT_0
-.define BUTTON_LEFT		BIT_1
-.define BUTTON_DOWN		BIT_2
-.define BUTTON_UP		BIT_3
-.define BUTTON_START	BIT_4
-.define BUTTON_SELECT	BIT_5
-.define BUTTON_B		BIT_6
-.define BUTTON_A		BIT_7
+.define BIT_BUTTON_RIGHT	BIT_0
+.define BIT_BUTTON_LEFT		BIT_1
+.define BIT_BUTTON_DOWN		BIT_2
+.define BIT_BUTTON_UP		BIT_3
+.define BIT_BUTTON_START	BIT_4
+.define BIT_BUTTON_SELECT	BIT_5
+.define BIT_BUTTON_B		BIT_6
+.define BIT_BUTTON_A		BIT_7
 
+.define BUTTON_RIGHT	FLAG_0
+.define BUTTON_LEFT		FLAG_1
+.define BUTTON_DOWN		FLAG_2
+.define BUTTON_UP		FLAG_3
+.define BUTTON_START	FLAG_4
+.define BUTTON_SELECT	FLAG_5
+.define BUTTON_B		FLAG_6
+.define BUTTON_A		FLAG_7
 ; $8008
 HeartHUDData:
 .byte HEART_HUD_Y, HEART_HUD_TILE, HEART_HUD_ATT, HEART_HUD_X
@@ -371,7 +379,7 @@ BankSequenceArray:
 ; $8010
 ; Reset handler, called by reset interrupt
 HandleReset:
-	lda #(BIT7+BIT6)		; flags %1100 0000
+	lda #(FLAG_7+FLAG_6)		; flags %1100 0000
 	sta Ctrl2_FrameCtr_4017
 	
 	; PPU Warm up
@@ -401,12 +409,12 @@ HandleReset:
 	ldx #$01
 	jsr LoadStage
 
-	lda #(BIT7+BIT3) 		; flags %1000 1000
-	TurnOFF	BIT3			; and #(ALL1-BIT3) ; flags %1111 0111 (Why?)
+	lda #(FLAG_7+FLAG_3) 		; flags %1000 1000
+	TurnOFF	FLAG_3			; and #(ALL1-FLAG_3) ; flags %1111 0111 (Why?)
 	sta flagPPUControl_17
 	sta flagPPUControl_19
 
-	lda #(BIT4+BIT3+BIT2)
+	lda #(FLAG_4+FLAG_3+FLAG_2)
 	sta flagPPUMask_18
 
 	lda #$00 ; Start at the opening screen
@@ -446,7 +454,7 @@ WaitForPressStart:
 	lda input1_20
 	
 	checkInputStart:
-	cmp #BIT4 ; equivalent to BUTTON_START
+	cmp #FLAG_4 ; equivalent to BIT_BUTTON_START
 	beq :+
 	jmp WaitForPressStart
 
@@ -507,10 +515,10 @@ StartingNewStage:
 	ldx #$01				; counts how many screen have scrolled
 	stx levelProgression_16
 	
-	lda #(BIT4+BIT3+BIT2) 	; flags %0001 1100
+	lda #(FLAG_4+FLAG_3+FLAG_2) 	; flags %0001 1100
 	sta flagPPUMask_18
 	
-	lda #(BIT7+BIT3)		; flags %1000 1000
+	lda #(FLAG_7+FLAG_3)		; flags %1000 1000
 	sta flagPPUControl_17
 	sta flagPPUControl_19
 	
@@ -706,7 +714,7 @@ StartingNewStage:
 		cmp #$F1				; check for control character $F1
 		bne :+					; if not, skip ahead
 
-		and #(BIT1+BIT0)		; $F1 & $03 = $01
+		and #(FLAG_1+FLAG_0)		; $F1 & $03 = $01
 		sta var_2D				; object status flags?
 		iny
 		lda (objectPtr_3A),Y	; read next byte after $F1
@@ -719,7 +727,7 @@ StartingNewStage:
 		cmp #$F2				; check for control character $F2
 		bne :+					; if not, skip ahead
 
-		and #(BIT1+BIT0)		; $F2 & $03 = $02
+		and #(FLAG_1+FLAG_0)		; $F2 & $03 = $02
 		sta var_2D				; object status flags?
 		iny
 		lda (objectPtr_3A),Y	; read next byte after $F2
@@ -796,7 +804,7 @@ doneLoadingEnemyBatch:
 	sta someObjProperty_0602,X	; stores #1 byte of 10
 	iny
 	lda (objectPtr_38),Y		; loads #2 byte of 10
-	ora #(BIT5+BIT6)			; turn ON flags 5 and 6
+	ora #(FLAG_5+FLAG_6)			; turn ON flags 5 and 6
 	ora var_2D					; turn ON other flags from var_2D (see previous routine)
 	sta object_Attrib_2_0405,X	; store #2 byte of 10
 	iny
@@ -840,7 +848,7 @@ doneLoadingEnemyBatch:
 	sta someObjProperty_0505,X	; zero out 
 	sta someObjProperty_0303,X	; zero out 
 
-	lda #BIT7
+	lda #FLAG_7
 	sta object_Attrib_1_0404,X ; Set as VALID OBJECT
 	pla
 	tay
@@ -904,31 +912,31 @@ doneLoadingEnemyBatch:
 	
 		SecondPart:
 		lda object_Attrib_2_0405,X
-		and #BIT4
+		and #FLAG_4
 		beq :+
 
 		lda object_Attrib_1_0404,X
-		and #BIT5
+		and #FLAG_5
 		beq :++
 
 		:
-		lda #BIT4
+		lda #FLAG_4
 		sta object_Attrib_1_0404,X
 		jmp doneCheckingPlayerCollision
 
 		:
 		lda object_Attrib_1_0404,X
-		TurnOFF BIT5					;	and #(ALL1-BIT5)
+		TurnOFF FLAG_5					;	and #(ALL1-FLAG_5)
 		sta object_Attrib_1_0404,X
 		jmp doneCheckingPlayerCollision
 	
 		ThirdPart:
 		lda object_Attrib_1_0404,X
-		ora #BIT5
+		ora #FLAG_5
 		sta object_Attrib_1_0404,X
 		jsr CalculateEnemyHitBox_X
 		lda object_Attrib_1_0404,X
-		and #BIT3
+		and #FLAG_3
 		beq doneCheckingPlayerCollision
 		lda var_5A
 		bne doneCheckingPlayerCollision
@@ -979,7 +987,7 @@ doneLoadingEnemyBatch:
 ; $8391
 .proc CalculateEnemyHitBox_X
 	lda object_Attrib_2_0405,X
-	and #BIT4
+	and #FLAG_4
 	beq objectIsBoss
 	
 	lda object_X_Hi_0401,X
@@ -1066,13 +1074,13 @@ doneLoadingEnemyBatch:
 	AnotherCheckAndLeave:
 	lda object_Attrib_1_0404,X
 	bpl StartLeaving
-	and #BIT5
+	and #FLAG_5
 	beq StartLeaving
 	lda object_Attrib_2_0405,X
 	bit BIT_6
 	beq StartLeaving
 	
-	and #BIT4
+	and #FLAG_4
 	bne :+
 	cpy #$00
 	beq :+
@@ -1413,14 +1421,14 @@ doneLoadingEnemyBatch:
 		bne handleDespawning
 	
 	:
-	cmp #(BIT1|BIT4|BIT5); $32
+	cmp #(FLAG_1|FLAG_4|FLAG_5); $32
 	bne :+
 
 	lda #$04
 	bne handleDespawning
 	
 	:
-	cmp #(BIT0|BIT1|BIT4|BIT5); $33
+	cmp #(FLAG_0|FLAG_1|FLAG_4|FLAG_5); $33
 	bne :+
 
 	lda #$05
@@ -1460,7 +1468,7 @@ doneLoadingEnemyBatch:
 		sta objectType_58			; death animation index
 		
 		lda object_Attrib_1_0404,X
-		and #BIT5 ; check if this object spawns another?
+		and #FLAG_5 ; check if this object spawns another?
 		beq doneWithObjectCollision
 
 		clc
@@ -1555,7 +1563,7 @@ doneLoadingEnemyBatch:
 	sta someObjProperty_0700,X
 	sta someObjProperty_0300,X
 	sta someObjProperty_0301,X
-	lda #BIT7
+	lda #FLAG_7
 	sta object_Attrib_1_0404,X ; Set VALID OBJECT
 
 	rts
@@ -1627,7 +1635,7 @@ Data_at8715:
 	lda #>Data_at8B7D		
 	sta someObjProperty_0502
 
-	lda #(BIT7+BIT5)			; $A0
+	lda #(FLAG_7+FLAG_5)			; $A0
 	sta object_Attrib_1_0404
 
 	lda #ZERO
@@ -1704,7 +1712,7 @@ Data_at8BD7:
 	sta object_X_Lo_0400,Y
 	lda #LIVES_HUD_Y
 	sta object_Y_Lo_0402,Y
-	lda #(BIT5+BIT7)				; $A0
+	lda #(FLAG_5+FLAG_7)				; $A0
 	sta object_Attrib_1_0404,Y
 	lda #ZERO
 	sta object_Attrib_2_0405,Y
@@ -1932,10 +1940,10 @@ Data_at8BD7:
 	sta object_Y_Hi_0403,X
 	sta healthPoints_0603,X
 
-	lda #BIT6					; SET COLLISION ON
+	lda #FLAG_6					; SET COLLISION ON
 	sta object_Attrib_2_0405,X
 
-	lda #BIT7					; VALID OBJECT
+	lda #FLAG_7					; VALID OBJECT
 	sta object_Attrib_1_0404,X
 	
 	rts
@@ -1990,7 +1998,7 @@ Data_at8D45:
 	
 	:
 		lda object_Attrib_1_0404,X
-		and #(BIT7+BIT4)
+		and #(FLAG_7+FLAG_4)
 		beq :+
 		txa
 		adc #OBJECT_BYTE_SIZE ; $06
@@ -2012,7 +2020,7 @@ Data_at8D45:
 	ldx #ENEMY_OBJECT_START
 	:
 		lda object_Attrib_1_0404,X
-		and #(BIT7+BIT4) ;%10010000 ; #$90
+		and #(FLAG_7+FLAG_4) ;%10010000 ; #$90
 		beq :+
 		txa
 		adc #OBJECT_BYTE_SIZE; $06
@@ -2032,7 +2040,7 @@ Data_at8D45:
 
 	:
 	lda object_Attrib_1_0404,X
-	TurnOFF BIT3				; and #(ALL1-BIT3)
+	TurnOFF FLAG_3				; and #(ALL1-FLAG_3)
 	sta object_Attrib_1_0404,X
 
 	lda someObjProperty_0700,X
@@ -2225,7 +2233,7 @@ Data_at8E3F:
 
 	lda #$01
 	sta someObjProperty_0602,X
-	lda #(BIT5+BIT6)
+	lda #(FLAG_5+FLAG_6)
 	sta object_Attrib_2_0405,X
 	lda #$04
 	sta objectWidth_0600,X
@@ -2235,7 +2243,7 @@ Data_at8E3F:
 	sta healthPoints_0603,X
 	sta someObjProperty_0301,X
 	sta someObjProperty_0302,X
-	lda #BIT7
+	lda #FLAG_7
 	sta object_Attrib_1_0404,X
 	
 	doneSpawningProjectiles:
@@ -2634,10 +2642,10 @@ LivesGraphicData:
 ReadData:
 	lda (addressPtr_32),Y
 	beq doneLoading
-	cmp #BIT7				; $80
+	cmp #FLAG_7				; $80
 	bcc DistinctTiles
 RepeatedTitles:
-	lda #(ALL1-BIT7) 		; %01111111
+	lda #(ALL1-FLAG_7) 		; %01111111
 	and (addressPtr_32),Y
 	tax
 	jsr NextBGByte_Y
@@ -2968,7 +2976,7 @@ RegisterInput:
 	tax
 	sta BankSwitching_FFF0,X
 	lda flagPPUControl_17
-	TurnOFF BIT4				; and #(ALL1-BIT4)
+	TurnOFF FLAG_4				; and #(ALL1-FLAG_4)
 	sta flagPPUControl_17
 	sta flagPPUControl_19
 	
@@ -3108,7 +3116,7 @@ EndingText_97A3:
 	sta PpuControl_2000
 	jsr WaitVBlank
 	lda flagPPUMask_18
-	TurnOFF BIT4 			; and #(ALL1-BIT4) $EF
+	TurnOFF FLAG_4 			; and #(ALL1-FLAG_4) $EF
 	sta PpuMask_2001
 	lda flagPPUControl_19
 	sta flagPPUControl_17
@@ -3466,7 +3474,7 @@ Data_at9ED6:
 		bpl loop
 
 		lda (objectPtr_36),Y
-		and #(BIT4+LOWER)
+		and #(FLAG_4+LOWER)
 		sta someObjProperty_0505,X
 		
 		loop:
@@ -3603,18 +3611,18 @@ Data_at9ED6:
 	
 	ReplaceMeLabel_6:
 		lda object_Attrib_1_0404,X
-		and #BIT5
+		and #FLAG_5
 		bne :+
 
 		jmp UpdateObjectIndex
 	
 	:
 		lda object_Attrib_2_0405,X
-		and #(BIT3+BIT4)
+		and #(FLAG_3+FLAG_4)
 		beq :+
 
 		lda frameCounter_12
-		and #(BIT0+BIT1)
+		and #(FLAG_0+FLAG_1)
 		bne :+
 
 		dec someObjProperty_0300,X
@@ -3622,7 +3630,7 @@ Data_at9ED6:
 		bne :+
 
 		lda object_Attrib_1_0404,X
-		ora #BIT3
+		ora #FLAG_3
 		sta object_Attrib_1_0404,X
 	
 	; loads a frame of animation
@@ -3812,7 +3820,7 @@ Data_at9ED6:
 ; $A728
 .proc PowerUpCheat
 	lda input1_20
-	cmp #$60
+	cmp #(BUTTON_B+BUTTON_SELECT)
 	bne :+
 	cmp flagUnknown_1F
 	beq :+
@@ -3858,7 +3866,7 @@ Data_at9ED6:
 	lda input1_20
 	
 	checkInputRight:
-		bit BUTTON_RIGHT
+		bit BIT_BUTTON_RIGHT
 		beq checkInputLeft
 
 		lda object_X_Lo_0400
@@ -3868,7 +3876,7 @@ Data_at9ED6:
 		bcc :+
 		
 	checkInputLeft:
-		bit BUTTON_LEFT
+		bit BIT_BUTTON_LEFT
 		beq checkInputDown
 		lda object_X_Lo_0400
 		cmp #$12
@@ -3880,7 +3888,7 @@ Data_at9ED6:
 	
 	checkInputDown:
 		lda input1_20
-		bit BUTTON_DOWN
+		bit BIT_BUTTON_DOWN
 		beq checkInputUp
 		lda object_Y_Lo_0402
 		cmp #$B8
@@ -3889,7 +3897,7 @@ Data_at9ED6:
 		bcc :+
 	
 	checkInputUp:
-		bit BUTTON_UP
+		bit BIT_BUTTON_UP
 		beq checkInputA
 		lda object_Y_Lo_0402
 		cmp #$14
@@ -3901,13 +3909,13 @@ Data_at9ED6:
 	
 	checkInputA:
 		lda input1_20
-		bit BUTTON_A
+		bit BIT_BUTTON_A
 		beq OnlyCheckForPause
 		lda inputPrev_22
-		bit BUTTON_A
+		bit BIT_BUTTON_A
 		bne OnlyCheckForPause
 		
-		lda #BIT1
+		lda #FLAG_1
 		jsr CheckPlayerCanShoot_A_rA
 		sta flagPlayerHasShot_62
 		
@@ -3970,11 +3978,11 @@ Data_atA80A:
 	lda input1_20
 
 	checkInputPressStart:
-	bit BUTTON_START
+	bit BIT_BUTTON_START
 	beq exitPauseRoutine
 	
 	lda inputPrev_22
-	bit BUTTON_START
+	bit BIT_BUTTON_START
 	bne exitPauseRoutine
 	
 	lda flagPause_1C

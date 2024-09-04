@@ -1,7 +1,7 @@
-.define PLS1 	BIT0
-.define PLS2 	BIT1
-.define TRI 	BIT2
-.define DMC 	BIT3
+.define PLS1 	FLAG_0
+.define PLS2 	FLAG_1
+.define TRI 	FLAG_2
+.define DMC 	FLAG_3
 
 ; square0Duty_9815
 .proc UpdateSoundAtVBlank
@@ -86,7 +86,7 @@
 	lda (soundEngineAddrList_7A,X)
 	
 	Compare89:
-	cmp #(BIT7 | BIT3 | BIT0) ;$89 
+	cmp #(FLAG_7 | FLAG_3 | FLAG_0) ;$89 
 	bne Compare81
 	
 	jsr UnknownSub4
@@ -104,7 +104,7 @@
 	jmp ReplaceMeLabel_S1
 
 	Compare81:
-	cmp #(BIT7 | BIT0) ;$81
+	cmp #(FLAG_7 | FLAG_0) ;$81
 	bne Compare82
 
 	txa
@@ -132,7 +132,7 @@
 	jmp skipToThis_1
 	
 	Compare82:
-	cmp #(BIT7 | BIT1) ;soundEngine_82
+	cmp #(FLAG_7 | FLAG_1) ;soundEngine_82
 	bne Compare83
 	txa
 	lsr A    
@@ -154,7 +154,7 @@
 	jmp skipToThis_1
 
 	Compare83:
-	cmp #(BIT7 | BIT1 | BIT0) ;soundEngine_83
+	cmp #(FLAG_7 | FLAG_1 | FLAG_0) ;soundEngine_83
 	bne Compare86
 	txa
 	pha
@@ -167,7 +167,7 @@
 	jmp ReplaceMeLabel_S1
 
 	Compare86:
-	cmp #(BIT7 | BIT2 | BIT1) ;$86 
+	cmp #(FLAG_7 | FLAG_2 | FLAG_1) ;$86 
 	bne Compare84
 	txa
 	cmp #$07 
@@ -214,7 +214,7 @@
 	jmp ReplaceMeLabel_S1
 
 	Compare84:
-	cmp #(BIT7 | BIT2) ;$84
+	cmp #(FLAG_7 | FLAG_2) ;$84
 	bne Compare85
 
 	txa
@@ -271,7 +271,7 @@
 	jmp ReplaceMeLabel_S1
 
 	Compare85:
-	cmp #(BIT7 | BIT2 | BIT0) ;$85
+	cmp #(FLAG_7 | FLAG_2 | FLAG_0) ;$85
 	bne skipToThis_1
 
 	lda soundEngineAddr_A8,X
