@@ -27,19 +27,6 @@
 	bne :-
 .endmacro
 
-; macro Add16
-; 16-bit addition
-; Adds <value> to <address> and store the result at <address>
-.macro Add16 address, value
-	lda address+1
-	clc
-	adc value
-	sta address+1
-	lda address+0
-	adc #$00
-	sta address+0
-.endmacro
-
 ; macro TurnOFF
 ; Turns OFF a given flag
 .macro TurnOFF flag
@@ -50,6 +37,12 @@
 ; Turns off a given flag
 .macro TurnON flag
 	ora #flag
+.endmacro
+
+; macro Flip
+; Flips a single big flag
+.macro Flip flag 
+	eor #flag
 .endmacro
 
 ; macro PushAXY
@@ -114,21 +107,11 @@
 	tay
 .endmacro
 
-; macro SpawnMultipleProjectiles
-; Spawn a given number of projectiles
-; from give address, using call
-.macro SpawnMultipleProjectiles address, number
-	txa
-	tay
-	ldx #$00
-	
-	:
-		lda address,X
-		sta projectileIndex_4A
-		jsr HandleSpawnProjectile_Y
-		inx
-		cpx #number
-		bne :-
+.macro COPY16 source, destination
+	lda #<source
+	sta destination+0
+	lda #>source
+	sta destination+1
 .endmacro
 
 ; Sound Engine Macros =====================

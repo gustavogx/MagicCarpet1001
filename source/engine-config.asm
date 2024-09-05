@@ -14,6 +14,10 @@
 .define ENEMY_WAVES_TO_NEXT		$F0
 .define ENEMY_WAVES_STEP		$01
 
+.define GAMEMODE_STAGE			$00
+.define GAMEMODE_STARTSCREEN	$01
+.define GAMEMODE_BOSSFIGHT		$02
+
 ; Heart is object zero (never shuffled)
 .define HEART_HUD_Y		$D8
 .define HEART_OFFSCREEN $F8
@@ -29,7 +33,13 @@
 .define PLAYER_START_X_Lo	$F2
 .define PLAYER_START_X_Hi	$FF
 .define PLAYER_START_Y_Lo	$70
-	
+
+; Player screen limits
+.define PLAYER_X_MIN	18
+.define PLAYER_X_MAX	220
+.define PLAYER_Y_MIN	20
+.define PLAYER_Y_MAX	184
+
 ; Other objects go after HEART
 .define FIRST_OBJECT_SLOT $04
 
@@ -41,6 +51,7 @@
 
 ; Enemy slots
 .define FREE_OBJECT_SLOTS	$20 ;	20
+.define ENEMY_OBJECT_END	$F0
 
 .define VRAM_PALETTES_PAGE $3F
 

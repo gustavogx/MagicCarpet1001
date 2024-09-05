@@ -4,19 +4,19 @@
 .include "engine-config.asm"
 
 ; song names
-.define OPENING_SONG 	$00; 00 Opening song
-.define STAGE_SONG 		$01; 01 Stage song
-.define BOSS_SONG 		$02; 02 Boss song
+.define SONG_OPENING 	$00; 00 Opening song
+.define SONG_STAGES 	$01; 01 Stage song
+.define SONG_BOSSES 	$02; 02 Boss song
 .define ARROW_SHOT_SFX 	$03; 03 Arrow shot SFX
-.define ENEMY_DEATH_SFX $04; 04 Enemy death SFX
-.define PLAYER_DEATH_SFX $05; 05 Player death SFX
-.define EXTRA_LIFE_SFX 	$06; 06 Extra life SFX
-.define GAME_START_SFX 	$07; 07 Game Start / Item grab SFX
-.define GAME_PAUSE_SFX 	$08; 08 Pause
-.define BOSS_DEATH_SFX 	$09; 09 Boss death SFX
-.define ENEMY_HIT_SFX 	$0A; 0A Enemy hit SFX
-.define ENDING_SONG 	$0B; 0B Ending song
-.define MAGIC_LAMP_SFX 	$0C; 0C Magic Lamp SFX
+.define SFX_ENEMY_DEATH $04; 04 Enemy death SFX
+.define SFX_PLAYER_DEATH $05; 05 Player death SFX
+.define SFX_EXTRA_LIFE 	$06; 06 Extra life SFX
+.define SFX_GAME_START 	$07; 07 Game Start / Item grab SFX
+.define SFX_GAME_PAUSE 	$08; 08 Pause
+.define SFX_BOSS_DEATH 	$09; 09 Boss death SFX
+.define SFX_ENEMY_HIT 	$0A; 0A Enemy hit SFX
+.define SONG_ENDING 	$0B; 0B Ending song
+.define SFX_MAGIC_LAMP 	$0C; 0C Magic Lamp SFX
 
 .segment "HEADER"
 .include "inesheader.inc"
@@ -61,17 +61,16 @@ inputPrev_22:			.res 1	; $22 ; 11
 .res 1 ; $23
 .res 1 ; $24
 .res 1 ; $25
-flagGameMode_26:		.res 1	; $26 ; 4
+flagGameMode_26:		.res 1	; $26 ; STAGE (00), STARTSCREEN (01), BOSSFIGHT (02)
 frameScrollAt_27:		.res 1	; $27 ; 2
 frameScrollCtr_28:		.res 1	; $28 ; 3
 screenScrollX_29:		.res 1	; $29 ; 7
 var_2A:					.res 1	; $2A	; 3
-var_2B:					.res 1	; $2B	; 4
-enemySetSize_2C:		.res 1	; $2C	; 4
+enemySet0Size_2C:					.res 1	; $2B	; 4
+enemySet1Size_2C:		.res 1	; $2C	; 4
 var_2D:					.res 1	; $2D	; 4
 flagGenDrop_2E:			.res 1	; $2E	; 4
 .res 1 ; $2F
-
 .res 1 ; $30
 .res 1 ; $31
 addressPtr_32:			.res 2	; $32 ; 32 (word address)
@@ -85,7 +84,7 @@ objectPtr_38:			.res 2	; $38 ; 14 (word address)
 objectPtr_3A:			.res 2	; $3A ; 13 (word address)
 ; $3B low byte of $3A
 counter_W_3C:			.res 1	; $3C ; 2
-beingUpdated_3D:					.res 1	; $3D ; 3
+beingUpdated_3D:		.res 1	; $3D ; 3
 oamAddressPtr_3E:		.res 2	; $3E ; 6 (word address)
 ; $3F low byte of $3E
 
@@ -268,7 +267,7 @@ paletteRAM_E0:			.res 32	; $E0 ; 4
 .define someObjProperty_0302 $0302 ; #6 of 10-byte file
 .define someObjProperty_0303 $0303
 
-.define someObjProperty_0333 $0333 ; 1 used once!
+.define someObjProperty_0333 $0333 ; unused variable
 
 ; page 04
 .define object_X_Lo_0400 $0400 ; object_X_Lo_0400
@@ -286,20 +285,29 @@ paletteRAM_E0:			.res 32	; $E0 ; 4
 ;						 ||+-------- 5: Player can shoot
 ;						 |+--------- 6:
 ;						 +---------- 7: Object is valid OR? flag if object has unresolved collision
+.define OBJPROP_PLAYERSHOT	FLAG_5
+.define OBJPROP_VALID		FLAG_7
 
 .define object_Attrib_2_0405 $0405 ; #2 of 10-byte file (flags) 
 ; object_Attrib_2_0405   7654 3210
-; 						 |||| |||+-- 0:
-;						 |||| ||+--- 1: Enemy is part of a set
+; 						 |||| |||+-- 0: Enemy is part of SET 1
+;						 |||| ||+--- 1: Enemy is part of SET 2
 ;						 |||| |+---- 2:
 ;						 |||| +----- 3:
-;						 |||+------- 4: Enemy is a boss 
+;						 |||+------- 4: Obj is a pickup 
 ;						 ||+-------- 5:
 ;						 |+--------- 6: Obj can collide
 ;						 +---------- 7:
-.define OBJPROP_PARTOF_SET 	BIT_1
-.define OBJPROP_STAGE_BOSS	BIT_4
-.define OBJPROP_CAN_COLLIDE	BIT_6
+.define OBJPROP_PARTOF_SET0 FLAG_0
+.define OBJPROP_PARTOF_SET1 FLAG_1
+.define OBJPROP_IS_PICKUP	FLAG_4
+.define OBJPROP_CAN_COLLIDE	FLAG_6
+
+.define BIT_OBJPROP_PARTOF_SET0 BIT_0
+.define BIT_OBJPROP_PARTOF_SET1 BIT_1
+.define BIT_OBJPROP_UNUSED 		BIT_3
+.define BIT_OBJPROP_IS_PICKUP	BIT_4
+.define BIT_OBJPROP_CAN_COLLIDE	BIT_6
 
 ; page 05
 .define someObjProperty_0500 $0500
@@ -320,7 +328,7 @@ paletteRAM_E0:			.res 32	; $E0 ; 4
 ; page 06
 .define objectWidth_0600 		$0600 ; #3 of 10-byte file
 .define objectHeight_0601 		$0601 ; #4 of 10-byte file
-.define someObjProperty_0602 	$0602 ; #1 of 10-byte file
+.define atackPoints_0602 		$0602 ; #1 of 10-byte file
 .define healthPoints_0603 	 	$0603 ; #5 of 10-byte file
 .define objectSpeed_X_0604 		$0604 ; #8 of 10-byte file 
 .define objectSpeed_Y_0605 		$0605 ; #9 of 10-byte file
@@ -333,7 +341,7 @@ paletteRAM_E0:			.res 32	; $E0 ; 4
 .define objectHitBox_Top_Y_0704 	$0704	; maybe vertices of hit box
 .define objectHitBox_Bottom_Y_0705 	$0705	; maybe vertices of hit box
 
-.segment "STARTUP"
+.segment "PRG_ROM"
 
 
 ; $8000
@@ -398,7 +406,7 @@ HandleReset:
 
 	StartSoundEngine
 
-	lda #$01 
+	lda #GAMEMODE_STARTSCREEN 
 	sta flagGameMode_26
 
 	lda #$00 
@@ -433,7 +441,7 @@ HandleReset:
 	
 	jsr RenderON
 	
-	PlaySoundForever #OPENING_SONG
+	PlaySoundForever #SONG_OPENING
 	; 00 Opening song
 	; 01 Stage song
 	; 02 Boss song
@@ -466,7 +474,7 @@ WaitForPressStart:
 		beq :-
 
 	StopPlaying
-	PlaySoundOnce #GAME_START_SFX
+	PlaySoundOnce #SFX_GAME_START
 	
 	lda #$00
 	sta currentStage_15
@@ -506,7 +514,7 @@ StartingNewStage:
 	lda #$FF
 	sta var_0C
 	
-	lda #ZERO				; no flags %0000 0000
+	lda #GAMEMODE_STAGE
 	sta flagGameMode_26
 	
 	ldx #BG_SCROLL_RATE		; how fast to update backgrounds
@@ -542,7 +550,7 @@ StartingNewStage:
 	
 	jsr RenderON
 
-	PlaySoundForever #STAGE_SONG
+	PlaySoundForever #SONG_STAGES
 	
 	lda currentStage_15
 	cmp #$02
@@ -558,7 +566,7 @@ StartingNewStage:
 		jsr TriggerNextLevel
 
 	loopMain:
-		jsr UnknownSub1
+		jsr HandlePhysics
 		jsr LoadEnemyBatch
 		jsr LivesHUD
 
@@ -692,7 +700,7 @@ StartingNewStage:
 		; Stage Boss Song===============
 		StopPlaying	
 		ResetSoundEngine 
-		PlaySoundForever #BOSS_SONG
+		PlaySoundForever #SONG_BOSSES
 		; ==============================
 
 		iny
@@ -718,8 +726,8 @@ StartingNewStage:
 		sta var_2D				; object status flags?
 		iny
 		lda (objectPtr_3A),Y	; read next byte after $F1
-		sta var_2B				; store it
-		inc var_2B				; increment it (is it a counter?)
+		sta enemySet0Size_2C				; store it
+		inc enemySet0Size_2C				; increment it (is it a counter?)
 		iny			
 		lda (objectPtr_3A),Y	; read next byte
 		
@@ -731,8 +739,8 @@ StartingNewStage:
 		sta var_2D				; object status flags?
 		iny
 		lda (objectPtr_3A),Y	; read next byte after $F2
-		sta enemySetSize_2C		; enemy is part of a set
-		inc enemySetSize_2C		; size of set (stores n+1)
+		sta enemySet1Size_2C		; enemy is part of a set
+		inc enemySet1Size_2C		; size of set (stores n+1)
 		iny
 		lda (objectPtr_3A),Y	; read next byte
 		
@@ -801,7 +809,7 @@ doneLoadingEnemyBatch:
 	sta someObjProperty_0502,X	; stores hi-byte of of Enemy AI(?)
 	iny
 	lda (objectPtr_38),Y		; loads #1 byte of 10
-	sta someObjProperty_0602,X	; stores #1 byte of 10
+	sta atackPoints_0602,X	; stores #1 byte of 10
 	iny
 	lda (objectPtr_38),Y		; loads #2 byte of 10
 	ora #(FLAG_5+FLAG_6)			; turn ON flags 5 and 6
@@ -856,7 +864,7 @@ doneLoadingEnemyBatch:
 .endproc
 ;
 ; $82C9
-.proc UnknownSub1
+.proc HandlePhysics
 
 	jsr CalculatePlayerHitBox
 
@@ -872,7 +880,7 @@ doneLoadingEnemyBatch:
 		bit BIT_4
 		beq :++
 
-			jsr HandleObjectCollision
+			jsr HandleCollisionEffects
 			lda someObjProperty_0303,X
 			cmp #$02
 			bne :+
@@ -952,7 +960,7 @@ doneLoadingEnemyBatch:
 		jmp loopCheckCollisions
 
 	:
-	jsr UnknownSub8
+	jsr HandleCollisionCheck
 	
 	rts
 .endproc
@@ -1046,186 +1054,212 @@ doneLoadingEnemyBatch:
 .endproc
 ;
 ; $83F4
-.proc UnknownSub8	; Maybe object collision?
-	ldy #$00
+.proc HandleCollisionCheck	
+; Clobbers A,X,Y
+;
+;	Checks every player object (player and awrros) 
+;	against every enemy.
+;
+;	Y are the player's objects
+;	Y = 0 (slot 0) THE PLAYER
+;	Y = 6 (slot 1) HEART ICON?
+;	Y = 12, 18, 24, 30, 36, 42 (slots from 2 to 7) arrows
+;
+;	X are the enemies
+; 	X = 48 (slot 8/enemy slot 0)
+; 	ends at Y = 234 (enemy slot 31)
+	ldy #ZERO
 	
-	BeginHere:
-	lda object_Attrib_1_0404,Y
-	bmi :+
-	jmp DoneWithThis
-	
-	:
-	lda object_Attrib_2_0405,Y	; object flags
-	bit OBJPROP_CAN_COLLIDE		; test for BIT 6: object can collide
-	bne :+						; if flag set, continue
-	jmp DoneWithThis			; if not, break
-	
-	:	; flag 6 is set: object has collision enabled
-	lda objectHitBox_Left_X_0702,Y ;
-	sta hitboxXRight_4F
-	lda objectHitBox_Right_X_0703,Y
-	sta hitboxXLeft_50
-	lda objectHitBox_Top_Y_0704,Y
-	sta hitboxYBottom_51
-	lda objectHitBox_Bottom_Y_0705,Y
-	sta hitboxYTop_52
-	
-	ldx #$30
-	AnotherCheckAndLeave:
-	lda object_Attrib_1_0404,X
-	bpl StartLeaving
-	and #FLAG_5
-	beq StartLeaving
-	lda object_Attrib_2_0405,X
-	bit BIT_6
-	beq StartLeaving
-	
-	and #FLAG_4
-	bne :+
-	cpy #$00
-	beq :+
-	
-	StartLeaving:
-	jmp dontHandleObjCollision
-	
-	: ; $843B
-	lda objectHitBox_Left_X_0702,X
-	cmp hitboxXLeft_50
-	bcs StartLeaving
-	lda hitboxXRight_4F
-	cmp objectHitBox_Right_X_0703,X
-	bcs StartLeaving
-	lda objectHitBox_Top_Y_0704,X
-	cmp hitboxYTop_52
-	bcs StartLeaving
-	lda hitboxYBottom_51
-	cmp objectHitBox_Bottom_Y_0705,X
-	bcs StartLeaving
-	lda healthPoints_0603,X
-	sec
-	sbc someObjProperty_0602,Y
-	beq :+
-	bcs :++
+	loopOverPlayerObjects:
+		lda object_Attrib_1_0404,Y
+		bmi :+		; if FLAG_7 this is a VALID object
+
+		jmp nextCollisionCheck
 	
 	:
-	jsr UnknownSub9
-	jmp :++
+		lda object_Attrib_2_0405,Y	; object flags
+		bit BIT_OBJPROP_CAN_COLLIDE		; test for BIT 6: object can collide
+		bne :+						; if flag set, continue
+		
+		jmp nextCollisionCheck		; if not, break
+	
+	:	
+		lda objectHitBox_Left_X_0702,Y 
+		sta hitboxXRight_4F
+		lda objectHitBox_Right_X_0703,Y
+		sta hitboxXLeft_50
+		lda objectHitBox_Top_Y_0704,Y
+		sta hitboxYBottom_51
+		lda objectHitBox_Bottom_Y_0705,Y
+		sta hitboxYTop_52	
+		
+		ldx #ENEMY_OBJECT_START 	; start of enemies slots
+	
+	loopOverEnemies:
+		
+		lda object_Attrib_1_0404,X
+		bpl noCollisionDetected
+		
+		and #OBJPROP_PLAYERSHOT
+		beq noCollisionDetected
+		
+		lda object_Attrib_2_0405,X
+		bit BIT_OBJPROP_CAN_COLLIDE
+		beq noCollisionDetected
+	
+		and #OBJPROP_IS_PICKUP
+		bne :+
+
+		cpy #ZERO
+		beq :+
+	
+	noCollisionDetected:
+		jmp nextEnemyObject ; mid-code drain to next enemy check
 	
 	:
-	sta healthPoints_0603,X
-	lda flagBossFight_1A
-	bne :+
-	clc
-	lda object_X_Lo_0400,X
-	adc #$07
-	sta object_X_Lo_0400,X
-	lda object_X_Hi_0401,X
-	adc #$00
-	sta object_X_Hi_0401,X
+		lda objectHitBox_Left_X_0702,X
+		cmp hitboxXLeft_50
+		bcs noCollisionDetected
+
+		lda hitboxXRight_4F
+		cmp objectHitBox_Right_X_0703,X
+		bcs noCollisionDetected
+
+		lda objectHitBox_Top_Y_0704,X
+		cmp hitboxYTop_52
+		bcs noCollisionDetected
+
+		lda hitboxYBottom_51
+		cmp objectHitBox_Bottom_Y_0705,X
+		bcs noCollisionDetected
+
+		lda healthPoints_0603,X
+		sec
+		sbc atackPoints_0602,Y
+		beq :+
+		bcs :++
 	
 	:
-	cpy #$00
-	bne :+
+		jsr DespatchEnemy_X
+		jmp :++
 	
 	:
-	lda healthPoints_0603,Y
-	sec
-	sbc someObjProperty_0602,X
-	beq doHandleObjCollision
-	bcc doHandleObjCollision
+		sta healthPoints_0603,X
+		lda flagBossFight_1A
+		bne :+
+		
+		clc
+		lda object_X_Lo_0400,X
+		adc #$07
+		sta object_X_Lo_0400,X
+		lda object_X_Hi_0401,X
+		adc #$00
+		sta object_X_Hi_0401,X
 	
-	cpy #$00
-	bne doStoreHitPointsAndLeave
-	cmp #$14
-	bcs doStoreHitPointsAndLeave
-	pha
-	lda #<Data_at8BD7
-	sta someObjProperty_0501
-	lda #>Data_at8BD7
-	sta someObjProperty_0502
-	lda #$00
-	sta someObjProperty_0503
-	sta someObjProperty_0504
-	sta someObjProperty_0505
-	pla
-	cmp #$01
-	bne doStoreHitPointsAndLeave
-	pha
-	lda #HEART_OFFSCREEN
-	sta OAM_0200
-	pla
+	:
+		cpy #$00
+		bne :+
+	
+	:
+		lda healthPoints_0603,Y
+		sec
+		sbc atackPoints_0602,X
+		beq doHandleObjCollision
+		bcc doHandleObjCollision
+	
+		cpy #$00
+		bne doStoreHitPointsAndLeave
+		cmp #$14
+		bcs doStoreHitPointsAndLeave
+		pha
+
+		COPY16 Data_at8BD7, someObjProperty_0501 ; and 0502, word address
+
+		lda #$00
+		sta someObjProperty_0503
+		sta someObjProperty_0504
+		sta someObjProperty_0505
+		pla
+		cmp #$01
+		bne doStoreHitPointsAndLeave
+
+		pha
+		lda #HEART_OFFSCREEN
+		sta OAM_0200
+		pla
 	
 	doStoreHitPointsAndLeave:
-	sta healthPoints_0603,Y
-	jmp DoneWithThis
+		sta healthPoints_0603,Y
+		jmp nextCollisionCheck
 	
 	doHandleObjCollision:
-	tya
-	tax
-	jsr HandleObjectCollision
-	jmp DoneWithThis
+		tya
+		tax
+		jsr HandleCollisionEffects
+		jmp nextCollisionCheck
 	
-	dontHandleObjCollision:
-	txa
-	clc
-	adc #$06
-	tax
-	cmp #$F0
-	bcc :+
-	bcs DoneWithThis
-	
-	:
-	jmp AnotherCheckAndLeave
-	
-	DoneWithThis:
-	tya
-	clc
-	
-	EvenMoreDone:
-	adc #$06
-	cmp #$30
-	bcs :+
-	tay
-	jmp BeginHere
+	nextEnemyObject:
+		txa
+		clc
+		adc #OBJECT_BYTE_SIZE
+		tax
+		cmp #ENEMY_OBJECT_END
+		bcc :+
+		bcs nextCollisionCheck
 	
 	:
-	rts
+		jmp loopOverEnemies
+	
+	nextCollisionCheck:
+		tya
+		clc
+	
+		adc #OBJECT_BYTE_SIZE
+		cmp #OBJECT_BYTE_SIZE*8
+		bcs :+
+		tay
+		jmp loopOverPlayerObjects
+	
+	:
+		rts
 .endproc
 ;
 ; $84E2
-.proc UnknownSub9
+.proc DespatchEnemy_X
 
 	PushXY
 
 	lda object_Attrib_2_0405,X
-	bit OBJPROP_STAGE_BOSS		; object is a TODO! NOT BOSS
-	bne :+						; if YES set, continue below
-		jmp doHandleObjCollision	; if NOT, skip to uniary-collision
+	bit BIT_OBJPROP_IS_PICKUP	
+	bne :+						
+		jmp doHandleObjCollision ; handle object pickup
 	
+	; There can be 2 sets of enemies on the screen
 	:  
-	bit BIT_0					
+	bit BIT_OBJPROP_PARTOF_SET0 ; check for Set 0
 	beq :+						
 
-		lda var_2B
+		lda enemySet0Size_2C
 		beq doHandleObjCollision
 		sec
 		sbc #$01
-		sta var_2B
+		sta enemySet0Size_2C
 		cmp #$01
 		bne doALSOHandleObjCollision
+		
 		sta flagGenDrop_2E
 		jsr GenerateDrop
 		jmp doHandleObjCollision
 	
 	:  
-	bit OBJPROP_PARTOF_SET		; enemy is part of set?
-	beq :+						; if not, break.
+	bit BIT_OBJPROP_PARTOF_SET1	; check for Set 1
+	beq :+						
 
-		lda enemySetSize_2C
+		lda enemySet1Size_2C
 		beq doHandleObjCollision
 		sec
 		sbc #$01
-		sta enemySetSize_2C
+		sta enemySet1Size_2C
 		cmp #$01
 		bne doALSOHandleObjCollision
 		
@@ -1234,26 +1268,27 @@ doneLoadingEnemyBatch:
 		jmp doHandleObjCollision
 	
 	:
-	bit BIT_3
+	bit BIT_OBJPROP_UNUSED
 	beq doALSOHandleObjCollision
+	
 		cpy #$00
 		bne skipHandlingCollision
 	
 	doALSOHandleObjCollision:
-		jsr HandleObjectCollision
+		jsr HandleCollisionEffects
 		lda soundIndex_8D
 		cmp #$05
 		beq skipHandlingCollision
 
 		; Sound effect =================
 		ResetSoundEngine 
-		PlaySoundOnce #ENEMY_DEATH_SFX
+		PlaySoundOnce #SFX_ENEMY_DEATH
 		; ==============================
 
 		jmp skipHandlingCollision
 	
 	doHandleObjCollision:
-		jsr HandleObjectCollision
+		jsr HandleCollisionEffects
 
 	skipHandlingCollision:
 	PullXY
@@ -1277,13 +1312,13 @@ doneLoadingEnemyBatch:
 .define SPAWNTYPE_PUFF		$02
 .define SPAWNTYPE_PLAYERDEATH $03
 
-.proc HandleObjectCollision
+.proc HandleCollisionEffects
 ; Checks if object with index X collided with something important.
 ; 	X = 0 is the player
 	
 	PushXY
 	lda object_Attrib_2_0405,X		; Object status flags
-	bit OBJPROP_CAN_COLLIDE			; check if the object is tangible (flag 6)
+	bit BIT_OBJPROP_CAN_COLLIDE			; check if the object is tangible (flag 6)
 	bne :+							; if TANGIBLE (can collide), continue
 	jmp doneWithObjectCollision		; else exit
 	
@@ -1316,7 +1351,7 @@ doneLoadingEnemyBatch:
 			; Sound effect =================
 			WaitUntilSoundFinishes
 			ResetSoundEngine	
-			PlaySoundOnce #EXTRA_LIFE_SFX
+			PlaySoundOnce #SFX_EXTRA_LIFE
 			; ==============================
 
 			inc livesCounter_11
@@ -1329,7 +1364,7 @@ doneLoadingEnemyBatch:
 			; Sound effect =================
 			WaitUntilSoundFinishes
 			ResetSoundEngine
-			PlaySoundOnce #GAME_START_SFX
+			PlaySoundOnce #SFX_GAME_START
 			; ==============================
 
 			lda powerLevel_64
@@ -1352,7 +1387,7 @@ doneLoadingEnemyBatch:
 			; Sound effect =================
 			WaitUntilSoundFinishes
 			ResetSoundEngine
-			PlaySoundOnce #GAME_START_SFX
+			PlaySoundOnce #SFX_GAME_START
 			; ==============================
 
 			jsr AddOneHeart
@@ -1365,7 +1400,7 @@ doneLoadingEnemyBatch:
 			; Sound effect =================
 			WaitUntilSoundFinishes
 			ResetSoundEngine
-			PlaySoundOnce #GAME_START_SFX
+			PlaySoundOnce #SFX_GAME_START
 			; ==============================
 
 			lda #PLAYER_SPEED_FAST
@@ -1382,15 +1417,14 @@ doneLoadingEnemyBatch:
 			:
 
 			; Sound effect =================
-			PlaySoundOnce #MAGIC_LAMP_SFX
+			PlaySoundOnce #SFX_MAGIC_LAMP
 			; ==============================
 
 			lda #MAGIC_LAMP_HEALTH_POINTS
 			sta healthPoints_0603
-			lda #<Data_at8BBD
-			sta someObjProperty_0501
-			lda #>Data_at8BBD
-			sta someObjProperty_0502
+
+			COPY16 Data_at8BBD, someObjProperty_0501 ; and 0502 word address
+			
 			lda #$00
 			sta someObjProperty_0503
 			sta someObjProperty_0504
@@ -1413,7 +1447,7 @@ doneLoadingEnemyBatch:
 	bne :+
 		WaitUntilSoundFinishes
 		ResetSoundEngine
-		PlaySoundOnce #PLAYER_DEATH_SFX
+		PlaySoundOnce #SFX_PLAYER_DEATH
 
 		lda #TRUE
 		sta flagPlaySFX_8F
@@ -1456,7 +1490,7 @@ doneLoadingEnemyBatch:
 	cmp #$24
 	bne doneWithObjectCollision
 
-	PlaySoundForever #BOSS_DEATH_SFX
+	PlaySoundForever #SFX_BOSS_DEATH
 
 
 	lda #$08
@@ -1537,7 +1571,7 @@ doneLoadingEnemyBatch:
 	lda Data_at8715+1,Y			; object VY table address
 	sta someObjProperty_0502,X  ; object VY table address
 	lda Data_at8715+2,Y
-	sta someObjProperty_0602,X
+	sta atackPoints_0602,X
 	lda Data_at8715+3,Y
 	sta object_Attrib_2_0405,X
 	lda Data_at8715+4,Y
@@ -1630,10 +1664,7 @@ Data_at8715:
 	lda #PLAYER_START_Y_Lo
 	sta object_Y_Lo_0402
 
-	lda #<Data_at8B7D					
-	sta someObjProperty_0501
-	lda #>Data_at8B7D		
-	sta someObjProperty_0502
+	COPY16 Data_at8B7D, someObjProperty_0501
 
 	lda #(FLAG_7+FLAG_5)			; $A0
 	sta object_Attrib_1_0404
@@ -1648,7 +1679,7 @@ Data_at8715:
 	lda #$1A
 	sta someObjProperty_0302
 	lda #$03
-	sta someObjProperty_0602
+	sta atackPoints_0602
 	
 	lda #$14
 	sta objectWidth_0600
@@ -1723,7 +1754,7 @@ Data_at8BD7:
 	sta someObjProperty_0303,Y
 	sta objectSpeed_X_0604,Y
 	sta objectSpeed_Y_0605,Y
-	sta someObjProperty_0602,Y
+	sta atackPoints_0602,Y
 	lda #$FF
 	sta healthPoints_0603,Y
 	lda #$07
@@ -1860,7 +1891,7 @@ Data_at8BD7:
 	beq doneShooting
 	
 	:
-	PlaySoundOnce #$03
+	PlaySoundOnce #ARROW_SHOT_SFX
 
 	doneShooting:
 		lda #$00
@@ -1914,7 +1945,7 @@ Data_at8BD7:
 	adc #$02					; add 2
 	
 	:
-	sta someObjProperty_0602,X	; store A (byte 1) #$02 single, #$04 triple
+	sta atackPoints_0602,X	; store A (byte 1) #$02 single, #$04 triple
 	lda Data_at8D1D+3,Y			; load byte 2
 	sta someObjProperty_0302,X	; store byte 2
 	lda Data_at8D1D+4,Y			; load byte 3
@@ -2202,6 +2233,23 @@ Data_at8D45:
 	rts
 .endproc
 ;
+; macro SpawnMultipleProjectiles
+; Spawn a given number of projectiles
+; from give address, using call
+.macro SpawnMultipleProjectiles address, number
+	txa
+	tay
+	ldx #$00
+	
+	:
+		lda address,X
+		sta projectileIndex_4A
+		jsr HandleSpawnProjectile_Y
+		inx
+		cpx #number
+		bne :-
+.endmacro
+;
 ; $8E25
 Data_at8E25:
 .byte $0f, $23, $0a, $19, $05, $1e, $00, $1e
@@ -2232,7 +2280,7 @@ Data_at8E3F:
 	jsr GetProjectileTrajectoryAddress_X_Y
 
 	lda #$01
-	sta someObjProperty_0602,X
+	sta atackPoints_0602,X
 	lda #(FLAG_5+FLAG_6)
 	sta object_Attrib_2_0405,X
 	lda #$04
@@ -2275,6 +2323,7 @@ Data_at8E3F:
 	lda object_Y_Hi_0403,Y 		; positionY_Hi
 	adc #$00
 	sta object_Y_Hi_0403,X
+
 	rts
 .endproc
 ;
@@ -2352,7 +2401,7 @@ Data_at92D4:
 .proc HandleBossAnimation_Shooting
 PushXY
 	lda #$05
-	sta someObjProperty_0333 ; not used in any other place
+	sta someObjProperty_0333 ; unused variable
 
 	lda someObjProperty_0531
 	sta someObjProperty_0531+page_5_Gap
@@ -2370,10 +2419,7 @@ PushXY
 	sta someObjProperty_0534
 	sta someObjProperty_0535
 
-	lda #<Data_at932D 			; see data below
-	sta objectPtr_34+0
-	lda #>Data_at932D 			; see data below
-	sta objectPtr_34+1
+	COPY16 Data_at932D, objectPtr_34 ; see data below
 
 	lda currentStage_15			; get stage index (starts at 1)
 	sec
@@ -2419,7 +2465,6 @@ Data_at932D:
 LivesGraphicData:
 .include "hud_lives.inc"
 ;
-.segment "CODEBLOCK"
 ; $93C9
 .proc ClearPages_3_to_7
 	lda #$00
@@ -2943,7 +2988,7 @@ RegisterInput:
 	sta flagPPUControl_19
 	jsr RenderON
 	
-	PlaySoundForever #ENDING_SONG
+	PlaySoundForever #SONG_ENDING
 
 	loopPressANYButton:
 		lda input1_20
@@ -3061,11 +3106,17 @@ RegisterInput:
 		sta PpuScroll_2005
 		
 		; play a sound effect
-		PlaySoundOnce #$0A
+		PlaySoundOnce #SFX_ENEMY_HIT
 
 		: ; advance to next screen position
-		Add16 vramAddress_67, #1
-		
+		lda vramAddress_67+1
+		clc
+		adc #$01
+		sta vramAddress_67+1
+		lda vramAddress_67+0
+		adc #$00
+		sta vramAddress_67+0
+
 		; wait 7 vblanks between characters
 		ldx #$07
 		:
@@ -3161,7 +3212,6 @@ Data_at97F5:
 ; =====================================================
 ;
 ; $9815
-.segment "SOUNDENGINE"
 .include "sound-engine.asm"
 
 ; Sound data
@@ -3182,8 +3232,6 @@ Data_at9ED6:
 .incbin "rom-prg/sound/sound-data-at9ED6.bin"
 ;
 ; =====================================================
-;
-.segment "CODEBLOCK2"
 ;
 ; $A3AC
 .proc HandleVBlank
@@ -3270,22 +3318,24 @@ Data_at9ED6:
 ;
 ; $A424
 .proc ReadControl_1
-	lda #$00
+	lda #ZERO
 	jsr ReadControl_A
 	rts
 .endproc
 ;
 ; $A42A
 .proc HandleScrollingControl
+
 	ldx flagGameMode_26
-	bne :+
+	bne :+	; any mode that's not GAMEMODE_STAGE ($00) doesn't scrool
+
 	inc frameScrollCtr_28
 	lda frameScrollCtr_28
 	cmp frameScrollAt_27
 	bcc :+
 	
 	; doScrollBackground
-	lda #$00
+	lda #ZERO
 	sta frameScrollCtr_28
 	jsr HandleStageScrolling 
 	
@@ -3295,25 +3345,27 @@ Data_at9ED6:
 ;
 ; $A43E
 .proc HandleStageScrolling
+
 	inc screenScrollX_29
 	lda screenScrollX_29
 	bne doneWithScrolling
-	ldx levelProgression_16
-	
+
+	ldx levelProgression_16	
 	cpx #BG_SCROLL_LIMIT		; test if reached end of stage
-	bcc doKeepScrollingStage 
-	lda #$02
+	bcc doKeepScrollingStage
+
+	lda #GAMEMODE_BOSSFIGHT
 	sta flagGameMode_26
 	
 	doKeepScrollingStage:
-	clc
-	inc levelProgression_16
-	lda flagPPUControl_19
-	eor #$01
-	sta flagPPUControl_19
+		clc
+		inc levelProgression_16
+		lda flagPPUControl_19
+		Flip FLAG_0
+		sta flagPPUControl_19
 	
 	doneWithScrolling:
-	rts
+		rts
 .endproc
 ;
 ; $A458
@@ -3840,8 +3892,9 @@ Data_at9ED6:
 ; $A743
 .proc HandleControllerInputs
 
-	lda #$00
+	lda #ZERO
 	jsr ReadControl_A
+
 	lda flagPause_1C
 	bne doGameIsPaused
 
@@ -3870,7 +3923,7 @@ Data_at9ED6:
 		beq checkInputLeft
 
 		lda object_X_Lo_0400
-		cmp #$DC
+		cmp #PLAYER_X_MAX
 		bcs checkInputDown
 		adc speedLevel_66
 		bcc :+
@@ -3879,7 +3932,7 @@ Data_at9ED6:
 		bit BIT_BUTTON_LEFT
 		beq checkInputDown
 		lda object_X_Lo_0400
-		cmp #$12
+		cmp #PLAYER_X_MIN
 		bcc checkInputDown
 		sbc speedLevel_66
 
@@ -3891,7 +3944,7 @@ Data_at9ED6:
 		bit BIT_BUTTON_DOWN
 		beq checkInputUp
 		lda object_Y_Lo_0402
-		cmp #$B8
+		cmp #PLAYER_Y_MAX
 		bcs checkInputA
 		adc speedLevel_66
 		bcc :+
@@ -3900,7 +3953,7 @@ Data_at9ED6:
 		bit BIT_BUTTON_UP
 		beq checkInputA
 		lda object_Y_Lo_0402
-		cmp #$14
+		cmp #PLAYER_Y_MIN
 		bcc checkInputA
 		sbc speedLevel_66
 
@@ -3911,6 +3964,7 @@ Data_at9ED6:
 		lda input1_20
 		bit BIT_BUTTON_A
 		beq OnlyCheckForPause
+
 		lda inputPrev_22
 		bit BIT_BUTTON_A
 		bne OnlyCheckForPause
@@ -3922,23 +3976,18 @@ Data_at9ED6:
 		lda healthPoints_0603
 		cmp #$14
 		bcc :+
-		lda #<Data_atA80A
-		sta someObjProperty_0501
-		lda #>Data_atA80A
-		sta someObjProperty_0502
-		lda #$00
+		
+		COPY16 Data_atA80A, someObjProperty_0501		
+		lda #ZERO
 		sta someObjProperty_0503
 		beq OnlyCheckForPause
 	
-		:
-		lda #<Data_atA7F0
-		sta someObjProperty_0501
-		lda #>Data_atA7F0
-		sta someObjProperty_0502
-		lda #$00
+	:
+		COPY16 Data_atA7F0, someObjProperty_0501
+		lda #ZERO
 		sta someObjProperty_0503
-	
-		OnlyCheckForPause:
+		
+	OnlyCheckForPause:
 		jsr CheckForPause
 		lda input1_20
 		sta inputPrev_22
@@ -3960,71 +4009,71 @@ Data_atA80A:
 ; In case not, zeoes-out A
 ; else, leaves A untouched.
 .proc CheckPlayerCanShoot_A_rA
+
 	pha
 	lda object_Attrib_1_0404
 	bit BIT_5
 	beq :+
+	
 	pla
 	rts
 
 	:
-	pla
-	lda #$00
-	rts
+		pla
+		lda #ZERO
+		rts
 .endproc
 ;
 ; $A84B
 .proc CheckForPause
+	
 	lda input1_20
 
 	checkInputPressStart:
-	bit BIT_BUTTON_START
-	beq exitPauseRoutine
+		bit BIT_BUTTON_START
+		beq exitPauseRoutine
 	
-	lda inputPrev_22
-	bit BIT_BUTTON_START
-	bne exitPauseRoutine
+		lda inputPrev_22
+		bit BIT_BUTTON_START
+		bne exitPauseRoutine
 	
-	lda flagPause_1C
-	eor #$01
-	sta flagPause_1C
-	beq :+
+		lda flagPause_1C
+		Flip FLAG_0
+		sta flagPause_1C
+		beq :+
 	
-	StopPlaying
-	PlaySoundOnce #$08
+		StopPlaying
+		PlaySoundOnce #SFX_GAME_PAUSE
 
-	jmp exitPauseRoutine
+		jmp exitPauseRoutine
 	
 	:
-	ResetSoundEngine 
+		ResetSoundEngine 
+		lda flagBossFight_1A
+		beq :+
 
-	lda flagBossFight_1A
-	beq :+
-	PlaySoundForever #BOSS_SONG
-	rts
+		PlaySoundForever #SONG_BOSSES
+		rts
 
 	:
-	PlaySoundForever #STAGE_SONG
+		PlaySoundForever #SONG_STAGES
 	
 	exitPauseRoutine:
-	rts
+		rts
 .endproc
 ;
 ; $A885
-.segment "OBJECTS"
-
 ObjectsData_A885:
 .include "objects.asm"
 
 
 ; $E847
-.segment "BACKGROUND"
-
+;
 BackgroundData_E847:
 .include "backgrounds.asm"
 
 
-.segment "DATA3"
+.segment "EXTRA_DATA"
 .byte $00, $01, $02, $03
 
 .segment "VECTORS"
