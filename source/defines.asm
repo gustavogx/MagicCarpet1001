@@ -20,7 +20,6 @@
 .define Ctrl1_4016			$4016
 .define Ctrl2_FrameCtr_4017 $4017
 .define BankSwitching_FFF0 	$FFF0
-.define UpdateDuringVBlank_Flag2	$75
 
 .define RAMPage_0	$0000
 .define RAMPage_1 	$0100
@@ -30,6 +29,14 @@
 .define RAMPage_5 	$0500
 .define RAMPage_6 	$0600
 .define RAMPage_7 	$0700
+
+; page 02 - OAM
+.define OAM_Y 		0
+.define OAM_TILE 	1
+.define OAM_ATT 	2
+.define OAM_X 		3
+.define OAM_STRIDE	4
+
 
 .define FLAG_0	%00000001
 .define FLAG_1	%00000010

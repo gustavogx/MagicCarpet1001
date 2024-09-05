@@ -45,6 +45,14 @@
 	eor #flag
 .endmacro
 
+; macro Div8
+; Divides value or accumulator by 8
+.macro Div8 variable
+	lsr variable
+	lsr variable
+	lsr variable
+.endmacro
+
 ; macro PushAXY
 ; Pushes the registers A, X and Y, in this order, 
 ; on the top of the stack

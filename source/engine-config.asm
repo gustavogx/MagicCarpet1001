@@ -6,6 +6,7 @@
 .define HEART_HEALTH_POINTS 	 $04
 .define PLAYER_MAX_POWER		 $04
 .define MAGIC_LAMP_HEALTH_POINTS $50
+.define PLAYER_FLASHING_HEALTH	 $14
 ; ====================================
 
 ; Engine Configuration ===============
