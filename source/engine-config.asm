@@ -89,6 +89,6 @@
 .define SFX_GAME_START 	$07; 07 Game Start / Item grab SFX
 .define SFX_GAME_PAUSE 	$08; 08 Pause
 .define SFX_BOSS_DEATH 	$09; 09 Boss death SFX
-.define SFX_ENEMY_HIT 	$0A; 0A Enemy hit SFX
+.define SFX_TYPE_WRITER	$0A; 0A Type writer key stroke SFX
 .define SONG_ENDING 	$0B; 0B Ending song
 .define SFX_MAGIC_LAMP 	$0C; 0C Magic Lamp SFX

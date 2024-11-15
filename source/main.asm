@@ -2998,7 +2998,7 @@ RegisterInput:
 	jsr PaletteFading
 	jsr RenderingOFF
 	jsr ClearPage_2_OAM
-	lda #$02					; Wait 2 seconds before
+	lda #$02			; Wait 2 seconds before
 	jsr WaitAliveTime_A	; respawings the player
 	lda #$00
 	sta PpuControl_2000
@@ -3096,7 +3096,7 @@ RegisterInput:
 		sta PpuScroll_2005
 		
 		; play a sound effect
-		PlaySoundOnce #SFX_ENEMY_HIT
+		PlaySoundOnce #SFX_TYPE_WRITER
 
 		: ; advance to next screen position
 		lda vramAddress_67+1
