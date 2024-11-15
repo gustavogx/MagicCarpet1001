@@ -10,8 +10,8 @@
 	jmp doneWithSoundEngine
 	:
 
-	ldx #$00 
-	lda #$01 
+	ldx #ZERO 
+	lda #FLAG_0 
 	sta soundEngine_8C
 	
 	ReplaceMeLabel_S5: 
@@ -35,7 +35,7 @@
 	
 	ReplaceMeLabel_S1:
 	lda (soundEngineAddrList_7A,X)
-	and #$80 
+	and #FLAG_7
 	bne skipToThis_2
 	txa
 	pha
@@ -66,7 +66,7 @@
 
 	skipToThis_2:
 	lda (soundEngineAddrList_7A,X)
-	cmp #$80 
+	cmp #FLAG_7 
 	bne :+
 	jsr UnknownSub4
 	txa
@@ -172,14 +172,14 @@
 	txa
 	cmp #$07 
 	bcs ReplaceMeLabel_S2
-	lda #$F0 
+	lda #UPPER 
 	and flagSound_70 
 	sta flagSound_70 
 	ldy #$00
 
 	loop_S1:
 		lda square0Duty_98,Y
-		and #$F6 
+		and #(UPPER+FLAG_1+FLAG_2) ; turns OFF flags 0 and 3
 		sta Sq0Duty_4000,Y
 		lda square1Duty_9C,Y
 		sta Sq1Duty_4004,Y
@@ -191,7 +191,7 @@
 		cpy #$02 
 		bne loop_S1
 
-	lda #$F0 
+	lda #UPPER 
 	and flagSound_70 
 	bne :+
 	
@@ -224,7 +224,7 @@
 	lda soundEngine_90,X
 	cmp #$00 
 	bne ReplaceMeLabel_S3
-	lda #$FF 
+	lda #FULL 
 	sta soundEngine_90,X
 	tya
 	tax
@@ -239,7 +239,7 @@
 	tay
 	jsr UnknownSub4
 	lda soundEngine_90,Y
-	cmp #$FF 
+	cmp #FULL 
 	bne ReplaceMeLabel_S4
 	tya
 	tax

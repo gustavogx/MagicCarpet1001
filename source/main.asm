@@ -3,21 +3,6 @@
 .include "defines.asm"
 .include "engine-config.asm"
 
-; song names
-.define SONG_OPENING 	$00; 00 Opening song
-.define SONG_STAGES 	$01; 01 Stage song
-.define SONG_BOSSES 	$02; 02 Boss song
-.define ARROW_SHOT_SFX 	$03; 03 Arrow shot SFX
-.define SFX_ENEMY_DEATH $04; 04 Enemy death SFX
-.define SFX_PLAYER_DEATH $05; 05 Player death SFX
-.define SFX_EXTRA_LIFE 	$06; 06 Extra life SFX
-.define SFX_GAME_START 	$07; 07 Game Start / Item grab SFX
-.define SFX_GAME_PAUSE 	$08; 08 Pause
-.define SFX_BOSS_DEATH 	$09; 09 Boss death SFX
-.define SFX_ENEMY_HIT 	$0A; 0A Enemy hit SFX
-.define SONG_ENDING 	$0B; 0B Ending song
-.define SFX_MAGIC_LAMP 	$0C; 0C Magic Lamp SFX
-
 .segment "HEADER"
 .include "inesheader.inc"
 
@@ -34,7 +19,7 @@
 .res 1 ; $09
 .res 1 ; $0a
 .res 1 ; $0b
-var_0C:	.res 1 ; $0c
+var_0C:	.res 1 ; $0c THIS HAS SOMETHING TO DO WITH THE MAGIC LAMP
 var_0D:	.res 1 ; $0d
 updateDuringVBlank_0E:	.res 1 ; $0e
 updateDuringVBlank_0F:	.res 1 ; $0f
@@ -509,7 +494,7 @@ StartingNewStage:
 	ldx #$01
 	jsr LoadStage
 	
-	lda #$FF
+	lda #FULL
 	sta var_0C
 	
 	lda #GAMEMODE_STAGE
@@ -531,7 +516,7 @@ StartingNewStage:
 	lda #ENEMY_WAVES_TO_FIRST
 	sta nextEnemyWave_5C
 	
-	lda #$00
+	lda #ZERO
 	sta input1_20
 	sta inputPrev_22
 	sta currentEnemyWave_5B
@@ -3405,9 +3390,9 @@ Data_at9ED6:
 ;
 ; $A46F
 ; HandleObjectsUpdates
-; This routine updates every object of the game, every VBlank time.
+; This routine updates every object of the game at every VBlank time.
 ; THIS IS BAD PROGRAMING!
-; This routine doesn't fit during vblank.
+; This routine takes longer than vblank.
 .proc HandleObjectsUpdates
 
 	lda #FIRST_OBJECT_SLOT		; Configuration constant

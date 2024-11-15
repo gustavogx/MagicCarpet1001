@@ -30,7 +30,7 @@
 ; macro TurnOFF
 ; Turns OFF a given flag
 .macro TurnOFF flag
-	and #(ALL1-flag)
+	and #(FULL-flag)
 .endmacro
 
 ; macro TurnON
@@ -123,7 +123,6 @@
 .endmacro
 
 ; Sound Engine Macros =====================
-
 .macro PlaySoundOnce index
 .if DISABLE_SOUND = 1
 	lda index
