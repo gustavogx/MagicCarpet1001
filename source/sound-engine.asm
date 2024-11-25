@@ -301,50 +301,50 @@
 	cmp #$07 
 	bcs :+
 
-	asl A    
-	tax
-	lda Data_at9D22+0,Y
-	sta Sq0Timer_4002,X
-	lda Data_at9D22+1,Y
-	sta Sq0Length_4003,X     
+		asl A
+		tax
+		lda Data_at9D22+0,Y
+		sta Sq0Timer_4002,X
+		lda Data_at9D22+1,Y
+		sta Sq0Length_4003,X
 	rts
 	
 	:
-	tya
-	pha
-	txa
-	and #$07 
-	lsr A    
-	tay
-	lda Data_at9DB4+4,Y
-	and flagSound_70 
-	beq :+
+		tya
+		pha
+		txa
+		and #$07 
+		lsr A
+		tay
+		lda Data_at9DB4+4,Y
+		and flagSound_70 
+		beq :+
 
-	tya
-	asl A    
-	asl A    
-	tax
-	pla
-	tay
-	lda Data_at9D22+0,Y
-	sta square0Timer_9A,X
-	lda Data_at9D22+1,Y
-	sta square0Length_9B,X
+		tya
+		asl A
+		asl A
+		tax
+		pla
+		tay
+		lda Data_at9D22+0,Y
+		sta square0Timer_9A,X
+		lda Data_at9D22+1,Y
+		sta square0Length_9B,X
 	rts
 
 	:
-	tya
-	asl A    
-	asl A    
-	tax
-	pla
-	tay
-	lda Data_at9D22+0,Y
-	sta Sq0Timer_4002,X
-	sta square0Timer_9A,X
-	lda Data_at9D22+1,Y
-	sta Sq0Length_4003,X     
-	sta square0Length_9B,X
+		tya
+		asl A
+		asl A
+		tax
+		pla
+		tay
+		lda Data_at9D22+0,Y
+		sta Sq0Timer_4002,X
+		sta square0Timer_9A,X
+		lda Data_at9D22+1,Y
+		sta Sq0Length_4003,X
+		sta square0Length_9B,X
 	rts
 
 .endproc

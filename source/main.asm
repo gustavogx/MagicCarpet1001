@@ -227,12 +227,11 @@ flagAPUStatus_C9:		.res 1	; $C9
 paletteRAM_E0:			.res 32	; $E0 ; 4
 
 
-.segment "SPRITES" ; LSB 0 - FF
-
 .segment "RAM" ; LSB 0100 - 07FF
 
 .define someObjProperty_0100 $0100 ; 1 only used once in UnusedFunction1
 
+.segment "SPRITES"
 
 ; page 02
 .define OAM_0200	RAMPage_2 ; Y
@@ -3206,9 +3205,12 @@ Data_at97F5:
 
 ; Sound data
 
+; Square Wave 0 :: [Timer,Lenght]=[$4002,$4003]
+; 7 values
 Data_at9D22:
 .incbin "rom-prg/sound/sound-data-at9D22.bin"
 
+; Square Wave 0 :: [Duty,Sweep]=[$4000,$4001]
 Data_at9DB4:
 .incbin "rom-prg/sound/sound-data-at9DB4.bin"
 
