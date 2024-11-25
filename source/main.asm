@@ -1,10 +1,10 @@
 .define DISABLE_SOUND 0
 .include "macros.asm"
-.include "defines.asm"
-.include "engine-config.asm"
+.include "config/defines.asm"
+.include "config/engine_config.asm"
 
 .segment "HEADER"
-.include "inesheader.inc"
+.include "config/inesheader.inc"
 
 .segment "ZEROPAGE" ; LSB 0 - FF
 .res 1 ; $00
@@ -1590,7 +1590,7 @@ doneLoadingEnemyBatch:
 ; $8715
 ; Object type table?
 Data_at8715:
-.include "despawn_objects.inc"
+.include "objects/data/despawn_objects.inc"
 ;
 ; $8AEA
 .proc GenerateDrop ; Generate a random drop
@@ -1700,7 +1700,7 @@ Data_at8715:
 ;
 ; $8B7D
 Data_at8B7D:
-.incbin "rom-prg/objects/data-block-at8B7D.bin"
+.incbin "data/objects/data-block-at8B7D.bin"
 ;.byte $0B, $10, $00, $81, $0C, $0C, $00, $81
 ;.byte $0D, $0B, $00, $81, $0B, $09, $00, $82
 ;.byte $0C, $07, $00, $82, $0D, $05, $00, $82
@@ -1711,14 +1711,14 @@ Data_at8B7D:
 ;.byte $00, $86, $0D, $00, $00, $86, $FE, $32
 
 Data_at8BBD:
-.incbin "rom-prg/objects/data-block-at8BBD.bin"
+.incbin "data/objects/data-block-at8BBD.bin"
 ;.byte $0B, $00, $00, $81, $43, $00, $00, $83
 ;.byte $0C, $00, $00, $81, $43, $00, $00, $83
 ;.byte $0D, $00, $00, $81, $43, $00, $00, $83
 ;.byte $FE, $00
 
 Data_at8BD7:
-.incbin "rom-prg/objects/data-block-at8BD7.bin"
+.incbin "data/objects/data-block-at8BD7.bin"
 ;.byte $0B, $00, $00, $86, $0C, $00, $00, $86, $0D, $00, $00, $86, $FE, $00
 ;
 ; $8BE5
@@ -1984,7 +1984,7 @@ Data_at8D1D:
 ;	|	+------------------
 ;	+----------------------
 ;
-;.incbin "rom-prg/objects/data-block-at8D1D.bin"
+;.incbin "data/objects/data-block-at8D1D.bin"
 
 .addr Data_at8D35
 .byte $02, $06, $06, $05, $12, $0C 
@@ -2333,7 +2333,7 @@ Data_at8E3F:
 ;
 ; $8EBE
 ; Projectile Trajectories Table
-.include "trajectories.inc"
+.include "objects/data/trajectories.inc"
 ;
 ;
 ; $927F
@@ -2429,7 +2429,7 @@ PushXY
 ; $932D
 Data_at932D:
 ;Boss animation frames
-.include "boss_animation_frames.inc"
+.include "objects/data/boss_animation_frames.inc"
 ;
 ; $9362
 .proc LivesHUD
@@ -2452,7 +2452,7 @@ Data_at932D:
 ;
 ; $937C
 LivesGraphicData:
-.include "hud_lives.inc"
+.include "data/hud_lives.inc"
 ;
 ; $93C9
 .proc ClearPages_3_to_7
@@ -3147,7 +3147,7 @@ EndingText_9785:
 EndingText_97A3:
 .byte $23, $4c, "THE END", $FF
 
-;.incbin "rom-prg/stages/EndCredits.bin"
+;.incbin "data/stages/EndCredits.bin"
 ;
 ; $97AD
 .proc ShowGameOver_WaitAnyButtonPress
@@ -3196,32 +3196,32 @@ EndingText_97A3:
 ; $97F5 32 bytes of data
 ; Hard-coded "GAME OVER" message using game 8 sprites
 Data_at97F5:
-.incbin "rom-prg/objects/data-block-at97F5.bin"
+.incbin "data/objects/data-block-at97F5.bin"
 ;
 ; =====================================================
 ;
 ; $9815
-.include "sound-engine.asm"
+.include "sounds/sound_engine.asm"
 
 ; Sound data
 
 ; Square Wave 0 :: [Timer,Lenght]=[$4002,$4003]
 ; 7 values
 Data_at9D22:
-.incbin "rom-prg/sound/sound-data-at9D22.bin"
+.incbin "sounds/data/sound-data-at9D22.bin"
 
 ; Square Wave 0 :: [Duty,Sweep]=[$4000,$4001]
 Data_at9DB4:
-.incbin "rom-prg/sound/sound-data-at9DB4.bin"
+.incbin "sounds/data/sound-data-at9DB4.bin"
 
 Data_at9E84:
-.incbin "rom-prg/sound/sound-data-at9E84.bin"
+.incbin "sounds/data/sound-data-at9E84.bin"
 
 Data_at9EB4:
-.incbin "rom-prg/sound/sound-data-at9EB4.bin"
+.incbin "sounds/data/sound-data-at9EB4.bin"
 
 Data_at9ED6:
-.incbin "rom-prg/sound/sound-data-at9ED6.bin"
+.incbin "sounds/data/sound-data-at9ED6.bin"
 ;
 ; =====================================================
 ;
@@ -3994,11 +3994,11 @@ Data_at9ED6:
 ;
 ; $A7F0
 Data_atA7F0:
-.incbin "rom-prg/objects/data-block-atA7F0.bin"
+.incbin "data/objects/data-block-atA7F0.bin"
 ;
 ; $A80A
 Data_atA80A:
-.incbin "rom-prg/objects/data-block-atA80A.bin"
+.incbin "data/objects/data-block-atA80A.bin"
 ;
 ; $A83C
 ; CheckPlayerCanShoot_A_rA
@@ -4061,13 +4061,13 @@ Data_atA80A:
 ;
 ; $A885
 ObjectsData_A885:
-.include "objects.asm"
+.include "objects/objects.asm"
 
 
 ; $E847
 ;
 BackgroundData_E847:
-.include "backgrounds.asm"
+.include "stages/backgrounds.asm"
 
 
 .segment "EXTRA_DATA"
@@ -4079,13 +4079,13 @@ BackgroundData_E847:
 	.word HandleReset ; for some reason, the irq vector also points to the reset
 
 .segment "CHARS0"
-.incbin "rom-chr/bank0.chr"
+.incbin "graphics/bank0.chr"
 
 .segment "CHARS1"
-.incbin "rom-chr/bank1.chr"
+.incbin "graphics/bank1.chr"
 
 .segment "CHARS2"
-.incbin "rom-chr/bank2.chr"
+.incbin "graphics/bank2.chr"
 
 .segment "CHARS3"
-.incbin "rom-chr/bank3.chr"
+.incbin "graphics/bank3.chr"

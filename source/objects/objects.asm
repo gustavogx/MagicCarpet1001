@@ -69,10 +69,10 @@ NUMBER_ADDR_09: ; $a941 - offset $04
 DATA_ADDR_10: ; $a945 - offset $04
 ;   This "GAME OVER" object is never used, since the 
 ; current GAME OVER is loaded into OAM from the ROM.
-.incbin "rom-prg/objects/data-object-atA945.bin" ; "Game Over" text, NOT ASCII
+.incbin "data/objects/data-object-atA945.bin" ; "Game Over" text, NOT ASCII
 
 DATA_ADDR_11: ; $a958 - offset $13
-.incbin "rom-prg/objects/data-object-atA958.bin" ; Player Flying Frame 1/3
+.incbin "data/objects/data-object-atA958.bin" ; Player Flying Frame 1/3
 
 ;.byte $1F, $1D ; W and H in pixels
 
@@ -97,31 +97,31 @@ DATA_ADDR_11: ; $a958 - offset $13
 ;.byte $1C, $00
 
 DATA_ADDR_12: ; $a975 - offset $1d
-.incbin "rom-prg/objects/data-object-atA975.bin" ; Player Flying Frame 2/3
+.incbin "data/objects/data-object-atA975.bin" ; Player Flying Frame 2/3
 
 DATA_ADDR_13: ; $a993 - offset $1e
-.incbin "rom-prg/objects/data-object-atA993.bin" ; Player Flying Frame 3/3
+.incbin "data/objects/data-object-atA993.bin" ; Player Flying Frame 3/3
 
 DATA_ADDR_14: ; $a9b0 - offset $1d
-.incbin "rom-prg/objects/data-object-atA9B0.bin" ; Player Shooting
+.incbin "data/objects/data-object-atA9B0.bin" ; Player Shooting
 
 DATA_ADDR_15: ; $a9ce - offset $1e
-.incbin "rom-prg/objects/data-object-atA9CE.bin" ; Player Death Frame 1/2
+.incbin "data/objects/data-object-atA9CE.bin" ; Player Death Frame 1/2
 
 DATA_ADDR_16: ; $a9e1 - offset $13
-.incbin "rom-prg/objects/data-object-atA9E1.bin" ; Player Death Frame 2/2
+.incbin "data/objects/data-object-atA9E1.bin" ; Player Death Frame 2/2
 
 DATA_ADDR_17: ; $a9f5 - offset $14
 .byte $06, $05, $3f, $03 			;	Player shot horizontal
 
 DATA_ADDR_18: ; $a9f9 - offset $04
-.incbin "rom-prg/objects/data-object-atA9F9.bin" ;	Enemy hit puff Frame 1/2
+.incbin "data/objects/data-object-atA9F9.bin" ;	Enemy hit puff Frame 1/2
 
 DATA_ADDR_19: ; $aa03 - offset $0a
-.incbin "rom-prg/objects/data-object-atAA03.bin" ; 	Enemy hit puff Frame 2/2
+.incbin "data/objects/data-object-atAA03.bin" ; 	Enemy hit puff Frame 2/2
 
 DATA_ADDR_20: ; $aa0d - offset $0a
-.incbin "rom-prg/objects/data-object-atAA0D.bin" ;  One Up icon
+.incbin "data/objects/data-object-atAA0D.bin" ;  One Up icon
 
 DATA_ADDR_21: ; $aa17 - offset $0a
 .byte $07, $07, $4c, $01		;	P power up
@@ -136,37 +136,37 @@ DATA_ADDR_24: ; $aa23 - offset $04
 .byte $07, $07, $4f, $03		;   Fireball 2
 
 DATA_ADDR_25: ; $aa27 - offset $04
-.incbin "rom-prg/objects/data-object-atAA27.bin" ;  Enemy flying rocket-bedouin Frame 1/2
+.incbin "data/objects/data-object-atAA27.bin" ;  Enemy flying rocket-bedouin Frame 1/2
 
 DATA_ADDR_26: ; $aa39 - offset $12
-.incbin "rom-prg/objects/data-object-atAA39.bin" ;  Enemy flying rocket-bedouin Frame 1/2
+.incbin "data/objects/data-object-atAA39.bin" ;  Enemy flying rocket-bedouin Frame 1/2
 
 DATA_ADDR_27: ; $aa47 - offset $0e
-.incbin "rom-prg/objects/data-object-atAA47.bin" ;  Enemy flying heads Frame 1/2
+.incbin "data/objects/data-object-atAA47.bin" ;  Enemy flying heads Frame 1/2
 
 DATA_ADDR_28: ; $aa51 - offset $0a
-.incbin "rom-prg/objects/data-object-atAA51.bin" ;  Enemy flying heads Frame 2/2
+.incbin "data/objects/data-object-atAA51.bin" ;  Enemy flying heads Frame 2/2
 
 DATA_ADDR_29: ; $aa5b - offset $0a
-.incbin "rom-prg/objects/data-object-atAA5B.bin" ;  Enemy bee Frame 1/2
+.incbin "data/objects/data-object-atAA5B.bin" ;  Enemy bee Frame 1/2
 
 DATA_ADDR_30: ; $aa64 - offset $09
-.incbin "rom-prg/objects/data-object-atAA64.bin" ;  Enemy bee Frame 2/2
+.incbin "data/objects/data-object-atAA64.bin" ;  Enemy bee Frame 2/2
 
 DATA_ADDR_31: ; $aa6e - offset $0a
-.incbin "rom-prg/objects/data-object-atAA6E.bin" ;  Enemy duck Frame 1/2
+.incbin "data/objects/data-object-atAA6E.bin" ;  Enemy duck Frame 1/2
 
 DATA_ADDR_32: ; $aa79 - offset $0b
-.incbin "rom-prg/objects/data-object-atAA79.bin" ;  Enemy duck Frame 2/2
+.incbin "data/objects/data-object-atAA79.bin" ;  Enemy duck Frame 2/2
 
 DATA_ADDR_33: ; $aa82 - offset $09
-.incbin "rom-prg/objects/data-object-atAA82.bin" ;  Enemy duck Frame 3/2
+.incbin "data/objects/data-object-atAA82.bin" ;  Enemy duck Frame 3/2
 
 DATA_ADDR_34: ; $aa8c - offset $0a
-.incbin "rom-prg/objects/data-object-atAA8C.bin" ;  Skull Boss Idle
+.incbin "data/objects/data-object-atAA8C.bin" ;  Skull Boss Idle
 
 DATA_ADDR_35: ; $aaae - offset $22
-.incbin "rom-prg/objects/data-object-atAAAE.bin" ;  Skull Boss Flashing
+.incbin "data/objects/data-object-atAAAE.bin" ;  Skull Boss Flashing
 
 DATA_ADDR_36: ; $aad0 - offset $22
 .byte $07, $05, $7f, $03 		;	Player shot vertical up
@@ -181,64 +181,64 @@ DATA_ADDR_39: ; $aadc - offset $04
 .byte $07, $07, $82, $01		; 	Speed Power up
 
 DATA_ADDR_40: ; $aae0 - offset $04
-.incbin "rom-prg/objects/data-object-atAAE0.bin" ; Witch boss Idle
+.incbin "data/objects/data-object-atAAE0.bin" ; Witch boss Idle
 
 DATA_ADDR_41: ; $ab08 - offset $28
-.incbin "rom-prg/objects/data-object-atAB08.bin" ; Witch boss Flashing
+.incbin "data/objects/data-object-atAB08.bin" ; Witch boss Flashing
 
 DATA_ADDR_42: ; $ab30 - offset $28
-.incbin "rom-prg/objects/data-object-atAB30.bin" ; Crock boss Idle
+.incbin "data/objects/data-object-atAB30.bin" ; Crock boss Idle
 
 DATA_ADDR_43: ; $ab65 - offset $35
-.incbin "rom-prg/objects/data-object-atAB65.bin" ; Crock boss shooting (mouth open)
+.incbin "data/objects/data-object-atAB65.bin" ; Crock boss shooting (mouth open)
 
 DATA_ADDR_44: ; $ab9a - offset $35
-.incbin "rom-prg/objects/data-object-atAB9A.bin" ; Straight comet shot
+.incbin "data/objects/data-object-atAB9A.bin" ; Straight comet shot
 
 DATA_ADDR_45: ; $aba2 - offset $08
-.incbin "rom-prg/objects/data-object-atABA2.bin" ; Enemy Bat Frame 1/3
+.incbin "data/objects/data-object-atABA2.bin" ; Enemy Bat Frame 1/3
 
 DATA_ADDR_46: ; $abb0 - offset $0e
-.incbin "rom-prg/objects/data-object-atABB0.bin" ; Enemy Bat Frame 2/3
+.incbin "data/objects/data-object-atABB0.bin" ; Enemy Bat Frame 2/3
 
 DATA_ADDR_47: ; $abbc - offset $0c
-.incbin "rom-prg/objects/data-object-atABBC.bin" ; Enemy Bat Frame 3/3
+.incbin "data/objects/data-object-atABBC.bin" ; Enemy Bat Frame 3/3
 
 DATA_ADDR_48: ; $abca - offset $0e
 .byte $05, $07, $c1, $03 ; Single Falling Sparkle
 
 DATA_ADDR_49: ; $abce - offset $04
-.incbin "rom-prg/objects/data-object-atABCE.bin" ; Enemy 4-pieces block Idle
+.incbin "data/objects/data-object-atABCE.bin" ; Enemy 4-pieces block Idle
 
 DATA_ADDR_50: ; $abd8 - offset $0a
-.incbin "rom-prg/objects/data-object-atABD8.bin" ; Enemy 4-pieces block Flashing
+.incbin "data/objects/data-object-atABD8.bin" ; Enemy 4-pieces block Flashing
 
 DATA_ADDR_51: ; $abe2 - offset $0a
-.incbin "rom-prg/objects/data-object-atABE2.bin" ; Enemy ball Frame 1/2
+.incbin "data/objects/data-object-atABE2.bin" ; Enemy ball Frame 1/2
 
 DATA_ADDR_52: ; $abec - offset $0a
-.incbin "rom-prg/objects/data-object-atABEC.bin" ; Enemy ball Frame 2/2
+.incbin "data/objects/data-object-atABEC.bin" ; Enemy ball Frame 2/2
 
 DATA_ADDR_53: ; $abf6 - offset $0a
-.incbin "rom-prg/objects/data-object-atABF6.bin" ; Enemy Mine Frame 1/2
+.incbin "data/objects/data-object-atABF6.bin" ; Enemy Mine Frame 1/2
 
 DATA_ADDR_54: ; $ac00 - offset $0a
-.incbin "rom-prg/objects/data-object-atAC00.bin" ; Enemy Mine Frame 2/2
+.incbin "data/objects/data-object-atAC00.bin" ; Enemy Mine Frame 2/2
 
 DATA_ADDR_55: ; $ac0a - offset $0a
-.incbin "rom-prg/objects/data-object-atAC0A.bin" ; Mouth Boss Frame 1/3 (open animation)
+.incbin "data/objects/data-object-atAC0A.bin" ; Mouth Boss Frame 1/3 (open animation)
 
 DATA_ADDR_56: ; $ac1c - offset $12
-.incbin "rom-prg/objects/data-object-atAC1C.bin" ; Mouth Boss Frame 2/3 (open animation)
+.incbin "data/objects/data-object-atAC1C.bin" ; Mouth Boss Frame 2/3 (open animation)
 
 DATA_ADDR_57: ; $ac2e - offset $12
-.incbin "rom-prg/objects/data-object-atAC2E.bin" ; Mouth Boss Frame 3/3 (open animation)
+.incbin "data/objects/data-object-atAC2E.bin" ; Mouth Boss Frame 3/3 (open animation)
 
 DATA_ADDR_58: ; $ac48 - offset $1a
-.incbin "rom-prg/objects/data-object-atAC48.bin" ; Enemy 4-pieces block (breaking up) Frame 1/2
+.incbin "data/objects/data-object-atAC48.bin" ; Enemy 4-pieces block (breaking up) Frame 1/2
 
 DATA_ADDR_59: ; $ac57 - offset $0f
-.incbin "rom-prg/objects/data-object-atAC57.bin" ; Enemy 4-pieces block (breaking up) Frame 2/2
+.incbin "data/objects/data-object-atAC57.bin" ; Enemy 4-pieces block (breaking up) Frame 2/2
 
 DATA_ADDR_60: ; $ac66 - offset $0f
 .byte $06, $06, $f6, $01 ; Enemy shot sparkle Frame 1/2
@@ -247,19 +247,19 @@ DATA_ADDR_61: ; $ac6a - offset $04
 .byte $06, $06, $f7, $00 ; Enemy shot sparkle Frame 2/2
 
 DATA_ADDR_62: ; $ac6e - offset $04
-.incbin "rom-prg/objects/data-object-atAC6E.bin" ; Upwards comet shot
+.incbin "data/objects/data-object-atAC6E.bin" ; Upwards comet shot
 
 DATA_ADDR_63: ; $ac76 - offset $08
-.incbin "rom-prg/objects/data-object-atAC76.bin" ; Downwards comet shot
+.incbin "data/objects/data-object-atAC76.bin" ; Downwards comet shot
 
 DATA_ADDR_64: ; $ac7e - offset $08
-.incbin "rom-prg/objects/data-object-atAC7E.bin" ; Enemy Top half ball
+.incbin "data/objects/data-object-atAC7E.bin" ; Enemy Top half ball
 
 DATA_ADDR_65: ; $ac84 - offset $06
-.incbin "rom-prg/objects/data-object-atAC84.bin" ; Enemy Bottom half ball
+.incbin "data/objects/data-object-atAC84.bin" ; Enemy Bottom half ball
 
 DATA_ADDR_66: ; $ac8a - offset $06
-.incbin "rom-prg/objects/data-object-atAC8A.bin" ; Enemy Falling Meteor
+.incbin "data/objects/data-object-atAC8A.bin" ; Enemy Falling Meteor
 
 DATA_ADDR_67: ; $ac94 - offset $0a
 .byte $01, $01, $00, $00 ; Blank 
@@ -268,10 +268,10 @@ DATA_ADDR_67: ; $ac94 - offset $0a
 ; ======================================
 ; Stage 01 Enemies
 Data_atAC98: 
-.include "objects_S1.inc"
+.include "objects/data/objects_S1.inc"
 
 Data_atAEC6:
-.include "objects_S1_data.inc"
+.include "objects/data/objects_S1_data.inc"
 ; ======================================
 
 
@@ -279,25 +279,25 @@ Data_atAEC6:
 ; ======================================
 ; Stage 02 Enemies
 Data_atB8ED: 
-.include "objects_S2.inc"
+.include "objects/data/objects_S2.inc"
 
 Data_atBB5D:
-.include "objects_S2_data.inc"
+.include "objects/data/objects_S2_data.inc"
 ; ======================================
 
 
 ; ======================================
 ; Stage 03 Enemies
 Data_atC50D:
-.include "objects_S3.inc"
+.include "objects/data/objects_S3.inc"
 
 Data_atC8B9:
-.include "objects_S3_data.inc"
+.include "objects/data/objects_S3_data.inc"
 ; ======================================
 
 
 ; ======================================
 ; Stage 04 Enemies
 Data_atE3A6:
-.include "objects_S4.inc"
+.include "objects/data/objects_S4.inc"
 ; ======================================
