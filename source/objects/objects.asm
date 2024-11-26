@@ -1,5 +1,8 @@
 
-.addr Data_atAC98, Data_atAEC6 ; stage 1
+; Enemies on each stage
+;Stage 1
+.addr Data_atAC98
+.addr Data_atAEC6
 .addr Data_atB8ED, Data_atBB5D ; stage 2
 .addr Data_atC50D, Data_atC8B9 ; stage 3
 .addr Data_atE3A6, Data_atC8B9 ; stage 4
@@ -267,9 +270,12 @@ DATA_ADDR_67: ; $ac94 - offset $0a
 
 ; ======================================
 ; Stage 01 Enemies
+
+; Batches
 Data_atAC98: 
 .include "objects/data/objects_S1.inc"
 
+; Singles
 Data_atAEC6:
 .include "objects/data/objects_S1_data.inc"
 ; ======================================

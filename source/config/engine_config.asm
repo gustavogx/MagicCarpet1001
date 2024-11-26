@@ -92,3 +92,12 @@
 .define SFX_TYPE_WRITER	$0A; 0A Type writer key stroke SFX
 .define SONG_ENDING 	$0B; 0B Ending song
 .define SFX_MAGIC_LAMP 	$0C; 0C Magic Lamp SFX
+
+; shots type ==========================
+.define SHOOT_NOTHING		$00
+.define SHOOT_SINGLE_BUBBLE	$01
+.define SHOOT_RING_BUBBLES	$03
+.define SHOOT_5_BUBBLES		$05
+.define SHOOT_3_COMETS			$06
+.define SHOOT_3_COMETS_2_AMBERS	$07
+.define SHOOT_3_COMETS_5_AMBERS	$08

@@ -259,7 +259,7 @@ paletteRAM_E0:			.res 32	; $E0 ; 4
 ; 						 |||| |||+-- 0:
 ;						 |||| ||+--- 1:
 ;						 |||| |+---- 2:
-;						 |||| +----- 3: TODO
+;						 |||| +----- 3: Player can shoot
 ;						 |||+------- 4: 
 ;						 ||+-------- 5: Player can shoot
 ;						 |+--------- 6:
@@ -275,20 +275,20 @@ paletteRAM_E0:			.res 32	; $E0 ; 4
 ;						 |||| ||+--- 1: Enemy is part of SET 1
 ;						 |||| |+---- 2:
 ;						 |||| +----- 3:
-;						 |||+------- 4: Obj is a pickup 
+;						 |||+------- 4: Obj is enemy or pickup (not boss)
 ;						 ||+-------- 5:
 ;						 |+--------- 6: Obj can collide
 ;						 +---------- 7:
 .define OBJPROP_PARTOF_SET0 FLAG_0
 .define OBJPROP_PARTOF_SET1 FLAG_1
 .define OBJPROP_UNUSED 		FLAG_3
-.define OBJPROP_IS_PICKUP	FLAG_4
+.define OBJPROP_IS_NOT_BOSS	FLAG_4
 .define OBJPROP_CAN_COLLIDE	FLAG_6
 
 .define BIT_OBJPROP_PARTOF_SET0 BIT_0
 .define BIT_OBJPROP_PARTOF_SET1 BIT_1
 .define BIT_OBJPROP_UNUSED 		BIT_3
-.define BIT_OBJPROP_IS_PICKUP	BIT_4
+.define BIT_OBJPROP_IS_NOT_BOSS	BIT_4
 .define BIT_OBJPROP_CAN_COLLIDE	BIT_6
 
 ; page 05
@@ -310,7 +310,7 @@ paletteRAM_E0:			.res 32	; $E0 ; 4
 ; page 06
 .define objectWidth_0600 		$0600 ; #3 of 10-byte file
 .define objectHeight_0601 		$0601 ; #4 of 10-byte file
-.define atackPoints_0602 		$0602 ; #1 of 10-byte file
+.define attackPoints_0602 		$0602 ; #1 of 10-byte file
 .define healthPoints_0603 	 	$0603 ; #5 of 10-byte file
 .define objectSpeed_X_0604 		$0604 ; #8 of 10-byte file 
 .define objectSpeed_Y_0605 		$0605 ; #9 of 10-byte file
@@ -650,7 +650,7 @@ StartingNewStage:
 	lda (objectPtr_34),Y		; hi-byte of current enemy batch
 	cmp #$FF					; check if end-of-file (EOF=FFFF)
 	bne :+						; if !EOF skip ahead
-	jmp doneLoadingEnemyBatch	; exit if EOF
+		jmp doneLoadingEnemyBatch	; exit if EOF
 
 	:							; if EOL was found
 	dey							; go back 1 byte
@@ -671,7 +671,7 @@ StartingNewStage:
 		bcs doneLooping			; exit if no free slot found
 		
 		lda (objectPtr_3A),Y	; read object type
-		cmp #$F8				; this is a STAGE_BOSS $F8
+		cmp #(UPPER+FLAG_3)		; this is a STAGE_BOSS $F8
 		bne :+					; if not, skip ahead
 
 		lda #TRUE				; if STAGE_BOSS
@@ -729,7 +729,7 @@ StartingNewStage:
 		; no control character found. 
 		; loading enemy
 		: 
-		sta objectType_58		; #1 byte of object file
+		sta objectType_58			; #1 byte of object file
 		iny
 		lda (objectPtr_3A),Y
 		sta new_X_Lo_54				; X position, #2 byte of object file
@@ -742,7 +742,7 @@ StartingNewStage:
 		iny
 		lda (objectPtr_3A),Y
 		sta new_Y_Hi_57				; #5 byte of object file
-		jsr SpawnEnemy		; Use's objectType_58 to load the specific enemy type
+		jsr SpawnEnemy				; Use's objectType_58 to load the specific enemy type
 		iny
 		jmp loopYLoadObject
 
@@ -784,14 +784,14 @@ doneLoadingEnemyBatch:
 	sta objectPtr_38+1
 
 	ldy #ZERO
-	lda (objectPtr_38),Y		; lo-byte of of Enemy AI(?)
-	sta someObjProperty_0501,X	; stores lo-byte of of Enemy AI(?)
+	lda (objectPtr_38),Y		; lo-byte of Enemy AI(?)
+	sta someObjProperty_0501,X	; stores lo-byte of Enemy AI(?)
 	iny
-	lda (objectPtr_38),Y		; hi-byte of of Enemy AI(?)
-	sta someObjProperty_0502,X	; stores hi-byte of of Enemy AI(?)
+	lda (objectPtr_38),Y		; hi-byte of Enemy AI(?)
+	sta someObjProperty_0502,X	; stores hi-byte of Enemy AI(?)
 	iny
 	lda (objectPtr_38),Y		; loads #1 byte of 10
-	sta atackPoints_0602,X		; stores #1 byte of 10
+	sta attackPoints_0602,X		; stores #1 byte of 10
 	iny
 	lda (objectPtr_38),Y		; loads #2 byte of 10
 	ora #(FLAG_5+FLAG_6)		; turn ON flags 5 and 6
@@ -872,10 +872,10 @@ doneLoadingEnemyBatch:
 				lda #$00
 				sta someObjProperty_0303,X		
 			:
-			jmp doneCheckingPlayerCollision
+			jmp doneWithPhysics
 		:
 		lda object_Attrib_1_0404,X
-		bpl doneCheckingPlayerCollision		; test BIT_7 for unresolved collision
+		bpl doneWithPhysics		; test BIT_7 for unresolved collision
 
 		lda object_X_Hi_0401,X
 		beq :+
@@ -890,7 +890,7 @@ doneLoadingEnemyBatch:
 
 		:
 		lda object_Y_Hi_0403,X
-		beq ThirdPart
+		beq AI_EnemyWillShoot
 		
 		cmp #$FF
 		bne SecondPart
@@ -898,7 +898,7 @@ doneLoadingEnemyBatch:
 		lda object_Y_Lo_0402,X
 		clc
 		adc objectHeight_0601,X
-		bcs ThirdPart
+		bcs AI_EnemyWillShoot
 	
 		SecondPart:
 		lda object_Attrib_2_0405,X
@@ -912,27 +912,31 @@ doneLoadingEnemyBatch:
 		:
 		lda #FLAG_4
 		sta object_Attrib_1_0404,X
-		jmp doneCheckingPlayerCollision
+		jmp doneWithPhysics
 
 		:
 		lda object_Attrib_1_0404,X
 		TurnOFF FLAG_5					;	and #(ALL1-FLAG_5)
 		sta object_Attrib_1_0404,X
-		jmp doneCheckingPlayerCollision
+		jmp doneWithPhysics
 	
-		ThirdPart:
-		lda object_Attrib_1_0404,X
-		ora #FLAG_5
-		sta object_Attrib_1_0404,X
-		jsr CalculateEnemyHitBox_X
-		lda object_Attrib_1_0404,X
-		and #FLAG_3
-		beq doneCheckingPlayerCollision
-		lda var_5A
-		bne doneCheckingPlayerCollision
-		jsr HandleEnemyIA_Shooting_X
+		AI_EnemyWillShoot:
+			lda object_Attrib_1_0404,X
+			ora #FLAG_5
+			sta object_Attrib_1_0404,X
+			
+			jsr CalculateEnemyHitBox_X
+			
+			lda object_Attrib_1_0404,X
+			and #FLAG_3
+			beq doneWithPhysics
+			
+			lda var_5A
+			bne doneWithPhysics
+			
+			jsr HandleEnemyIA_Shooting_X
 	
-		doneCheckingPlayerCollision:
+		doneWithPhysics:
 		lda iterator_4D
 		clc
 		adc #$06
@@ -977,7 +981,7 @@ doneLoadingEnemyBatch:
 ; $8391
 .proc CalculateEnemyHitBox_X
 	lda object_Attrib_2_0405,X
-	and #FLAG_4
+	and #OBJPROP_IS_NOT_BOSS
 	beq objectIsBoss
 	
 	lda object_X_Hi_0401,X
@@ -1021,6 +1025,7 @@ doneLoadingEnemyBatch:
 	rts
 
 	objectIsBoss: ; make the hit box the same size as the sprite
+	
 	lda object_X_Lo_0400,X
 	sta objectHitBox_Left_X_0702,X
 	clc
@@ -1089,7 +1094,7 @@ doneLoadingEnemyBatch:
 		bit BIT_OBJPROP_CAN_COLLIDE
 		beq noCollisionDetected
 	
-		and #OBJPROP_IS_PICKUP
+		and #OBJPROP_IS_NOT_BOSS
 		bne :+
 
 		cpy #ZERO
@@ -1117,7 +1122,7 @@ doneLoadingEnemyBatch:
 
 		lda healthPoints_0603,X
 		sec
-		sbc atackPoints_0602,Y
+		sbc attackPoints_0602,Y
 		beq :+
 		bcs :++
 	
@@ -1145,7 +1150,7 @@ doneLoadingEnemyBatch:
 	:
 		lda healthPoints_0603,Y
 		sec
-		sbc atackPoints_0602,X
+		sbc attackPoints_0602,X
 		beq doHandleObjCollision
 		bcc doHandleObjCollision
 	
@@ -1212,7 +1217,7 @@ doneLoadingEnemyBatch:
 	PushXY
 
 	lda object_Attrib_2_0405,X
-	bit BIT_OBJPROP_IS_PICKUP	
+	bit BIT_OBJPROP_IS_NOT_BOSS	
 	bne :+						
 		jmp doHandleObjCollision ; handle object pickup
 	
@@ -1553,7 +1558,7 @@ doneLoadingEnemyBatch:
 	lda Data_at8715+1,Y			; object VY table address
 	sta someObjProperty_0502,X  ; object VY table address
 	lda Data_at8715+2,Y
-	sta atackPoints_0602,X
+	sta attackPoints_0602,X
 	lda Data_at8715+3,Y
 	sta object_Attrib_2_0405,X
 	lda Data_at8715+4,Y
@@ -1664,7 +1669,7 @@ Data_at8715:
 	lda #$1A
 	sta someObjProperty_0302
 	lda #$03
-	sta atackPoints_0602
+	sta attackPoints_0602
 	
 	lda #$14
 	sta objectWidth_0600
@@ -1741,7 +1746,7 @@ Data_at8BD7:
 	sta someObjProperty_0303,Y
 	sta objectSpeed_X_0604,Y
 	sta objectSpeed_Y_0605,Y
-	sta atackPoints_0602,Y
+	sta attackPoints_0602,Y
 	lda #$FF
 	sta healthPoints_0603,Y
 	lda #$07
@@ -1932,7 +1937,7 @@ Data_at8BD7:
 	adc #$02					; add 2
 	
 	:
-	sta atackPoints_0602,X	; store A (byte 1) #$02 single, #$04 triple
+	sta attackPoints_0602,X	; store A (byte 1) #$02 single, #$04 triple
 	lda Data_at8D1D+3,Y			; load byte 2
 	sta someObjProperty_0302,X	; store byte 2
 	lda Data_at8D1D+4,Y			; load byte 3
@@ -2053,8 +2058,9 @@ Data_at8D45:
 ; $8D73
 .proc HandleEnemyIA_Shooting_X
 	
-	lda someObjProperty_0301,X	; check if enemy is shooting?
-	bne :+						; if not, break.
+	lda someObjProperty_0301,X	; what kind of attack?
+	bne :+						; if not ZERO, continue
+	
 	rts
 
 	:
@@ -2067,26 +2073,37 @@ Data_at8D45:
 	
 	lda someObjProperty_0301,X	; what kind of attack?
 
-	cmp #$01
+	; SIMPLE ENEMY SHOTS
+
+	; single bubble at the player direction
+	cmp #SHOOT_SINGLE_BUBBLE
 	bne :+
 	jsr ShootAtPlayer_X
 	jmp doneHandlingShooting
 	
+	; multidirectional ring of bubbles
 	:
-	cmp #$03
+	cmp #SHOOT_RING_BUBBLES
 	bne :+
 	jsr SpawnProjectiles_8_1
 	jmp doneHandlingShooting
 	
+	; COMPLEX BOSS SHOTS
+
+	; wall of 4 bubble with a central wavy spark
 	:
-	cmp #$05
+	cmp #SHOOT_5_BUBBLES
 	bne :+++
-	lda #$0F
-	bit frameCounter_12
+	
+	lda #LOWER
+	bit frameCounter_12		; uses timer for diversity
 	beq :+
+
+	; 3 in 4 attacks are SHOOT_5_BUBBLES
 	jsr Level_1_Attack
 	jmp :++
 	
+	; 1 in 4 attacks is just SHOOT_SINGLE_BUBBLE
 	:
 	jsr ShootAtPlayer_X
 	
@@ -2096,24 +2113,24 @@ Data_at8D45:
 	jsr HandleBossAnimation_Shooting
 	
 	:
-	cmp #$06
+	cmp #SHOOT_3_COMETS
 	bne :+
 	jsr Level_2_Attack
 	jsr HandleBossAnimation_Shooting
 	
 	:
-	cmp #$07
+	cmp #SHOOT_3_COMETS_2_AMBERS
 	bne :+
 	jsr Level_3_Attack
 	jsr HandleBossAnimation_Shooting
 	
 	:
-	cmp #$08
+	cmp #SHOOT_3_COMETS_5_AMBERS
 	bne doneHandlingShooting
 	jsr Level_4_Attack
 	jsr HandleBossAnimation_Shooting
 	
-	doneHandlingShooting:
+doneHandlingShooting:
 	lda #$01
 	sta var_5A
 	rts
@@ -2268,7 +2285,7 @@ Data_at8E3F:
 	jsr GetProjectileTrajectoryAddress_X_Y
 
 	lda #$01
-	sta atackPoints_0602,X
+	sta attackPoints_0602,X
 	lda #(FLAG_5+FLAG_6)
 	sta object_Attrib_2_0405,X
 	lda #$04
@@ -3664,7 +3681,7 @@ Data_at9ED6:
 	
 	:
 		lda object_Attrib_2_0405,X
-		and #(OBJPROP_UNUSED+OBJPROP_IS_PICKUP)
+		and #(OBJPROP_UNUSED+OBJPROP_IS_NOT_BOSS)
 		beq :+
 
 		lda frameCounter_12
@@ -3901,7 +3918,7 @@ Data_at9ED6:
 	lda aliveTimer_14
 	cmp #$02
 	bcc handlePlayerActions
-	lda #(OBJPROP_IS_PICKUP+OBJPROP_CAN_COLLIDE)
+	lda #(OBJPROP_IS_NOT_BOSS+OBJPROP_CAN_COLLIDE)
 	sta object_Attrib_2_0405
 	bne handlePlayerActions
 	
