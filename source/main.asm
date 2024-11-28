@@ -100,11 +100,11 @@ new_Y_Lo_56:			.res 1	; $56 ; 5 ; object loading property
 new_Y_Hi_57:			.res 1	; $57 ; 5 ; object loading property
 objectType_58:			.res 1	; $58 ; 5
 objIndexStep_59:		.res 1	; $59 ; 5 ; it is either +6 or -6
-var_5A:					.res 1	; $5A ; 3
+flagEnemyWillShoot_5A:	.res 1	; $5A ; 3 ; used only within enemy AI to signal SHOOTING state
 currentEnemyWave_5B:	.res 1	; $5B ; 3
 nextEnemyWave_5C:		.res 1	; $5C ; 5
 .res 1 ; $5D
-var_5E:					.res 1	; $5E ; 2
+flagUpdateObjectsOnVBlank_5A: .res 1	; $5E ; 2 is FALSE only on NEW GAME ore RESET
 objectIndex_5F:			.res 1	; $5F ; 9
 
 arrowsFlying_60:		.res 1	; $60 ; 7
@@ -155,7 +155,7 @@ soundEngineAddress_8A:	.res 2 ; $8A $8B
 ; $8B
 soundEngine_8C: 		.res 1 ; $8C
 soundIndex_8D:			.res 1	; $8D
-flagUpdateSoundAtVBlank_8E:	.res 1	; $8E
+flagUpdateSoundOnVBlank_8E:	.res 1	; $8E ; 
 flagPlaySFX_8F:			.res 1	; $8F
 
 soundEngine_90:		.res 1 ; $90
@@ -399,7 +399,7 @@ HandleReset:
 	ldx #$01
 	jsr LoadStage
 
-	lda #(FLAG_7+FLAG_3) 		; flags %1000 1000
+	lda #(FLAG_7+FLAG_3) 	; flags %1000 1000
 	TurnOFF	FLAG_3			; and #(ALL1-FLAG_3) ; flags %1111 0111 (Why?)
 	sta flagPPUControl_17
 	sta flagPPUControl_19
@@ -549,7 +549,7 @@ StartingNewStage:
 
 	loopMain:
 		jsr HandlePhysics
-		jsr LoadEnemyBatch
+		jsr LoadEnemyWave
 		jsr LivesHUD
 
 		lda flagPlayerHasShot_62	; did the player shoot?
@@ -618,12 +618,12 @@ StartingNewStage:
 .endproc
 ;
 ; $8175
-; LoadEnemyBatch
-; Loads Batch of Enemies
+; LoadEnemyWave
+; Loads a Batch of Enemies
 ; Inputs: nextEnemyWave_5C, currentEnemyWave_5B
 ; Variable nextEnemyWave_5C holds the timer for loading next enemy batch.
 ; If timer larger than or equal to $FA, spawn new batch.
-.proc LoadEnemyBatch
+.proc LoadEnemyWave
 	lda nextEnemyWave_5C 		; count down until next batch load
 	cmp #ENEMY_WAVES_TRIGGER	; will load next batch if counter >= $FA 
 	bcs :+						; continue if it is time to load
@@ -708,8 +708,8 @@ StartingNewStage:
 		sta var_2D				; object status flags?
 		iny
 		lda (objectPtr_3A),Y	; read next byte after $F1
-		sta enemySet0Size_2C				; store it
-		inc enemySet0Size_2C				; increment it (is it a counter?)
+		sta enemySet0Size_2C	; store it
+		inc enemySet0Size_2C	; increment it (is it a counter?)
 		iny			
 		lda (objectPtr_3A),Y	; read next byte
 		
@@ -717,12 +717,12 @@ StartingNewStage:
 		cmp #$F2				; check for control character $F2
 		bne :+					; if not, skip ahead
 
-		and #(FLAG_1+FLAG_0)		; $F2 & $03 = $02
+		and #(FLAG_1+FLAG_0)	; $F2 & $03 = $02
 		sta var_2D				; object status flags?
 		iny
 		lda (objectPtr_3A),Y	; read next byte after $F2
-		sta enemySet1Size_2C		; enemy is part of a set
-		inc enemySet1Size_2C		; size of set (stores n+1)
+		sta enemySet1Size_2C	; enemy is part of a set
+		inc enemySet1Size_2C	; size of set (stores n+1)
 		iny
 		lda (objectPtr_3A),Y	; read next byte
 		
@@ -850,8 +850,9 @@ doneLoadingEnemyBatch:
 
 	jsr CalculatePlayerHitBox
 
-	lda #$00
-	sta var_5A
+	lda #FALSE
+	sta flagEnemyWillShoot_5A
+
 	lda #$06
 	sta iterator_4D
 	
@@ -931,7 +932,7 @@ doneLoadingEnemyBatch:
 			and #FLAG_3
 			beq doneWithPhysics
 			
-			lda var_5A
+			lda flagEnemyWillShoot_5A
 			bne doneWithPhysics
 			
 			jsr HandleEnemyIA_Shooting_X
@@ -1759,16 +1760,17 @@ Data_at8BD7:
 ;
 ; $8C23
 .proc TriggerNextLevel
-	lda #$00
+	lda #ZERO
 	sta objectIndex_5F		; reset object handling index
+	
 	lda flagNextLevel_1B
 	bne :+
-	lda #PLAYER_SPEED_SLOW
-	sta speedLevel_66
+		lda #PLAYER_SPEED_SLOW
+		sta speedLevel_66
 	
 	:
-	lda #$FF
-	sta var_5E
+	lda #FULL		; optimize to TRUE
+	sta flagUpdateObjectsOnVBlank_5A
 	rts
 .endproc
 ;
@@ -2132,8 +2134,8 @@ Data_at8D45:
 	jsr HandleBossAnimation_Shooting
 	
 doneHandlingShooting:
-	lda #$01
-	sta var_5A
+	lda #TRUE
+	sta flagEnemyWillShoot_5A
 	rts
 .endproc
 ;
@@ -3291,7 +3293,7 @@ Data_at97F5:
 		dec nextEnemyWave_5C	; Decrement the counter for next enemy batch on EVEN frames
 
 	:
-		lda var_5E
+		lda flagUpdateObjectsOnVBlank_5A
 		beq :+
 
 		jsr HandleControllerInputs
