@@ -638,7 +638,7 @@
 	dex
 	bne :-
 	:
-	EOR #$FF 
+	eor #$FF 
 	and flagSound_70 
 	sta flagSound_70 
 	rts
@@ -646,8 +646,8 @@
 SecondPart:
 	cpx #$FF 
 	bne :+
-	tay
-	ldx Data_at9ED6,Y
+		tay
+		ldx Data_at9ED6,Y
 	
 	:
 	asl A    
@@ -766,7 +766,7 @@ SecondPart:
 	bne loop_S2
 	
 	:
-	EOR #$FF 
+	eor #$FF 
 	and flagSound_70 
 	sta flagSound_70 
 	rts
