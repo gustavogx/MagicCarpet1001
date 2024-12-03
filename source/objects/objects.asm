@@ -1,11 +1,10 @@
 
 ; Enemies on each stage
-;Stage 1
-.addr Data_atAC98
-.addr Data_atAEC6
-.addr Data_atB8ED, Data_atBB5D ; stage 2
-.addr Data_atC50D, Data_atC8B9 ; stage 3
-.addr Data_atE3A6, Data_atC8B9 ; stage 4
+;       Waves			Enemies 		
+.addr	Data_atAC98,	Data_atAEC6 ; stage 1
+.addr	Data_atB8ED,	Data_atBB5D ; stage 2
+.addr	Data_atC50D,	Data_atC8B9 ; stage 3
+.addr	Data_atE3A6,	Data_atC8B9 ; stage 4
 
 Data_atA895:
 
@@ -271,9 +270,9 @@ DATA_ADDR_67: ; $ac94 - offset $0a
 ; ======================================
 ; Stage 01 Enemies
 
-; Batches
+; Waves
 Data_atAC98: 
-.include "objects/data/objects_S1.inc"
+.include "objects/data/objects_S1_waves.inc"
 
 ; Singles
 Data_atAEC6:
@@ -285,7 +284,7 @@ Data_atAEC6:
 ; ======================================
 ; Stage 02 Enemies
 Data_atB8ED: 
-.include "objects/data/objects_S2.inc"
+.include "objects/data/objects_S2_waves.inc"
 
 Data_atBB5D:
 .include "objects/data/objects_S2_data.inc"
@@ -295,7 +294,7 @@ Data_atBB5D:
 ; ======================================
 ; Stage 03 Enemies
 Data_atC50D:
-.include "objects/data/objects_S3.inc"
+.include "objects/data/objects_S3_waves.inc"
 
 Data_atC8B9:
 .include "objects/data/objects_S3_data.inc"
@@ -305,5 +304,9 @@ Data_atC8B9:
 ; ======================================
 ; Stage 04 Enemies
 Data_atE3A6:
-.include "objects/data/objects_S4.inc"
+.include "objects/data/objects_S4_waves.inc"
 ; ======================================
+
+Data_atE801:
+;.res 70
+.incbin "objects/data/stage4/data-block-atE801.bin"

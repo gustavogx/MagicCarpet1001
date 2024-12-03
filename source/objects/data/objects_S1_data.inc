@@ -3,102 +3,102 @@
 
 ; The address itself is stored in objectPtr_38
 
-.addr Data_atAF06
-.addr Data_atAF12
-.addr Data_atAF1E
-.addr Data_atAF2A
-.addr Data_atAF36
-.addr Data_atAF42
-.addr Data_atAF4E
-.addr Data_atAF5A
-.addr Data_atAF66
-.addr Data_atAF72
-.addr Data_atAF7E
-.addr Data_atAF8A
+.addr Data_atAF06	;	index $00
+.addr Data_atAF12	;	index $01
+.addr Data_atAF1E	;	index $02
+.addr Data_atAF2A	;	index $03
+.addr Data_atAF36	;	index $04
+.addr Data_atAF42	;	index $05
+.addr Data_atAF4E	;	index $06
+.addr Data_atAF5A	;	index $07
+.addr Data_atAF66	;	index $08
+.addr Data_atAF72	;	index $09
+.addr Data_atAF7E	;	index $0A
+.addr Data_atAF8A	;	index $0B
 
-.addr Data_atB27D
-.addr Data_atB289
-.addr Data_atB295
-.addr Data_atB2A1
-.addr Data_atB2AD
-.addr Data_atB2B9
-.addr Data_atB2C5
-.addr Data_atB2D1
-.addr Data_atB2DD
-.addr Data_atB2E9
-.addr Data_atB2F5
-.addr Data_atB301 
-.addr Data_atB30D
-.addr Data_atB319
-.addr Data_atB325
-.addr Data_atB331
-.addr Data_atAF96
-.addr Data_atB33D
-.addr Data_atB349
-.addr Data_atB355 ; AF04
+.addr Data_atB27D	;	index $0C
+.addr Data_atB289	;	index $0D
+.addr Data_atB295	;	index $0E
+.addr Data_atB2A1	;	index $0F
+.addr Data_atB2AD	;	index $10
+.addr Data_atB2B9	;	index $11
+.addr Data_atB2C5	;	index $12
+.addr Data_atB2D1	;	index $13
+.addr Data_atB2DD	;	index $14
+.addr Data_atB2E9	;	index $15
+.addr Data_atB2F5	;	index $16
+.addr Data_atB301 	;	index $17
+.addr Data_atB30D	;	index $18
+.addr Data_atB319	;	index $19
+.addr Data_atB325	;	index $1A
+.addr Data_atB331	;	index $1B
+.addr Data_atAF96	;	index $1C
+.addr Data_atB33D	;	index $1D
+.addr Data_atB349	;	index $1E
+.addr Data_atB355	;	index $1F
 
 ;; These below are enemies, followed by their AI
 
-Data_atAF06:
+Data_atAF06:	;	index $00
 .addr Data_atAFA2
 .incbin "objects/metadata/data-10bytes-atAF08.bin"
 ;.byte $02, $70, $10, $0B, $10, $1F, $01, $05, $0A, $00
 ;.byte $02, $70, $00, $00, $00, $00, $00, $00, $00, $00
 
-Data_atAF12:
+Data_atAF12:	;	index $01
 .addr Data_atB004
 .incbin "objects/metadata/data-10bytes-atAF14.bin"
 ;.byte $02, $70, $10, $0E, $02, $1F, $01, $00, $0A, $00
 ;.byte $02, $70, $00, $00, $00, $00, $00, $00, $00, $00
 
-Data_atAF1E:
+Data_atAF1E:	;	index $02
 .addr Data_atB03A
 .incbin "objects/metadata/data-10bytes-atAF20.bin"
 ;.byte $00, $00, $00, $00, $00, $00, $00, $00, $00, $00
 
 
-Data_atAF2A:
+Data_atAF2A:	;	index $03
 .addr Data_atB070
 .incbin "objects/metadata/data-10bytes-atAF2C.bin"
 ;.byte $00, $00, $00, $00, $00, $00, $00, $00, $00, $00
 
 
-Data_atAF36:
+Data_atAF36:	;	index $04
 .addr Data_atB09A
 .incbin "objects/metadata/data-10bytes-atAF38.bin"
 
 
-Data_atAF42:
+Data_atAF42:	;	index $05
 .addr Data_atB0AD
 .incbin "objects/metadata/data-10bytes-atAF44.bin"
 
 
-Data_atAF4E:
+Data_atAF4E:	;	index $06
 .addr Data_atB0BF
 .incbin "objects/metadata/data-10bytes-atAF50.bin"
 
 
-Data_atAF5A:
+Data_atAF5A:	;	index $07
 .addr Data_atB123
 .incbin "objects/metadata/data-10bytes-atAF5C.bin"
 
 
-Data_atAF66:
+Data_atAF66:	;	index $08
 .addr Data_atB169
 .incbin "objects/metadata/data-10bytes-atAF68.bin"
 
 
-Data_atAF72:
+Data_atAF72:	;	index $09
 .addr Data_atB18F
 .incbin "objects/metadata/data-10bytes-atAF74.bin"
 
 
-Data_atAF7E:
+Data_atAF7E:	;	index $0A
 .addr Data_atB211
 .incbin "objects/metadata/data-10bytes-atAF80.bin"
 
 
-Data_atAF8A:
+Data_atAF8A:	;	index $0B
 .addr Data_atB247
 .incbin "objects/metadata/data-10bytes-atAF8C.bin"
 
@@ -172,22 +172,22 @@ Data_atB247:
 ;==========================
 
 
-;; These below are PROBABLY enemies, followed by their AI
+;; These below are enemies (followed by their AI?)
 
 Data_atB27D:
 .addr Data_atB361
-;.incbin "objects/metadata/data-10bytes-atB27F.bin" 
+.incbin "objects/metadata/data-10bytes-atB27F.bin" 
 
-.byte $02 ; attack points
-.byte $70 ; object flags
-.byte $10 ; hit box width
-.byte $0B ; hit box height
-.byte $02 ; health points
-.byte $1F ; unknown property
-.byte $01 ; unknown property
-.byte $05 ; object VX
-.byte $0A ; object VY
-.byte $33 ; unknown property
+;.byte $02 ; attack points
+;.byte $70 ; object flags
+;.byte $10 ; hit box width
+;.byte $0B ; hit box height
+;.byte $02 ; health points
+;.byte $1F ; unknown property
+;.byte $01 ; type of shot
+;.byte $05 ; object VX
+;.byte $0A ; object VY
+;.byte $33 ; unknown property
 
 Data_atB289:
 .addr Data_atB377
@@ -257,17 +257,17 @@ Data_atB349:
 .addr Data_atB859
 .incbin "objects/metadata/data-10bytes-atB34B.bin" 
 
-Data_atB355:
+Data_atB355:	; BOSS
 .addr Data_atB86D
-;.incbin "objects/metadata/data-10bytes-atB357.bin"
+.incbin "objects/metadata/data-10bytes-atB357.bin"
 
-.byte $03 ; attack points
-.byte $70 ; object flags
-.byte $1F ; hit box width
-.byte $23 ; hit box height
-.byte $8C ; health points
-.byte $24 ; unknown property
-.byte $05 ; type of shot
+;.byte $03 ; attack points
+;.byte $70 ; object flags
+;.byte $1F ; hit box width
+;.byte $23 ; hit box height
+;.byte $8C ; health points
+;.byte $24 ; unknown property
+;.byte $05 ; type of shot
 		;	00 nothing
 		;	01 single directional bubble 
 		;	02 nothing
@@ -277,9 +277,9 @@ Data_atB355:
 		; 	06 three comets
 		;	07 wall with three comets and 2 ambers
 		;	08 3 commets wall with 5 ambers, 1 wavy
-.byte $00 ; object VX
-.byte $0A ; object VY
-.byte $17 ; unknown property
+;.byte $00 ; object VX
+;.byte $0A ; object VY
+;.byte $17 ; unknown property
 
 ; Each one of the above has one below (enemy AI?)
 

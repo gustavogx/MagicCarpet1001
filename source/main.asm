@@ -678,7 +678,7 @@ StartingNewStage:
 
 		lda #TRUE				; if STAGE_BOSS
 		sta flagBossFight_1A	; set this flag TRUE
-		ldx #$30				; WHY? 
+		ldx #$30				; WHY? $30 is the first enemy slot
 		jsr ClearObjectsDescription; Clears page $04 of RAM
 	
 		; Stage Boss Song===============
@@ -842,6 +842,7 @@ doneLoadingEnemyBatch:
 
 	lda #FLAG_7
 	sta object_Attrib_1_0404,X ; Set as VALID OBJECT
+	
 	pla
 	tay
 	rts
