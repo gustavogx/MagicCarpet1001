@@ -131,43 +131,43 @@ Data_atAF96:
 ;
 Data_atAFA2:
 ; Bee moving sine wave
-.incbin "data/objects/data-block-atAFA2.bin"
+.incbin "objects/data/data1/data-block-atAFA2.bin"
 
 Data_atB004:
-.incbin "data/objects/data-block-atB004.bin"
+.incbin "objects/data/data1/data-block-atB004.bin"
 
 Data_atB03A:
-.incbin "data/objects/data-block-atB03A.bin"
+.incbin "objects/data/data1/data-block-atB03A.bin"
 
 Data_atB070:
-.incbin "data/objects/data-block-atB070.bin"
+.incbin "objects/data/data1/data-block-atB070.bin"
 
 Data_atB09A:
-.incbin "data/objects/data-block-atB09A.bin"
+.incbin "objects/data/data1/data-block-atB09A.bin"
 
 Data_atB0AD:
-.incbin "data/objects/data-block-atB0AD.bin"
+.incbin "objects/data/data1/data-block-atB0AD.bin"
 
 Data_atB0BF:
-.incbin "data/objects/data-block-atB0BF.bin"
+.incbin "objects/data/data1/data-block-atB0BF.bin"
 
 Data_atB123:
-.incbin "data/objects/data-block-atB123.bin"
+.incbin "objects/data/data1/data-block-atB123.bin"
 
 Data_atB146:
-.incbin "data/objects/data-block-atB146.bin"
+.incbin "objects/data/data1/data-block-atB146.bin"
 
 Data_atB169:
-.incbin "data/objects/data-block-atB169.bin"
+.incbin "objects/data/data1/data-block-atB169.bin"
 
 Data_atB18F:
-.incbin "data/objects/data-block-atB18F.bin"
+.incbin "objects/data/data1/data-block-atB18F.bin"
 
 Data_atB211:
-.incbin "data/objects/data-block-atB211.bin"
+.incbin "objects/data/data1/data-block-atB211.bin"
 
 Data_atB247:
-.incbin "data/objects/data-block-atB247.bin" 
+.incbin "objects/data/data1/data-block-atB247.bin" 
 
 ;==========================
 
@@ -284,58 +284,58 @@ Data_atB355:
 ; Each one of the above has one below (enemy AI?)
 
 Data_atB361:
-.incbin "data/objects/data-block-atB361.bin"
+.incbin "objects/data/data1/data-block-atB361.bin"
 
 Data_atB377:
-.incbin "data/objects/data-block-atB377.bin"
+.incbin "objects/data/data1/data-block-atB377.bin"
 
 Data_atB38D:
-.incbin "data/objects/data-block-atB38D.bin"
+.incbin "objects/data/data1/data-block-atB38D.bin"
 
 Data_atB397:
-.incbin "data/objects/data-block-atB397.bin"
+.incbin "objects/data/data1/data-block-atB397.bin"
 
 Data_atB3AD:
-.incbin "data/objects/data-block-atB3AD.bin"
+.incbin "objects/data/data1/data-block-atB3AD.bin"
 
 Data_atB3C3:
-.incbin "data/objects/data-block-atB3C3.bin"
+.incbin "objects/data/data1/data-block-atB3C3.bin"
 
 Data_atB3E9:
-.incbin "data/objects/data-block-atB3E9.bin"
+.incbin "objects/data/data1/data-block-atB3E9.bin"
 
 Data_atB40F:
-.incbin "data/objects/data-block-atB40F.bin"
+.incbin "objects/data/data1/data-block-atB40F.bin"
 
 Data_atB421:
-.incbin "data/objects/data-block-atB421.bin"
+.incbin "objects/data/data1/data-block-atB421.bin"
 
 Data_atB447:
-.incbin "data/objects/data-block-atB447.bin"
+.incbin "objects/data/data1/data-block-atB447.bin"
 
 Data_atB46D:
-.incbin "data/objects/data-block-atB46D.bin"
+.incbin "objects/data/data1/data-block-atB46D.bin"
 
 Data_atB511:
-.incbin "data/objects/data-block-atB511.bin"
+.incbin "objects/data/data1/data-block-atB511.bin"
 
 Data_atB5B5:
-.incbin "data/objects/data-block-atB5B5.bin"
+.incbin "objects/data/data1/data-block-atB5B5.bin"
 
 Data_atB659:
-.incbin "data/objects/data-block-atB659.bin"
+.incbin "objects/data/data1/data-block-atB659.bin"
 
 Data_atB6FD:
-.incbin "data/objects/data-block-atB6FD.bin"
+.incbin "objects/data/data1/data-block-atB6FD.bin"
 
 Data_atB7A1:
-.incbin "data/objects/data-block-atB7A1.bin"
+.incbin "objects/data/data1/data-block-atB7A1.bin"
 
 Data_atB845:
-.incbin "data/objects/data-block-atB845.bin"
+.incbin "objects/data/data1/data-block-atB845.bin"
 
 Data_atB859:
-.incbin "data/objects/data-block-atB859.bin"
+.incbin "objects/data/data1/data-block-atB859.bin"
 
 Data_atB86D:
-.incbin "data/objects/data-block-atB86D.bin"
+.incbin "objects/data/data1/data-block-atB86D.bin"

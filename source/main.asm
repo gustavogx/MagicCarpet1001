@@ -7,6 +7,7 @@
 .include "config/inesheader.inc"
 
 .segment "ZEROPAGE" ; LSB 0 - FF
+
 .res 1 ; $00
 .res 1 ; $01
 .res 1 ; $02
@@ -23,6 +24,7 @@ var_0C:	.res 1 ; $0c THIS HAS SOMETHING TO DO WITH THE MAGIC LAMP
 var_0D:	.res 1 ; $0d
 updateDuringVBlank_0E:	.res 1 ; $0e
 updateDuringVBlank_0F:	.res 1 ; $0f
+
 .res 1 ; $10
 livesCounter_11:		.res 1	; $11 ; 5
 frameCounter_12:		.res 1	; $12 ; 8
@@ -51,11 +53,12 @@ frameScrollAt_27:		.res 1	; $27 ; 2
 frameScrollCtr_28:		.res 1	; $28 ; 3
 screenScrollX_29:		.res 1	; $29 ; 7
 var_2A:					.res 1	; $2A	; 3
-enemySet0Size_2C:		.res 1	; $2B	; 4
+enemySet0Size_2B:		.res 1	; $2B	; 4
 enemySet1Size_2C:		.res 1	; $2C	; 4
 var_2D:					.res 1	; $2D	; 4
 flagGenDrop_2E:			.res 1	; $2E	; 4
 .res 1 ; $2F
+
 .res 1 ; $30
 .res 1 ; $31
 addressPtr_32:			.res 2	; $32 ; 32 (word address)
@@ -174,7 +177,6 @@ square1Duty_9C:		.res 1 ; $9C
 square1Sweep_9D:	.res 1 ; $9D
 square1Timer_9E:	.res 1 ; $9E
 square1Length_9F:	.res 1 ; $9F
-
 
 triangleLinear_A0:	.res 3 ; $A0
 .res 1 ; $A3
@@ -323,7 +325,7 @@ paletteRAM_E0:			.res 32	; $E0 ; 4
 .define objectHitBox_Top_Y_0704 	$0704	; maybe vertices of hit box
 .define objectHitBox_Bottom_Y_0705 	$0705	; maybe vertices of hit box
 
-.segment "PRG_ROM"
+.segment "BANK0"
 
 
 ; $8000
@@ -708,8 +710,8 @@ StartingNewStage:
 		sta var_2D				; object status flags?
 		iny
 		lda (objectPtr_3A),Y	; read next byte after $F1
-		sta enemySet0Size_2C	; store it
-		inc enemySet0Size_2C	; increment it (is it a counter?)
+		sta enemySet0Size_2B	; store it
+		inc enemySet0Size_2B	; increment it (is it a counter?)
 		iny			
 		lda (objectPtr_3A),Y	; read next byte
 		
@@ -1046,7 +1048,7 @@ doneLoadingEnemyBatch:
 .proc HandleCollisionCheck	
 ; Clobbers A,X,Y
 ;
-;	Checks every player object (player and awrros) 
+;	Checks every player object (player and arrows) 
 ;	against every enemy.
 ;
 ;	Y are the player's objects
@@ -1056,18 +1058,19 @@ doneLoadingEnemyBatch:
 ;
 ;	X are the enemies
 ; 	X = 48 (slot 8/enemy slot 0)
-; 	ends at Y = 234 (enemy slot 31)
+; 	ends at X = 234 (enemy slot 31)
 	ldy #ZERO
 	
 	loopOverPlayerObjects:
+
 		lda object_Attrib_1_0404,Y
-		bmi :+		; if FLAG_7 this is a VALID object
+		bmi :+						; if FLAG_7 this is a VALID object
 
 		jmp nextCollisionCheck
 	
 	:
 		lda object_Attrib_2_0405,Y	; object flags
-		bit BIT_OBJPROP_CAN_COLLIDE		; test for BIT 6: object can collide
+		bit BIT_OBJPROP_CAN_COLLIDE	; test for BIT 6: object can collide
 		bne :+						; if flag set, continue
 		
 		jmp nextCollisionCheck		; if not, break
@@ -1228,11 +1231,11 @@ doneLoadingEnemyBatch:
 	bit BIT_OBJPROP_PARTOF_SET0 ; check for Set 0
 	beq :+						
 
-		lda enemySet0Size_2C
+		lda enemySet0Size_2B
 		beq doHandleObjCollision
 		sec
 		sbc #$01
-		sta enemySet0Size_2C
+		sta enemySet0Size_2B
 		cmp #$01
 		bne doALSOHandleObjCollision
 		
@@ -1597,7 +1600,7 @@ doneLoadingEnemyBatch:
 ; $8715
 ; Object type table?
 Data_at8715:
-.include "objects/data/despawn_objects.inc"
+.include "objects/despawn/despawn_objects.inc"
 ;
 ; $8AEA
 .proc GenerateDrop ; Generate a random drop
@@ -1707,7 +1710,7 @@ Data_at8715:
 ;
 ; $8B7D
 Data_at8B7D:
-.incbin "data/objects/data-block-at8B7D.bin"
+.incbin "objects/data/misc/data-block-at8B7D.bin"
 ;.byte $0B, $10, $00, $81, $0C, $0C, $00, $81
 ;.byte $0D, $0B, $00, $81, $0B, $09, $00, $82
 ;.byte $0C, $07, $00, $82, $0D, $05, $00, $82
@@ -1718,14 +1721,14 @@ Data_at8B7D:
 ;.byte $00, $86, $0D, $00, $00, $86, $FE, $32
 
 Data_at8BBD:
-.incbin "data/objects/data-block-at8BBD.bin"
+.incbin "objects/data/misc/data-block-at8BBD.bin"
 ;.byte $0B, $00, $00, $81, $43, $00, $00, $83
 ;.byte $0C, $00, $00, $81, $43, $00, $00, $83
 ;.byte $0D, $00, $00, $81, $43, $00, $00, $83
 ;.byte $FE, $00
 
 Data_at8BD7:
-.incbin "data/objects/data-block-at8BD7.bin"
+.incbin "objects/data/misc/data-block-at8BD7.bin"
 ;.byte $0B, $00, $00, $86, $0C, $00, $00, $86, $0D, $00, $00, $86, $FE, $00
 ;
 ; $8BE5
@@ -1992,7 +1995,7 @@ Data_at8D1D:
 ;	|	+------------------
 ;	+----------------------
 ;
-;.incbin "data/objects/data-block-at8D1D.bin"
+;.incbin "objects/data/misc/data-block-at8D1D.bin"
 
 .addr Data_at8D35
 .byte $02, $06, $06, $05, $12, $0C 
@@ -2353,7 +2356,7 @@ Data_at8E3F:
 ;
 ; $8EBE
 ; Projectile Trajectories Table
-.include "objects/data/trajectories.inc"
+.include "objects/misc/trajectories.inc"
 ;
 ;
 ; $927F
@@ -2449,7 +2452,7 @@ PushXY
 ; $932D
 Data_at932D:
 ;Boss animation frames
-.include "objects/data/boss_animation_frames.inc"
+.include "objects/misc/boss_animation_frames.inc"
 ;
 ; $9362
 .proc LivesHUD
@@ -2472,7 +2475,7 @@ Data_at932D:
 ;
 ; $937C
 LivesGraphicData:
-.include "data/hud_lives.inc"
+.include "objects/data/hud_lives.inc"
 ;
 ; $93C9
 .proc ClearPages_3_to_7
@@ -3216,7 +3219,7 @@ EndingText_97A3:
 ; $97F5 32 bytes of data
 ; Hard-coded "GAME OVER" message using game 8 sprites
 Data_at97F5:
-.incbin "data/objects/data-block-at97F5.bin"
+.incbin "objects/data/misc/data-block-at97F5.bin"
 ;
 ; =====================================================
 ;	SOUND ENGINE AND DATA
@@ -3996,11 +3999,11 @@ Data_at97F5:
 ;
 ; $A7F0
 Data_atA7F0:
-.incbin "data/objects/data-block-atA7F0.bin"
+.incbin "objects/data/misc/data-block-atA7F0.bin"
 ;
 ; $A80A
 Data_atA80A:
-.incbin "data/objects/data-block-atA80A.bin"
+.incbin "objects/data/misc/data-block-atA80A.bin"
 ;
 ; $A83C
 ; CheckPlayerCanShoot_A_rA
@@ -4072,7 +4075,7 @@ BackgroundData_E847:
 .include "stages/backgrounds.asm"
 
 
-.segment "EXTRA_DATA"
+.segment "EXTRA_DATA"	; not used
 .byte $00, $01, $02, $03
 
 .segment "VECTORS"

@@ -5,7 +5,7 @@
 
 ; square0Duty_9815
 .proc UpdateSoundAtVBlank
-	lda flagUpdateSoundAtVBlank_8E  
+	lda flagUpdateSoundOnVBlank_8E  
 	beq :+
 	jmp doneWithSoundEngine
 	:
@@ -567,7 +567,7 @@
 	sta flagSound_70 
 	sta Sq0Sweep_4001 
 	sta Sq1Sweep_4005 
-	sta flagUpdateSoundAtVBlank_8E  
+	sta flagUpdateSoundOnVBlank_8E  
 	lda #$FF 
 	ldy #$00 
 	:
@@ -593,7 +593,7 @@
 	PushAXY
 	
 	lda #TRUE
-	sta flagUpdateSoundAtVBlank_8E  
+	sta flagUpdateSoundOnVBlank_8E  
 	lda flagSound_70 
 	and #LOWER 
 	sta flagSound_70 
@@ -620,7 +620,7 @@
 	sta ApuStatus_4015
 	sta flagAPUStatus_C9  
 	lda #$00 
-	sta flagUpdateSoundAtVBlank_8E  
+	sta flagUpdateSoundOnVBlank_8E  
 	
 	PullAXY
 	rts
@@ -689,7 +689,7 @@ SecondPart:
 	bne doneWithSFX
 
 	lda #$01 
-	sta flagUpdateSoundAtVBlank_8E
+	sta flagUpdateSoundOnVBlank_8E
 	
 	lda flagSound_70 
 	and #$F0 
@@ -743,7 +743,7 @@ SecondPart:
 	sta flagAPUStatus_C9  
 	
 	lda #$00 
-	sta flagUpdateSoundAtVBlank_8E  
+	sta flagUpdateSoundOnVBlank_8E  
 
 	doneWithSFX:     
 	PullAXY

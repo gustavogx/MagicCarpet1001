@@ -6,37 +6,37 @@
 .word $ffff
 
 DATA_S2_01: ; $b90d
-.incbin "data/objects/data-block-atB90D.bin"
+.incbin "objects/data/stage2/data-block-atB90D.bin"
 
 DATA_S2_02: ; $b936
-.incbin "data/objects/data-block-atB936.bin"
+.incbin "objects/data/stage2/data-block-atB936.bin"
 
 DATA_S2_03: ; $b95a
-.incbin "data/objects/data-block-atB95A.bin"
+.incbin "objects/data/stage2/data-block-atB95A.bin"
 
 DATA_S2_05: ; $b986
-.incbin "data/objects/data-block-atB986.bin"
+.incbin "objects/data/stage2/data-block-atB986.bin"
 
 DATA_S2_06: ; $b9b2
-.incbin "data/objects/data-block-atB9B2.bin"
+.incbin "objects/data/stage2/data-block-atB9B2.bin"
 
 DATA_S2_07: ; $b9f2
-.incbin "data/objects/data-block-atB9F2.bin"
+.incbin "objects/data/stage2/data-block-atB9F2.bin"
 
 DATA_S2_08: ; $ba1b
-.incbin "data/objects/data-block-atBA1B.bin"
+.incbin "objects/data/stage2/data-block-atBA1B.bin"
 
 DATA_S2_09: ; $ba5b
-.incbin "data/objects/data-block-atBA5B.bin"
+.incbin "objects/data/stage2/data-block-atBA5B.bin"
 
 DATA_S2_04: ; $ba87
-.incbin "data/objects/data-block-atBA87.bin"
+.incbin "objects/data/stage2/data-block-atBA87.bin"
 
 DATA_S2_10: ; $bab5
-.incbin "data/objects/data-block-atBAB5.bin"
+.incbin "objects/data/stage2/data-block-atBAB5.bin"
 
 DATA_S2_11: ; $baeb
-.incbin "data/objects/data-block-atBAEB.bin"
+.incbin "objects/data/stage2/data-block-atBAEB.bin"
 
 DATA_S2_12: ; $bb56
-.incbin "data/objects/data-block-atBB56.bin"
+.incbin "objects/data/stage2/data-block-atBB56.bin"

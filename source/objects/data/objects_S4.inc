@@ -7,49 +7,49 @@
 .addr $ffff
 
 DATA_S4_01: ; $e3c6
-.incbin "data/objects/data-block-atE3C6.bin"
+.incbin "objects/data/stage4/data-block-atE3C6.bin"
 
 DATA_S4_02: ; $e413
-.incbin "data/objects/data-block-atE413.bin"
+.incbin "objects/data/stage4/data-block-atE413.bin"
 
 DATA_S4_03: ; $e46a
-.incbin "data/objects/data-block-atE46A.bin"
+.incbin "objects/data/stage4/data-block-atE46A.bin"
 
 DATA_S4_04: ; $e4ac
-.incbin "data/objects/data-block-atE4AC.bin"
+.incbin "objects/data/stage4/data-block-atE4AC.bin"
 
 DATA_S4_05: ; $e4e7
-.incbin "data/objects/data-block-atE4E7.bin"
+.incbin "objects/data/stage4/data-block-atE4E7.bin"
 
 DATA_S4_06: ; $e552
-.incbin "data/objects/data-block-atE552.bin"
+.incbin "objects/data/stage4/data-block-atE552.bin"
 
 DATA_S4_07: ; $e5a1
-.incbin "data/objects/data-block-atE5A1.bin"
+.incbin "objects/data/stage4/data-block-atE5A1.bin"
 
 DATA_S4_08: ; $e5eb
-.incbin "data/objects/data-block-atE5EB.bin"
+.incbin "objects/data/stage4/data-block-atE5EB.bin"
 
 DATA_S4_09: ; $e63a
-.incbin "data/objects/data-block-atE63A.bin"
+.incbin "objects/data/stage4/data-block-atE63A.bin"
 
 DATA_S4_10: ; $e670
-.incbin "data/objects/data-block-atE670.bin"
+.incbin "objects/data/stage4/data-block-atE670.bin"
 
 DATA_S4_11: ; $e6c4
-.incbin "data/objects/data-block-atE6C4.bin"
+.incbin "objects/data/stage4/data-block-atE6C4.bin"
 
 DATA_S4_12: ; $e731
-.incbin "data/objects/data-block-atE731.bin"
+.incbin "objects/data/stage4/data-block-atE731.bin"
 
 DATA_S4_13: ; $e7ba
-.incbin "data/objects/data-block-atE7BA.bin"
+.incbin "objects/data/stage4/data-block-atE7BA.bin"
 
 DATA_S4_14: ; $e7fa
-.incbin "data/objects/data-block-atE7FA.bin"
+.incbin "objects/data/stage4/data-block-atE7FA.bin"
 ;.res 7
 
 Data_atE801:
 ;.res 70
-.incbin "data/objects/data-block-atE801.bin"
+.incbin "objects/data/stage4/data-block-atE801.bin"
 

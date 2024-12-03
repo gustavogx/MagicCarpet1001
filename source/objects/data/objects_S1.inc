@@ -7,40 +7,40 @@
 .word $ffff
 
 DATA_S1_01: ; $acb8
-.incbin "data/objects/data-object-atACB8.bin" 
+.incbin "objects/data/stage1/data-object-atACB8.bin" 
 
 DATA_S1_02: ; $ace1
-.incbin "data/objects/data-object-atACE1.bin"
+.incbin "objects/data/stage1/data-object-atACE1.bin"
 
 DATA_S1_03: ; $ad05
-.incbin "data/objects/data-object-atAD05.bin"
+.incbin "objects/data/stage1/data-object-atAD05.bin"
 
 DATA_S1_04: ; $ad29
-.incbin "data/objects/data-object-atAD29.bin"
+.incbin "objects/data/stage1/data-object-atAD29.bin"
 
 DATA_S1_05: ; $ad5c
-.incbin "data/objects/data-object-atAD5C.bin"
+.incbin "objects/data/stage1/data-object-atAD5C.bin"
 
 DATA_S1_06: ; $ad83
-.incbin "data/objects/data-object-atAD83.bin"
+.incbin "objects/data/stage1/data-object-atAD83.bin"
 
 DATA_S1_07: ; $adcd
-.incbin "data/objects/data-object-atADAC.bin"
+.incbin "objects/data/stage1/data-object-atADAC.bin"
 
 DATA_S1_08: ; $add3
-.incbin "data/objects/data-object-atADD3.bin"
+.incbin "objects/data/stage1/data-object-atADD3.bin"
 
 DATA_S1_09: ; $ae25
-.incbin "data/objects/data-object-atAE25.bin"
+.incbin "objects/data/stage1/data-object-atAE25.bin"
 
 DATA_S1_10: ; $ae63
-.incbin "data/objects/data-object-atAE63.bin"
+.incbin "objects/data/stage1/data-object-atAE63.bin"
 
 DATA_S1_11: ; $ae85
-.incbin "data/objects/data-object-atAE85.bin"
+.incbin "objects/data/stage1/data-object-atAE85.bin"
 
 DATA_S1_12: ; $aea2
-.incbin "data/objects/data-object-atAEA2.bin"
+.incbin "objects/data/stage1/data-object-atAEA2.bin"
 
 DATA_S1_13: ; $aebf
-.incbin "data/objects/data-object-atAEBF.bin"
+.incbin "objects/data/stage1/data-object-atAEBF.bin"

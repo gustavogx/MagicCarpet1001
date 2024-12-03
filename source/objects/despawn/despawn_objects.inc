@@ -54,67 +54,67 @@
 
 ; index $00
 Data_at877D:
-.incbin "data/objects/data-block-at877D.bin"
+.incbin "objects/despawn/data/data-block-at877D.bin"
 ;.res 5
 ;.byte $12, $00, $00, $82, $FF
 
 ; index $01
 Data_at8782:
-.incbin "data/objects/data-block-at8782.bin"
+.incbin "objects/despawn/data/data-block-at8782.bin"
 ;.res 8
 ;.byte $12, $00, $00, $13, $00, $00, $83, $FF
 
 ; index $02
 Data_at878A:
-.incbin "data/objects/data-block-at878A.bin"
+.incbin "objects/despawn/data/data-block-at878A.bin"
 ;.res 14
 
 ; index $03
 Data_at8798:
-.incbin "data/objects/data-block-at8798.bin"
+.incbin "objects/despawn/data/data-block-at8798.bin"
 ;.res 55
 
 ; index $04
 Data_at87CF:
-.incbin "data/objects/data-block-at87CF.bin"
+.incbin "objects/despawn/data/data-block-at87CF.bin"
 ;.res 27
 
 ; index $05
 Data_at87EA:
-.incbin "data/objects/data-block-at87EA.bin"
+.incbin "objects/despawn/data/data-block-at87EA.bin"
 ;.res 27
 
 ; index $06
 Data_at8805:
-.incbin "data/objects/data-block-at8805.bin"
+.incbin "objects/despawn/data/data-block-at8805.bin"
 ;.res 27
 
 ; index $07
 Data_at8820:
-.incbin "data/objects/data-block-at8820.bin"
+.incbin "objects/despawn/data/data-block-at8820.bin"
 ;.res 27
 
 ; index $08
 Data_at883B:
-.incbin "data/objects/data-block-at883B.bin"
+.incbin "objects/despawn/data/data-block-at883B.bin"
 ;.res 165
 
 ; index $09
 Data_at88E0:
-.incbin "data/objects/data-block-at88E0.bin"
+.incbin "objects/despawn/data/data-block-at88E0.bin"
 ;.res 165
 
 ; index $0A
 Data_at8985:
-.incbin "data/objects/data-block-at8985.bin"
+.incbin "objects/despawn/data/data-block-at8985.bin"
 ;.res 165
 
 ; index $0B
 Data_at8A2A:
-.incbin "data/objects/data-block-at8A2A.bin"
+.incbin "objects/despawn/data/data-block-at8A2A.bin"
 ;.res 165
 
 ; index $0C
 Data_at8ACF:
-.incbin "data/objects/data-block-at8ACF.bin"
+.incbin "objects/despawn/data/data-block-at8ACF.bin"
 ;.res 27
