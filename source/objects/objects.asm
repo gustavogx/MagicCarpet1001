@@ -4,7 +4,7 @@
 .addr	Data_atAC98,	Data_atAEC6 ; stage 1
 .addr	Data_atB8ED,	Data_atBB5D ; stage 2
 .addr	Data_atC50D,	Data_atC8B9 ; stage 3
-.addr	Data_atE3A6,	Data_atC8B9 ; stage 4
+.addr	Data_atE3A6,	Data_atC8B9 ; stage 4 (same enemies as Stage 3)
 
 Data_atA895:
 
@@ -297,7 +297,7 @@ Data_atC50D:
 .include "objects/data/objects_S3_waves.inc"
 
 Data_atC8B9:
-.include "objects/data/objects_S3_data.inc"
+.include "objects/data/objects_S3_S4_data.inc"
 ; ======================================
 
 

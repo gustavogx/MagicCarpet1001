@@ -1,36 +1,41 @@
+; The offset used to read from this list, 
+; stored in objectType_58, is the first byte in each file. 
 
-.word Data_atBB9D ;$bb9d
-.word Data_atBBA9 ;$bba9
-.word Data_atBBB5 ;$bbb5
-.word Data_atBBC1 ;$bbc1
-.word Data_atBBCD ;$bbcd  
-.word Data_atBBD9 ;$bbd9
-.word Data_atBBE5 ;$bbe5
-.word Data_atBBF1 ;$bbf1
-.word Data_atBBFD ;$bbfd
-.word Data_atBC09 ;$bc09
-.word Data_atBC15 ;$bc15
-.word Data_atBC21 ;$bc21
-.word Data_atBC2D ;$bc2d
-.word Data_atBC39 ;$bc39
-.word Data_atBC45 ;$bc45
-.word Data_atBC51 ;$bc51
-.word Data_atBC5D ;$bc5d
-.word Data_atBC69 ;$bc69
-.word Data_atBC75 ;$bc75
-.word Data_atBC81 ;$bc81
-.word Data_atBC8D ;$bc8d
-.word Data_atBC99 ;$bc99
-.word Data_atBCA5 ;$bca5
-.word Data_atBCB1 ;$bcb1
-.word Data_atBCBD ;$bcbd
-.word Data_atBCC9 ;$bcc9
-.word Data_atBCD5 ;$bcd5
-.word Data_atBCE1 ;$bce1
-.word Data_atBCED ;$bced
-.word Data_atBCF9 ;$bcf9
-.word Data_atBD05 ;$bd05
-.word Data_atBD11 ;$bd11
+; The address itself is stored in objectPtr_38
+
+.word Data_atBB9D	;	index $00
+.word Data_atBBA9	;	index $01
+.word Data_atBBB5	;	index $02
+.word Data_atBBC1	;	index $03
+.word Data_atBBCD	;	index $04
+.word Data_atBBD9	;	index $05
+.word Data_atBBE5	;	index $06
+.word Data_atBBF1	;	index $07
+.word Data_atBBFD	;	index $08
+.word Data_atBC09	;	index $09
+.word Data_atBC15	;	index $0A
+.word Data_atBC21	;	index $0B
+.word Data_atBC2D	;	index $0C
+.word Data_atBC39	;	index $0D
+.word Data_atBC45	;	index $0E
+.word Data_atBC51	;	index $0F
+
+.word Data_atBC5D	;	index $10
+.word Data_atBC69	;	index $11
+.word Data_atBC75	;	index $12
+.word Data_atBC81	;	index $13
+.word Data_atBC8D	;	index $14
+.word Data_atBC99	;	index $15
+.word Data_atBCA5	;	index $16
+.word Data_atBCB1	;	index $17
+.word Data_atBCBD	;	index $18
+.word Data_atBCC9	;	index $19
+.word Data_atBCD5	;	index $1A
+.word Data_atBCE1	;	index $1B
+.word Data_atBCED	;	index $1C
+.word Data_atBCF9	;	index $1D
+.word Data_atBD05	;	index $1E
+.word Data_atBD11	;	index $1F
 
 Data_atBB9D:
 .word Data_atBD1D ;$bd1d 

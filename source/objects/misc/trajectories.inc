@@ -1,5 +1,4 @@
 ; Projectile Trajectories Table
-Data_at8EBE:
 .addr Data_at8F36, Data_at8F3F, Data_at8F4A, Data_at8F55
 .addr Data_at8F5F, Data_at8F69, Data_at8F72, Data_at8F7D
 .addr Data_at8F88, Data_at8F92, Data_at8F97, Data_at8FA0

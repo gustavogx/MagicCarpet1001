@@ -842,7 +842,7 @@ doneLoadingEnemyBatch:
 
 	lda #FLAG_7
 	sta object_Attrib_1_0404,X ; Set as VALID OBJECT
-	
+
 	pla
 	tay
 	rts
@@ -2245,10 +2245,10 @@ doneHandlingShooting:
 	rts
 .endproc
 ;
-; macro SpawnMultipleProjectiles
-; Spawn a given number of projectiles
-; from give address, using call
-.macro SpawnMultipleProjectiles address, number
+; macro SpawnMultipleProjectiles_X
+; Spawn a given <number> of projectiles
+; from given <address>, using call
+.macro SpawnMultipleProjectiles_X address, number
 	txa
 	tay
 	ldx #$00
@@ -2269,7 +2269,7 @@ Data_at8E25:
 ; $8E2D
 ; Shoot Bubbles 8 directions
 .proc SpawnProjectiles_8_1
-	SpawnMultipleProjectiles Data_at8E3F, $08
+	SpawnMultipleProjectiles_X Data_at8E3F, $08
 	rts
 .endproc
 ;
@@ -2285,7 +2285,7 @@ Data_at8E3F:
 	PushXY
 	jsr FindFreeObjectSlot_rX			; get free slot
 	cpx #$F0							; check if list is full
-	bcs doneSpawningProjectiles			; if it is (full), break.
+	bcs doneSpawningProjectiles			; if it's (full), break.
 
 	jsr HandleEnemyIA_Movement_X_Y
 	ldy projectileIndex_4A
@@ -2342,9 +2342,9 @@ Data_at8E3F:
 ; $8EA6
 .proc GetProjectileTrajectoryAddress_X_Y
 	
-	lda Data_at8EBE+0,Y
+	lda Projectile_Trajectories_at8EBE+0,Y
 	sta someObjProperty_0501,X
-	lda Data_at8EBE+1,Y
+	lda Projectile_Trajectories_at8EBE+1,Y
 	sta someObjProperty_0502,X
 	
 	lda #ZERO
@@ -2357,6 +2357,7 @@ Data_at8E3F:
 ;
 ; $8EBE
 ; Projectile Trajectories Table
+Projectile_Trajectories_at8EBE:
 .include "objects/misc/trajectories.inc"
 ;
 ;
@@ -2365,7 +2366,7 @@ Data_at8E3F:
 ; later by bedouins.
 ; Shoots 5 Sparkles (4 linear and 1 wavy)
 .proc Level_1_Attack 	
-	SpawnMultipleProjectiles Data_at9291, $05
+	SpawnMultipleProjectiles_X Data_at9291, $05
 	rts
 .endproc
 ;
@@ -2377,7 +2378,7 @@ Data_at9291:
 ; Level_2_Attack (The Crock) - Used by level 2 boss.
 ; Shoots 3 Fireballs (all linear)
 .proc Level_2_Attack
-	SpawnMultipleProjectiles Data_at92A8, $03
+	SpawnMultipleProjectiles_X Data_at92A8, $03
 	rts
 .endproc
 ;
@@ -2389,7 +2390,7 @@ Data_at92A8:
 ; Level_3_Attack (The Skull) - Used by level 3 boss.
 ; Shoots 3 Fireballs and 2 Ambers (all linear)
 .proc Level_3_Attack
-	SpawnMultipleProjectiles Data_at92BD, $05
+	SpawnMultipleProjectiles_X Data_at92BD, $05
 	rts
 .endproc
 ;
@@ -2401,7 +2402,7 @@ Data_at92BD:
 ; Level_4_Attack (The Mouth) - Used by level 4 boss.
 ; Shoots 3 Fireballs (linear) and 5 Ambers (3 linear and 1 wavy)
 .proc Level_4_Attack
-	SpawnMultipleProjectiles Data_at92D4, $08
+	SpawnMultipleProjectiles_X Data_at92D4, $08
 	rts
 .endproc
 ;

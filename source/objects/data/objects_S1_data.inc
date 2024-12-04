@@ -15,11 +15,11 @@
 .addr Data_atAF72	;	index $09
 .addr Data_atAF7E	;	index $0A
 .addr Data_atAF8A	;	index $0B
-
 .addr Data_atB27D	;	index $0C
 .addr Data_atB289	;	index $0D
 .addr Data_atB295	;	index $0E
 .addr Data_atB2A1	;	index $0F
+
 .addr Data_atB2AD	;	index $10
 .addr Data_atB2B9	;	index $11
 .addr Data_atB2C5	;	index $12

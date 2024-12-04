@@ -1,74 +1,82 @@
+; The offset used to read from this list, 
+; stored in objectType_58, is the first byte in each file. 
 
-.addr Data_atC945 ;$c945
-.addr Data_atC951 ;$c951
-.addr Data_atC95D ;$c95d
-.addr Data_atC969 ;$c969
-.addr Data_atC975 ;$c975
-.addr Data_atC981 ;$c981
-.addr Data_atC98D ;$c98d
-.addr Data_atC999 ;$c999 
-.addr Data_atC9A5 ;$c9a5
-.addr Data_atC9B1 ;$c9b1
-.addr Data_atC9BD ;$c9bd
-.addr Data_atC9C9 ;$c9c9 
-.addr Data_atC9D5 ;$c9d5
-.addr Data_atC9E1 ;$c9e1
-.addr Data_atC9ED ;$c9ed
-.addr Data_atC9F9 ;$c9f9 
-.addr Data_atCA05 ;$ca05
-.addr Data_atCA11 ;$ca11 
-.addr Data_atCA1D ;$ca1d
-.addr Data_atCA29 ;$ca29
-.addr Data_atCA35 ;$ca35
-.addr Data_atCA41 ;$ca41
-.addr Data_atCA4D ;$ca4d
-.addr Data_atCA59 ;$ca59 
-.addr Data_atCA65 ;$ca65
-.addr Data_atCA71 ;$ca71
-.addr Data_atCA7D ;$ca7d
-.addr Data_atCA89 ;$ca89  
-.addr Data_atCA95 ;$ca95
-.addr Data_atCAA1 ;$caa1
-.addr Data_atCAAD ;$caad
-.addr Data_atCAB9 ;$cab9 
-.addr Data_atCAC5 ;$cac5
-.addr Data_atCAD1 ;$cad1
-.addr Data_atCADD ;$cadd
-.addr Data_atCAE9 ;$cae9 
-.addr Data_atCAF5 ;$caf5
-.addr Data_atCB01 ;$cb01
-.addr Data_atCB0D ;$cb0d
-.addr Data_atCB19 ;$cb19 
-.addr Data_atCB25 ;$cb25
-.addr Data_atCB31 ;$cb31
-.addr Data_atCB3D ;$cb3d
-.addr Data_atCB49 ;$cb49 
-.addr Data_atCB55 ;$cb55
-.addr Data_atCB61 ;$cb61
-.addr Data_atCB6D ;$cb6d
-.addr Data_atCB79 ;$cb79 
-.addr Data_atCB85 ;$cb85
-.addr Data_atCB91 ;$cb91
-.addr Data_atCB9D ;$cb9d
-.addr Data_atCBA9 ;$cba9 
-.addr Data_atCBB5 ;$cbb5
-.addr Data_atCBC1 ;$cbc1
-.addr Data_atCBCD ;$cbcd
-.addr Data_atCBD9 ;$cbd9 
-.addr Data_atCBE5 ;$cbe5
-.addr Data_atCBF1 ;$cbf1
-.addr Data_atCBFD ;$cbfd
-.addr Data_atCC09 ;$cc09 
-.addr Data_atCC15 ;$cc15
-.addr Data_atCC21 ;$cc21
-.addr Data_atCC2D ;$cc2d
-.addr Data_atCC39 ;$cc39 
-.addr Data_atCC45 ;$cc45
-.addr Data_atCC51 ;$cc51
-.addr Data_atCC5D ;$cc5d
-.addr Data_atCC69 ;$cc69 
-.addr Data_atCC75 ;$cc75
-.addr Data_atCC81 ;$cc81
+; The address itself is stored in objectPtr_38
+
+.addr Data_atC945	;	index $00
+.addr Data_atC951	;	index $01
+.addr Data_atC95D	;	index $02
+.addr Data_atC969	;	index $03
+.addr Data_atC975	;	index $04
+.addr Data_atC981	;	index $05
+.addr Data_atC98D	;	index $06
+.addr Data_atC999	;	index $07
+.addr Data_atC9A5	;	index $08
+.addr Data_atC9B1	;	index $09
+.addr Data_atC9BD	;	index $0A
+.addr Data_atC9C9	;	index $0B
+.addr Data_atC9D5	;	index $0C
+.addr Data_atC9E1	;	index $0D
+.addr Data_atC9ED	;	index $0E
+.addr Data_atC9F9	;	index $0F
+
+.addr Data_atCA05	;	index $10
+.addr Data_atCA11	;	index $11
+.addr Data_atCA1D	;	index $12
+.addr Data_atCA29	;	index $13
+.addr Data_atCA35	;	index $14
+.addr Data_atCA41	;	index $15
+.addr Data_atCA4D	;	index $16
+.addr Data_atCA59	;	index $17
+.addr Data_atCA65	;	index $18
+.addr Data_atCA71	;	index $19
+.addr Data_atCA7D	;	index $1A
+.addr Data_atCA89	;	index $1B
+.addr Data_atCA95	;	index $1C
+.addr Data_atCAA1	;	index $1D
+.addr Data_atCAAD	;	index $1E
+.addr Data_atCAB9	;	index $1F
+
+.addr Data_atCAC5	;	index $20
+.addr Data_atCAD1	;	index $21
+.addr Data_atCADD	;	index $22
+.addr Data_atCAE9	;	index $23
+.addr Data_atCAF5	;	index $24
+.addr Data_atCB01	;	index $25
+.addr Data_atCB0D	;	index $26
+.addr Data_atCB19	;	index $27
+.addr Data_atCB25	;	index $28
+.addr Data_atCB31	;	index $29
+.addr Data_atCB3D	;	index $2A
+.addr Data_atCB49	;	index $2B
+.addr Data_atCB55	;	index $2C
+.addr Data_atCB61	;	index $2D
+.addr Data_atCB6D	;	index $2E
+.addr Data_atCB79	;	index $2F
+
+.addr Data_atCB85	;	index $30
+.addr Data_atCB91	;	index $31
+.addr Data_atCB9D	;	index $32
+.addr Data_atCBA9	;	index $33
+.addr Data_atCBB5	;	index $34
+.addr Data_atCBC1	;	index $35
+.addr Data_atCBCD	;	index $36
+.addr Data_atCBD9	;	index $37
+.addr Data_atCBE5	;	index $38
+.addr Data_atCBF1	;	index $39
+.addr Data_atCBFD	;	index $3A
+.addr Data_atCC09	;	index $3B
+.addr Data_atCC15	;	index $3C
+.addr Data_atCC21	;	index $3D
+.addr Data_atCC2D	;	index $3E
+.addr Data_atCC39	;	index $3F
+
+.addr Data_atCC45	;	index $40
+.addr Data_atCC51	;	index $41
+.addr Data_atCC5D	;	index $42
+.addr Data_atCC69	;	index $43
+.addr Data_atCC75	;	index $44
+.addr Data_atCC81	;	index $45
 
 Data_atC945:
 .addr Data_atCC8D ;$cc8d 
@@ -622,8 +630,3 @@ Data_atE262:
 Data_atE2B5:
 .incbin "objects/data/data3/data-block-atE2B5.bin"
 ;.res 241
-
-
-
-
-
