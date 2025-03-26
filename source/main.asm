@@ -425,7 +425,7 @@ HandleReset:
 	
 	jsr RenderON
 	
-	PlaySoundForever #SONG_OPENING
+	PlaySoundForever #SONG_TITLESCREEN
 	; 00 Opening song
 	; 01 Stage song
 	; 02 Boss song
@@ -694,7 +694,7 @@ StartingNewStage:
 		cmp #$F0				; check for control character $F0
 		bne :+					; if not, skip ahead
 
-		and #ZERO				; WHY? equivalent to LDA #$00
+		and #ZERO				; WHY "and"? equivalent to LDA #$00
 		sta var_2D				; zeroing var_2D (still unknown?)
 		iny
 		lda (objectPtr_3A),Y
@@ -706,7 +706,7 @@ StartingNewStage:
 		cmp #$F1				; check for control character $F1
 		bne :+					; if not, skip ahead
 
-		and #(FLAG_1+FLAG_0)		; $F1 & $03 = $01
+		and #(FLAG_1+FLAG_0)	; $F1 & $03 = $01
 		sta var_2D				; object status flags?
 		iny
 		lda (objectPtr_3A),Y	; read next byte after $F1
@@ -1890,7 +1890,7 @@ Data_at8BD7:
 	beq doneShooting
 	
 	:
-	PlaySoundOnce #ARROW_SHOT_SFX
+	PlaySoundOnce #SFX_ARROW_SHOT
 
 	doneShooting:
 		lda #$00

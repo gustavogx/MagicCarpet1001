@@ -79,10 +79,10 @@
 .define Stage4Bank   $02
 
 ; song names ==========================
-.define SONG_OPENING 	$00; 00 Opening song
+.define SONG_TITLESCREEN $00; 00 Opening song
 .define SONG_STAGES 	$01; 01 Stage song
 .define SONG_BOSSES 	$02; 02 Boss song
-.define ARROW_SHOT_SFX 	$03; 03 Arrow shot SFX
+.define SFX_ARROW_SHOT 	$03; 03 Arrow shot SFX
 .define SFX_ENEMY_DEATH $04; 04 Enemy death SFX
 .define SFX_PLAYER_DEATH $05; 05 Player death SFX
 .define SFX_EXTRA_LIFE 	$06; 06 Extra life SFX
