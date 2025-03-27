@@ -945,7 +945,7 @@ doneLoadingEnemyBatch:
 		clc
 		adc #$06
 		sta iterator_4D
-		cmp #$F0
+		cmp #$F0				; 240, or 40 object slots of 6 bytes each
 		beq :+
 		jmp loopCheckCollisions
 
@@ -1944,13 +1944,13 @@ Data_at8BD7:
 	adc #$02					; add 2
 	
 	:
-	sta attackPoints_0602,X	; store A (byte 1) #$02 single, #$04 triple
+	sta attackPoints_0602,X		; store A (byte 1) #$02 single, #$04 triple
 	lda Data_at8D1D+3,Y			; load byte 2
 	sta someObjProperty_0302,X	; store byte 2
 	lda Data_at8D1D+4,Y			; load byte 3
-	sta objectWidth_0600,X	; store byte 3
+	sta objectWidth_0600,X		; store byte 3
 	lda Data_at8D1D+5,Y			; load byte 4
-	sta objectHeight_0601,X	; store byte 4
+	sta objectHeight_0601,X		; store byte 4
 	
 	lda object_X_Lo_0400		; load player X position from RAM
 	clc
@@ -3400,7 +3400,7 @@ Data_at97F5:
 ; $A46F
 ; HandleObjectsUpdates
 ; This routine updates every object of the game at every VBlank time.
-; THIS IS BAD PROGRAMING!
+; THIS IS BAD PROGRAMMING!
 ; This routine takes longer than vblank.
 .proc HandleObjectsUpdates
 
@@ -3413,7 +3413,7 @@ Data_at97F5:
 	BeginHere:
 		ldx objectIndex_5F			; load object index into X
 		lda object_Attrib_1_0404,X	; check if object should be handled
-		bmi :+						; if negative, handle object
+		bmi :+						; if BIT7 is set, handle object
 		
 		jmp UpdateObjectIndex		; else move forward.
 	
@@ -3436,9 +3436,9 @@ Data_at97F5:
 	ReplaceMeLabel_7:
 	
 		lda (objectPtr_36),Y ; reads which object to load
-		bmi :+				 ; if index is negative, skip ahead
+		bmi :+				 ; if index BIT7 is set, skip ahead
 		
-		jmp RetrieveObject   ; if index is positive, will load
+		jmp RetrieveObject   ; if index BIT7 is NOT set, will load
 	
 	:
 		asl A
