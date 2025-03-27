@@ -56,7 +56,7 @@
 
 .define VRAM_PALETTES_PAGE $3F
 
-.define BG_SCROLL_RATE	$01
+.define BG_SCROLL_RATE	$02
 	; $01 every frame 		(60fps)
 	; $02 every other frame	(30fps) (original)
 	; $03 every two frames 	(15fps)
