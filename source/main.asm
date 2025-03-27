@@ -28,8 +28,8 @@ updateDuringVBlank_0F:	.res 1 ; $0f
 .res 1 ; $10
 livesCounter_11:		.res 1	; $11 ; 5
 frameCounter_12:		.res 1	; $12 ; 8
-frameCounter62_13:		.res 1	; $13 ; 4
-aliveTimer_14:			.res 1	; $14 ; 6
+timerInSeconds_13:		.res 1	; $13 ; 4
+flagTimerInSeconds_14:	.res 1	; $14 ; 6
 currentStage_15:		.res 1	; $15 ; 14 ; Stage Index 0(opening), 1, 2, 3, 4, and 5(ending)
 levelProgression_16:	.res 1	; $16 ; 3
 flagPPUControl_17:		.res 1	; $17 ; 8
@@ -457,12 +457,17 @@ WaitForPressStart:
 		cmp inputPrev_22
 		beq :-
 
-	StopPlaying
+	StopSoundEngine
 	PlaySoundOnce #SFX_GAME_START
 	
 	lda #$00
 	sta currentStage_15
-	jmp HandleStageClear ; Check what this one does
+
+	; Handles when a stage is cleared.
+	; Decides if the program has to 
+	; jump back to StartingNewStage
+	; or to EndGame.
+	jmp HandleStageClear	; New stage or game credits?
 
 StartingNewStage:
 
@@ -521,8 +526,8 @@ StartingNewStage:
 	sta input1_20
 	sta inputPrev_22
 	sta currentEnemyWave_5B
-	sta aliveTimer_14
-	sta frameCounter62_13
+	sta flagTimerInSeconds_14
+	sta timerInSeconds_13
 	
 	jsr InitializePlayer
 	jsr InitializeHUD_Lives
@@ -560,33 +565,40 @@ StartingNewStage:
 		jsr HandlePlayerShots
 		
 		:
-		lda flagPlayerHit_1E
-		beq skipPlayerHit
-		dec livesCounter_11
+		lda flagPlayerHit_1E		; test if player has been hit
+		beq :+						; if not, skip
+
+		; player hit
+		dec livesCounter_11			; decrease lives
 		lda #$01					; Wait 1 second before
-		jsr WaitAliveTime_A			; respawning the player
-		lda #$00
+		jsr WaitForSeconds_A		; respawning the player
+
+		lda #FALSE					; reset hit flag
 		sta flagPlayerHit_1E
-		sta flagPlaySFX_8F
+		sta flagPlaySFX_8F			; play $00 SFX?
 		jmp SetupNewLevel
 
-		skipPlayerHit:
-		lda livesCounter_11
-		bne skipSomethingImportant
-		StopPlaying
-
+		:	; is the player out of lives?
+			lda livesCounter_11		; check if lives are 0
+			bne :+					; if not, skip
+		
+		; GAME OVER ========================
+		StopSoundEngine
 		jsr ShowGameOver_WaitAnyButtonPress
+
 		jsr PaletteFading
 		jsr RenderingOFF
-		lda #$FF
+		lda #FULL
 		sta updateDuringVBlank_0E
 		sta updateDuringVBlank_0F
 		jmp HandleReset
+		; ==================================
 		
-		skipSomethingImportant:
-		lda flagNextLevel_1B
-		beq dontAdvanceLevel
-		StopPlaying
+		:
+		lda flagNextLevel_1B		; check if level transitioning
+		beq :+						; if not, we're done
+
+		StopSoundEngine
 
 		; Handles when a stage is cleared.
 		; Decides if the program has to 
@@ -594,7 +606,7 @@ StartingNewStage:
 		; or to EndGame.
 		jmp HandleStageClear	; New stage or game credits?
 
-		dontAdvanceLevel:
+		:
 		jmp loopMain
 ;
 
@@ -682,7 +694,7 @@ StartingNewStage:
 		jsr ClearObjectsDescription; Clears page $04 of RAM
 	
 		; Stage Boss Song===============
-		StopPlaying	
+		StopSoundEngine	
 		ResetSoundEngine 
 		PlaySoundForever #SONG_BOSSES
 		; ==============================
@@ -856,7 +868,7 @@ doneLoadingEnemyBatch:
 	lda #FALSE
 	sta flagEnemyWillShoot_5A
 
-	lda #$06
+	lda #OBJECT_BYTE_SIZE
 	sta iterator_4D
 	
 	loopCheckCollisions:
@@ -943,9 +955,9 @@ doneLoadingEnemyBatch:
 		doneWithPhysics:
 		lda iterator_4D
 		clc
-		adc #$06
+		adc #OBJECT_BYTE_SIZE
 		sta iterator_4D
-		cmp #$F0				; 240, or 40 object slots of 6 bytes each
+		cmp #ENEMY_OBJECT_END				; 240, or 40 object slots of 6 bytes each
 		beq :+
 		jmp loopCheckCollisions
 
@@ -1669,7 +1681,7 @@ Data_at8715:
 	sta someObjProperty_0504
 	sta someObjProperty_0505
 
-	sta aliveTimer_14
+	sta flagTimerInSeconds_14
 	sta soundIndex_8D
 
 	lda #$1A
@@ -1693,13 +1705,13 @@ Data_at8715:
 	lda #$00
 	sta arrowsFlying_60
 	
-	lda flagNextLevel_1B
-	bne :+
-	lda #$01
-	sta healthPoints_0603
-	lda powerLevel_64
-	beq :+
-	dec powerLevel_64
+	lda flagNextLevel_1B		; check if level transitioning
+	bne :+						; if not, player has just died
+		lda #STARTING_HEALTH	; reset player's health
+		sta healthPoints_0603
+		lda powerLevel_64		; check player's power
+		beq :+					; if power is 0, skip decreasing
+		dec powerLevel_64		; decrease player's power
 
 	:
 	rts
@@ -2518,32 +2530,30 @@ LivesGraphicData:
 ; ATENTION: This block of code is not actually a subroutine!
 ; It is never called with a JSR instruction and it doesn't end in RTS.
 ; Instead, it always return either by JMP to 
-;		StartingNewSage
+;		StartingNewStage
 ;	or
 ;		EndGame
 ; Both of which are part of the main program.
 ; Because of this, this block is actually part of the main program too.
-;
-; Maybe it was added at the last minute?
 .proc HandleStageClear
 
 	jsr PaletteFading			; Fade-out palletes
 	
 	lda #$02					
-	jsr WaitAliveTime_A			; Wait 2 seconds
+	jsr WaitForSeconds_A		; Wait 2 seconds
 	
 	lda currentStage_15
-	cmp #$04					; Check if the last stage was completed
+	cmp #LAST_STAGE_INDEX		; Check if the last stage was completed
 	bne :+						; if not, skip ahead.
 		jmp EndGame				; else (completed last stage), end the game.
 	
-	:
-	lda OAM_0200				; Load the current HEAR_HUD_Y position.
+	:							; This next block clears OAM but retains the heart Y position
+	lda OAM_0200				; Load the current HEART_HUD_Y position.
 	pha							; Push it away
 	jsr ClearPage_2_OAM			; Clear page 2 (objects)
 	pla							; Pull it back
-	sta OAM_0200				; Restore the current HEAR_HUD_Y position.
-	Copy HeartHUDData, OAM_0200, #1, #4 ; Copy the rest of the HEAR_HUD data.
+	sta OAM_0200				; Restore the current HEART_HUD_Y position.
+	Copy HeartHUDData, OAM_0200, #1, #4 ; Copy the rest of the HEART_HUD data.
 
 	lda healthPoints_0603		; Load the current health points.
 	pha							; Push it away
@@ -2833,15 +2843,16 @@ RepeatedTitles:
 .endproc
 ;
 ; $956A
-; WaitAliveTime_A
-; Wait A seconds before respawning the player
-.proc WaitAliveTime_A
+; WaitForSeconds_A
+; Wait for a given number of seconds.
+; A times 62 frames.
+.proc WaitForSeconds_A
 	:
 		pha
 		lda #$00
-		sta aliveTimer_14
+		sta flagTimerInSeconds_14
 		:
-			lda aliveTimer_14
+			lda flagTimerInSeconds_14
 			cmp #$01
 			bne :-
 		pla
@@ -3014,7 +3025,7 @@ RegisterInput:
 		cmp inputPrev_22
 		beq :-
 	
-	StopPlaying
+	StopSoundEngine
 
 	lda #$00
 	sta screenScrollX_29
@@ -3023,7 +3034,7 @@ RegisterInput:
 	jsr RenderingOFF
 	jsr ClearPage_2_OAM
 	lda #$02			; Wait 2 seconds before
-	jsr WaitAliveTime_A	; respawings the player
+	jsr WaitForSeconds_A	; respawings the player
 	lda #$00
 	sta PpuControl_2000
 	sta screenScrollX_29
@@ -3192,9 +3203,9 @@ EndingText_97A3:
 
 	jsr UpdatePPUSettings
 	lda #$02				; Waits 2 seconds
-	jsr WaitAliveTime_A		; before respawning the player
+	jsr WaitForSeconds_A		; before respawning the player
 	lda #$00
-	sta frameCounter62_13
+	sta timerInSeconds_13
 	
 	; Wait for any button to be pressed before reseting.
 	;
@@ -3204,7 +3215,7 @@ EndingText_97A3:
 	: ; Check for press
 	lda input1_20			; Load current button being pressed.
 	bne :+					; If pressed, skip forward.
-	lda frameCounter62_13	; else, check if 10 frames have passed.
+	lda timerInSeconds_13	; else, check if 10 frames have passed.
 	cmp #$0A				; If so (10 frames since last check),
 	bne :-					; check for the first press again.
 	rts						; else (other frames), return.
@@ -3262,8 +3273,8 @@ Data_at97F5:
 		and #63 				; $3F = every 62 frames, increase aliveTimer
 		bne :+
 
-		inc aliveTimer_14
-		inc frameCounter62_13
+		inc flagTimerInSeconds_14
+		inc timerInSeconds_13
 
 	:
 		lda flagNextLevel_1B
@@ -3905,7 +3916,7 @@ Data_at97F5:
 	lda object_X_Hi_0401
 	bne doGameIsPaused
 
-	lda aliveTimer_14
+	lda flagTimerInSeconds_14
 	cmp #$02
 	bcc handlePlayerActions
 	lda #(OBJPROP_IS_NOT_BOSS+OBJPROP_CAN_COLLIDE)
@@ -4046,7 +4057,7 @@ Data_atA80A:
 		sta flagPause_1C
 		beq :+
 	
-		StopPlaying
+		StopSoundEngine
 		PlaySoundOnce #SFX_GAME_PAUSE
 
 		jmp exitPauseRoutine

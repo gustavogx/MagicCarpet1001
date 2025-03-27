@@ -151,7 +151,7 @@
 .endif
 .endmacro
 
-.macro StopPlaying
+.macro StopSoundEngine
 .if DISABLE_SOUND = 1
 	nop
 	nop

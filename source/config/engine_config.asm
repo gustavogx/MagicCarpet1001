@@ -1,12 +1,14 @@
 ; Game Configuration =================
 .define STARTING_LIVES			 $06
 .define STARTING_POWER			 $00
+.define STARTING_HEALTH			 $01
 .define PLAYER_SPEED_SLOW		 $02
 .define PLAYER_SPEED_FAST		 $03
 .define HEART_HEALTH_POINTS 	 $04
 .define PLAYER_MAX_POWER		 $04
 .define MAGIC_LAMP_HEALTH_POINTS $50
 .define PLAYER_FLASHING_HEALTH	 $14
+
 ; ====================================
 
 ; Engine Configuration ===============
@@ -78,6 +80,8 @@
 .define Stage3Bank   $01
 .define Stage4Bank   $02
 
+.define LAST_STAGE_INDEX $04
+
 ; song names ==========================
 .define SONG_TITLESCREEN $00; 00 Opening song
 .define SONG_STAGES 	$01; 01 Stage song
@@ -94,10 +98,10 @@
 .define SFX_MAGIC_LAMP 	$0C; 0C Magic Lamp SFX
 
 ; shots type ==========================
-.define SHOOT_NOTHING		$00
-.define SHOOT_SINGLE_BUBBLE	$01
-.define SHOOT_RING_BUBBLES	$03
-.define SHOOT_5_BUBBLES		$05
+.define SHOOT_NOTHING			$00
+.define SHOOT_SINGLE_BUBBLE		$01
+.define SHOOT_RING_BUBBLES		$03
+.define SHOOT_5_BUBBLES			$05
 .define SHOOT_3_COMETS			$06
 .define SHOOT_3_COMETS_2_AMBERS	$07
 .define SHOOT_3_COMETS_5_AMBERS	$08
