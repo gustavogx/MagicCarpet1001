@@ -20,8 +20,8 @@
 .res 1 ; $09
 .res 1 ; $0a
 .res 1 ; $0b
-var_0C:	.res 1 ; $0c THIS HAS SOMETHING TO DO WITH THE MAGIC LAMP
-var_0D:	.res 1 ; $0d
+objectDeltaX_0C:	.res 1 ; $0c THIS HAS SOMETHING TO DO WITH THE MAGIC LAMP
+objectDeltaY_0D:	.res 1 ; $0d
 updateDuringVBlank_0E:	.res 1 ; $0e
 updateDuringVBlank_0F:	.res 1 ; $0f
 
@@ -265,7 +265,7 @@ paletteRAM_E0:			.res 32	; $E0 ; 4
 ;						 |||+------- 4: 
 ;						 ||+-------- 5: Player can shoot
 ;						 |+--------- 6:
-;						 +---------- 7: Object is valid OR? flag if object has unresolved collision
+;						 +---------- 7: Object needs to be updated
 .define OBJPROP_TODO	FLAG_3
 .define OBJPROP_SHOT	FLAG_5
 .define OBJPROP_VALID	FLAG_7
@@ -501,7 +501,7 @@ StartingNewStage:
 	jsr LoadStage
 	
 	lda #FULL
-	sta var_0C
+	sta objectDeltaX_0C
 	
 	lda #GAMEMODE_STAGE
 	sta flagGameMode_26
@@ -3415,53 +3415,56 @@ Data_at97F5:
 ; This routine takes longer than vblank.
 .proc HandleObjectsUpdates
 
-	lda #FIRST_OBJECT_SLOT		; Configuration constant
+	lda #FIRST_OBJECT_SLOT		; Updates start AFTER heart icon
 	sta oamAddressPtr_3E		; Store first OAM address
 	
-	lda objectIndex_5F			; Object index, initialized with $00
+	lda objectIndex_5F			; Get current objetc index
+								; It counts from 0 to 240 or 240 to 0, 
+								; depending on objIndexStep_59
 	sta beingUpdated_3D			; Store current object index
 	
-	BeginHere:
+	loopOverObjects:
 		ldx objectIndex_5F			; load object index into X
 		lda object_Attrib_1_0404,X	; check if object should be handled
-		bmi :+						; if BIT7 is set, handle object
-		
-		jmp UpdateObjectIndex		; else move forward.
+		bmi :+						; if BIT7 is set, handle object		
+			jmp NextObjectIndex		; else move forward.
 	
-	:
+	: 
 		ldy someObjProperty_0504,X
-		beq :+
+		beq :+ 
 		
 		dec someObjProperty_0504,X
 		dec someObjProperty_0503,X
 		jmp ReplaceMeLabel_2
 	
 	:
-		lda someObjProperty_0501,X
+		lda someObjProperty_0501,X	; Loads XXX address (Lo)
 		sta objectPtr_36+0
-		lda someObjProperty_0502,X
+		lda someObjProperty_0502,X	; Loads XXX address (Hi)
 		sta objectPtr_36+1
 		
-		ldy someObjProperty_0503,X
+		ldy someObjProperty_0503,X	; Loads index into XXX address
 	
 	ReplaceMeLabel_7:
 	
-		lda (objectPtr_36),Y ; reads which object to load
-		bmi :+				 ; if index BIT7 is set, skip ahead
-		
-		jmp RetrieveObject   ; if index BIT7 is NOT set, will load
+		lda (objectPtr_36),Y ; reads control byte Y of table XXX
+		bmi :+				 ; if BIT7 is set, don't retreive object
+			jmp RetrieveObject   ; if  BIT7 is NOT set, will load
 	
-	:
+		:
 		asl A
-		bmi ReplaceMeLabel_1
-		lsr A
-		sbc #$00
+			bmi ReplaceMeLabel_1	; if BIT6 is set, jump to ReplaceMeLabel_1
+
+		lsr A						; return to original value (sans BIT7)
+		sbc #$00					; optimization for subtracting 1 since 
+									; the carry flag C will always be set by
+									; the first bmi 
 		sta someObjProperty_0504,X
 	
 	ReplaceMeLabel_2:
 		lda object_Attrib_2_0405,X
 		bpl ReplaceMeLabel_4
-		lda var_0C
+		lda objectDeltaX_0C
 		bpl :+
 
 		lda #FULL
@@ -3472,7 +3475,7 @@ Data_at97F5:
 	
 	:
 		sta tile_X_Hi_47
-		lda var_0C
+		lda objectDeltaX_0C
 		clc
 		adc object_X_Lo_0400,X
 		sta object_X_Lo_0400,X
@@ -3481,7 +3484,7 @@ Data_at97F5:
 		adc object_X_Hi_0401,X
 		sta object_X_Hi_0401,X
 		sta var_41
-		lda var_0D
+		lda objectDeltaY_0D
 		bpl :+
 
 		lda #FULL
@@ -3492,7 +3495,7 @@ Data_at97F5:
 	
 	:
 		sta var_49
-		lda var_0D
+		lda objectDeltaY_0D
 		clc
 		adc object_Y_Lo_0402,X
 		sta object_Y_Lo_0402,X
@@ -3562,7 +3565,7 @@ Data_at97F5:
 		lda object_Attrib_1_0404,X
 		ora #$08
 		sta object_Attrib_1_0404,X
-		jmp UpdateObjectIndex
+		jmp NextObjectIndex
 	
 	:
 		lda someObjProperty_0303,X
@@ -3592,7 +3595,7 @@ Data_at97F5:
 		sta object_Attrib_1_0404,X
 	
 	:
-		jmp UpdateObjectIndex
+		jmp NextObjectIndex
 	
 	RetrieveObject:					; A holds index for object to be loaded
 		asl A						; index is doubled since addresses are 16bit (double stride)
@@ -3609,7 +3612,7 @@ Data_at97F5:
 
 		lda (objectPtr_36),Y
 		clc
-		adc var_0C
+		adc objectDeltaX_0C
 		jmp :++
 	
 	:
@@ -3642,7 +3645,7 @@ Data_at97F5:
 
 		lda (objectPtr_36),Y
 		clc
-		adc var_0D
+		adc objectDeltaY_0D
 		jmp :++
 	
 	:
@@ -3678,7 +3681,7 @@ Data_at97F5:
 		and #OBJPROP_SHOT
 		bne :+
 
-		jmp UpdateObjectIndex
+		jmp NextObjectIndex
 	
 	:
 		lda object_Attrib_2_0405,X
@@ -3789,36 +3792,35 @@ Data_at97F5:
 	:
 		stx oamAddressPtr_3E	; stores next OAM free address
 	
-	UpdateObjectIndex:
+	NextObjectIndex:
 
-		lda objectIndex_5F
+		lda objectIndex_5F		; get current object index
 		clc
-		adc objIndexStep_59
-		cmp #ENEMY_OBJECT_END	; Check if 240 (40 objects)
-		bcc :++
-	
-		beq :+
+		adc objIndexStep_59		; add step (+6 or -6)
+		cmp #ENEMY_OBJECT_END	; check if 240 (40 objects)
+		bcc ContinueUpdating	; if less than 240, skip ahead	
+		beq ResetIndex			; if equal to 240, continue
 	
 		lda #ENEMY_OBJECT_END - OBJECT_BYTE_SIZE; $EA Replace last object				
-		bne :++
+		bne ContinueUpdating
 		
-	:
-		lda #$00
+		ResetIndex:
+			lda #$00
 		
-	:
+	ContinueUpdating:
 		sta objectIndex_5F
 		cmp beingUpdated_3D
 		beq ReplaceMeLabel_12
 
-		jmp BeginHere
+		jmp loopOverObjects
 	
 	ReplaceMeLabel_8:
 		ldx oamAddressPtr_3E
 		lda var_41
-		bne UpdateObjectIndex
+		bne NextObjectIndex
 
 		lda tile_Y_Hi_43
-		bne UpdateObjectIndex
+		bne NextObjectIndex
 
 		lda tile_Y_Lo_42
 		sta OAM_0200+OAM_Y,X
@@ -3837,7 +3839,7 @@ Data_at97F5:
 		beq ReplaceMeLabel_9
 
 		sta oamAddressPtr_3E
-		jmp UpdateObjectIndex
+		jmp NextObjectIndex
 	
 	ReplaceMeLabel_12:
 		ldx oamAddressPtr_3E
