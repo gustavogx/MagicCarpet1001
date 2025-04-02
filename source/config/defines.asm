@@ -46,6 +46,7 @@
 .define FLAG_5	%00100000
 .define FLAG_6	%01000000
 .define FLAG_7	%10000000
+
 .define ZERO	$00
 .define FULL	$FF
 .define ALL1	$FF

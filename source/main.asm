@@ -76,8 +76,8 @@ beingUpdated_3D:		.res 1	; $3D ; 3
 oamAddressPtr_3E:		.res 2	; $3E ; 6 (word address)
 ; $3F low byte of $3E
 
-var_40:					.res 1	; $40 ; 5
-var_41:					.res 1	; $41 ; 5
+tempTile_X_Lo_40:		.res 1	; $40 ; 5
+tempTile_X_Hi_41:		.res 1	; $41 ; 5
 tile_Y_Lo_42:			.res 1	; $42 ; 7
 tile_Y_Hi_43:			.res 1	; $43 ; 6
 var_44:					.res 1	; $44 ; 2
@@ -97,7 +97,7 @@ hitboxXLeft_50:			.res 1	; $50 ; 4
 hitboxYBottom_51:		.res 1	; $51 ; 4
 hitboxYTop_52:			.res 1	; $52 ; 4
 .res 1 ; $53
-new_X_Lo_54:			.res 1	; $54 ; 5 ; used by SpawnObject and SpawnEnemy
+new_X_Lo_54:			.res 1	; $54 ; 5 ; used by SpawnObject and SpawnEnemy_X
 new_X_Hi_55:			.res 1	; $55 ; 5 ; object loading property
 new_Y_Lo_56:			.res 1	; $56 ; 5 ; object loading property
 new_Y_Hi_57:			.res 1	; $57 ; 5 ; object loading property
@@ -248,7 +248,7 @@ paletteRAM_E0:			.res 32	; $E0 ; 4
 .define someObjProperty_0302 $0302 ; #6 of 10-byte file
 .define someObjProperty_0303 $0303
 
-.define someObjProperty_0333 $0333 ; unused variable
+;.define someObjProperty_0333 $0333 ; unused variable
 
 ; page 04
 .define object_X_Lo_0400 $0400 ; object_X_Lo_0400
@@ -295,19 +295,20 @@ paletteRAM_E0:			.res 32	; $E0 ; 4
 
 ; page 05
 .define someObjProperty_0500 $0500
-.define someObjProperty_0501 $0501 ; lo-byte of object AI??? address
-.define someObjProperty_0502 $0502 ; hi-byte of object AI??? address
-.define someObjProperty_0503 $0503
+.define animationTable_Lo_0501 		$0501 ; lo-byte of object AI??? address
+.define animationTable_Hi_0502 		$0502 ; hi-byte of object AI??? address
+.define animationTable_Index_0503 	$0503
 .define someObjProperty_0504 $0504
 .define someObjProperty_0505 $0505
 
-.define someObjProperty_0531 $0531
-.define someObjProperty_0532 $0532
-.define someObjProperty_0533 $0533
-.define someObjProperty_0534 $0534
-.define someObjProperty_0535 $0535
+; ENEMY_OBJECT_START = $30
+;.define someObjProperty_0531 $0531
+;.define someObjProperty_0532 $0532
+;.define someObjProperty_0533 $0533
+;.define someObjProperty_0534 $0534
+;.define someObjProperty_0535 $0535
 
-.define page_5_Gap		 	RAMPage_6-someObjProperty_0535-1
+.define page_5_Gap		 	RAMPage_6-(someObjProperty_0505+ENEMY_OBJECT_START+1)
 
 ; page 06
 .define objectWidth_0600 		$0600 ; #3 of 10-byte file
@@ -318,12 +319,12 @@ paletteRAM_E0:			.res 32	; $E0 ; 4
 .define objectSpeed_Y_0605 		$0605 ; #9 of 10-byte file
 
 ; page 07
-.define someObjProperty_0700 $0700 ; #10 of 10-byte file (also $0300)
-.define someObjProperty_0701 $0701
-.define objectHitBox_Left_X_0702 	$0702	; maybe vertices of hit box
-.define objectHitBox_Right_X_0703 	$0703	; maybe vertices of hit box
-.define objectHitBox_Top_Y_0704 	$0704	; maybe vertices of hit box
-.define objectHitBox_Bottom_Y_0705 	$0705	; maybe vertices of hit box
+.define someObjProperty_0700 		$0700 	; #10 of 10-byte file (also $0300)
+.define someObjProperty_0701 		$0701
+.define objectHitBox_Left_X_0702 	$0702	; vertices of hit box
+.define objectHitBox_Right_X_0703 	$0703	; vertices of hit box
+.define objectHitBox_Top_Y_0704 	$0704	; vertices of hit box
+.define objectHitBox_Bottom_Y_0705 	$0705	; vertices of hit box
 
 .segment "BANK0"
 
@@ -388,21 +389,21 @@ HandleReset:
 	jsr SetupAfterReset	
 	jsr InitializeObjectIndexStep
 
-	StartSoundEngine
+	SOUNDENGINE_START
 
 	lda #GAMEMODE_STARTSCREEN 
 	sta flagGameMode_26
 
 	lda #$00 
 	tax
-	jsr LoadStage
+	jsr LoadStage_A_X
 
 	lda #$01
 	ldx #$01
-	jsr LoadStage
+	jsr LoadStage_A_X
 
 	lda #(FLAG_7+FLAG_3) 	; flags %1000 1000
-	TurnOFF	FLAG_3			; and #(ALL1-FLAG_3) ; flags %1111 0111 (Why?)
+	TURNOFF	FLAG_3			; and #(ALL1-FLAG_3) ; flags %1111 0111 (Why?)
 	sta flagPPUControl_17
 	sta flagPPUControl_19
 
@@ -423,9 +424,9 @@ HandleReset:
 	sta PpuScroll_2005
 	sta PpuScroll_2005
 	
-	jsr RenderON
+	jsr RenderingON
 	
-	PlaySoundForever #SONG_TITLESCREEN
+	SOUNDENGINE_PLAY_FOREVER #SONG_TITLESCREEN
 	; 00 Opening song
 	; 01 Stage song
 	; 02 Boss song
@@ -457,8 +458,8 @@ WaitForPressStart:
 		cmp inputPrev_22
 		beq :-
 
-	StopSoundEngine
-	PlaySoundOnce #SFX_GAME_START
+	SOUNDENGINE_STOP
+	SOUNDENGINE_PLAY_ONCE #SFX_GAME_START
 	
 	lda #$00
 	sta currentStage_15
@@ -473,7 +474,7 @@ StartingNewStage:
 
 	jsr RenderingOFF
 
-	ResetSoundEngine 
+	SOUNDENGINE_RESET 
 
 	lda #$00
 	sta PpuControl_2000
@@ -492,13 +493,13 @@ StartingNewStage:
 	asl A
 	pha
 	ldx #$00
-	jsr LoadStage
+	jsr LoadStage_A_X
 	
 	pla
 	clc
 	adc #$01
 	ldx #$01
-	jsr LoadStage
+	jsr LoadStage_A_X
 	
 	lda #FULL
 	sta objectDeltaX_0C
@@ -537,15 +538,15 @@ StartingNewStage:
 	sta flagNextLevel_1B
 	sta flagBossFight_1A
 	
-	jsr RenderON
+	jsr RenderingON
 
-	PlaySoundForever #SONG_STAGES
+	SOUNDENGINE_PLAY_FOREVER #SONG_STAGES
 	
 	lda currentStage_15
 	cmp #$02
 	bcs loopMain
 
-	Copy HeartHUDData, OAM_0200, #0, #4
+	COPY_DATA HeartHUDData, OAM_0200, #0, #4
 	
 	SetupNewLevel:
 		lda #HEART_OFFSCREEN
@@ -583,7 +584,7 @@ StartingNewStage:
 			bne :+					; if not, skip
 		
 		; GAME OVER ========================
-		StopSoundEngine
+		SOUNDENGINE_STOP
 		jsr ShowGameOver_WaitAnyButtonPress
 
 		jsr PaletteFading
@@ -598,7 +599,7 @@ StartingNewStage:
 		lda flagNextLevel_1B		; check if level transitioning
 		beq :+						; if not, we're done
 
-		StopSoundEngine
+		SOUNDENGINE_STOP
 
 		; Handles when a stage is cleared.
 		; Decides if the program has to 
@@ -646,13 +647,11 @@ StartingNewStage:
 	; MACRO that reads the stage number and returns the index 
 	; (address offset) for this stage's object data.
 	:
-	GetObjectsIndexTable_Y
-	; now Y contains the index
+	GAMEENGINE_OBJECTS_INDEX_rY	
+	; retrieves the index of ObjectsData for this stage.
+								; now Y contains the index
 
-	lda ObjectsData_A885+0,Y	; lo-byte of stage's enemy data
-	sta objectPtr_34+0
-	lda ObjectsData_A885+1,Y	; hi-byte of stage's enemy data
-	sta objectPtr_34+1
+	COPY_WORD_Y ObjectsData_A885, objectPtr_34	; stage's enemy data
 
 	lda currentEnemyWave_5B		; index for current enemy batch
 	asl A
@@ -681,7 +680,7 @@ StartingNewStage:
 	loopYLoadObject:
 
 		jsr FindFreeObjectSlot_rX; finds a free object slot and return it on X
-		cpx #$F0 				; no slot available to load object
+		cpx #ENEMY_OBJECT_END	; no slot available to load object
 		bcs doneLooping			; exit if no free slot found
 		
 		lda (objectPtr_3A),Y	; read object type
@@ -690,13 +689,13 @@ StartingNewStage:
 
 		lda #TRUE				; if STAGE_BOSS
 		sta flagBossFight_1A	; set this flag TRUE
-		ldx #$30				; WHY? $30 is the first enemy slot
+		ldx #ENEMY_OBJECT_START	; WHY? $30 is the first enemy slot
 		jsr ClearObjectsDescription; Clears page $04 of RAM
 	
 		; Stage Boss Song===============
-		StopSoundEngine	
-		ResetSoundEngine 
-		PlaySoundForever #SONG_BOSSES
+		SOUNDENGINE_STOP	
+		SOUNDENGINE_RESET 
+		SOUNDENGINE_PLAY_FOREVER #SONG_BOSSES
 		; ==============================
 
 		iny
@@ -756,7 +755,7 @@ StartingNewStage:
 		iny
 		lda (objectPtr_3A),Y
 		sta new_Y_Hi_57				; #5 byte of object file
-		jsr SpawnEnemy				; Use's objectType_58 to load the specific enemy type
+		jsr SpawnEnemy_X				; Use's objectType_58 to load the specific enemy type
 		iny
 		jmp loopYLoadObject
 
@@ -774,22 +773,23 @@ doneLoadingEnemyBatch:
 .endproc
 ;
 ; $822F
-.proc SpawnEnemy
+.proc SpawnEnemy_X
+;	Loads a new enemy from ROM
+; 	X is the object slot
+; 	Clobbers X and Y (protects A)
 	tya
 	pha
 
 	; MACRO that reads the stage number and returns the index 
-	GetObjectsIndexTable_Y	
+	GAMEENGINE_OBJECTS_INDEX_rY	
 	; now Y contains the index
 
-	lda ObjectsData_A885+2,Y	; lo-byte of stage's enemies AI/Animation data(?)
-	sta objectPtr_34+0
-	lda ObjectsData_A885+3,Y	; hi-byte of stage's enemies AI/Animation data(?)
-	sta objectPtr_34+1
+	COPY_WORD_Y ObjectsData_A885+2, objectPtr_34	; stage's enemy data
 
 	; objectType_58 holds the index (address offset) for a given enemy's data
 	lda objectType_58			; this was the FIRST byte loaded from the object file
 	asl A						; multiply by 2 since address are WORDs (2 bytes)
+	
 	tay
 	lda (objectPtr_34),Y		; lo-byte of a given enemy data
 	sta objectPtr_38+0
@@ -797,13 +797,17 @@ doneLoadingEnemyBatch:
 	lda (objectPtr_34),Y		; hi-byte of a given enemy data
 	sta objectPtr_38+1
 
+	; Now objectPtr_38 points to the enemy data
+	; Uses Y to index into the enemy data
 	ldy #ZERO
+
 	lda (objectPtr_38),Y		; lo-byte of Enemy AI(?)
-	sta someObjProperty_0501,X	; stores lo-byte of Enemy AI(?)
+	sta animationTable_Lo_0501,X	; stores lo-byte of Enemy AI(?)
 	iny
 	lda (objectPtr_38),Y		; hi-byte of Enemy AI(?)
-	sta someObjProperty_0502,X	; stores hi-byte of Enemy AI(?)
+	sta animationTable_Hi_0502,X	; stores hi-byte of Enemy AI(?)
 	iny
+
 	lda (objectPtr_38),Y		; loads #1 byte of 10
 	sta attackPoints_0602,X		; stores #1 byte of 10
 	iny
@@ -812,24 +816,28 @@ doneLoadingEnemyBatch:
 	ora var_2D					; turn ON other flags from var_2D (see previous routine)
 	sta object_Attrib_2_0405,X	; store #2 byte of 10
 	iny
+
 	lda (objectPtr_38),Y		; loads #3 byte of 10
 	sta objectWidth_0600,X		; stores #3 byte of 10
 	iny
 	lda (objectPtr_38),Y		; loads #4 byte of 10
 	sta objectHeight_0601,X		; stores #4 byte of 10
 	iny
+
 	lda (objectPtr_38),Y		; loads #5 byte of 10 
 	sta healthPoints_0603,X		; stores #5 byte of 10
 	iny
 	lda (objectPtr_38),Y		; loads #6 byte of 10
 	sta someObjProperty_0302,X	; stores #6 byte of 10
 	iny
+
 	lda (objectPtr_38),Y		; loads #7 byte of 10
 	sta someObjProperty_0301,X	; stores #7 byte of 10
 	iny
 	lda (objectPtr_38),Y		; loads #8 byte of 10
 	sta objectSpeed_X_0604,X	; stores #8 byte of 10
 	iny
+
 	lda (objectPtr_38),Y		; loads #9 byte of 10
 	sta objectSpeed_Y_0605,X	; stores #9 byte of 10
 	iny
@@ -847,7 +855,7 @@ doneLoadingEnemyBatch:
 	sta object_Y_Hi_0403,X	; #5 byte of object file
 	
 	lda #ZERO
-	sta someObjProperty_0503,X	; zero out 
+	sta animationTable_Index_0503,X	; zero out 
 	sta someObjProperty_0504,X	; zero out 
 	sta someObjProperty_0505,X	; zero out 
 	sta someObjProperty_0303,X	; zero out 
@@ -932,7 +940,7 @@ doneLoadingEnemyBatch:
 
 		:
 		lda object_Attrib_1_0404,X
-		TurnOFF FLAG_5					;	and #(ALL1-FLAG_5)
+		TURNOFF FLAG_5					;	and #(ALL1-FLAG_5)
 		sta object_Attrib_1_0404,X
 		jmp doneWithPhysics
 	
@@ -972,24 +980,24 @@ doneLoadingEnemyBatch:
 ; with its hitbox's vertices coordinates.
 .proc CalculatePlayerHitBox
 
-	lda object_X_Lo_0400			; get player's X position
+	lda object_X_Lo_0400					; get player's X position
 	clc
-	adc #$08						; add 8 pixels
-	sta objectHitBox_Left_X_0702	; store left X
+	adc #CONFIG_PLAYER_HITBOX_BORDER_XMIN	; add 8 pixels
+	sta objectHitBox_Left_X_0702			; store left X
 	
-	lda object_X_Lo_0400			; get player's X position
-	adc objectWidth_0600			; add object's width (in pixels)
-	sbc #$08						; subtract 8 pixels
-	sta objectHitBox_Right_X_0703	; store right X
+	lda object_X_Lo_0400					; get player's X position
+	adc objectWidth_0600					; add object's width (in pixels)
+	sbc #CONFIG_PLAYER_HITBOX_BORDER_XMAX 	; subtract 8 pixels
+	sta objectHitBox_Right_X_0703			; store right X
 
-	lda object_Y_Lo_0402			; get player's Y position
-	adc #$03						; add 3 pixels
-	sta objectHitBox_Top_Y_0704		; store top Y
+	lda object_Y_Lo_0402					; get player's Y position
+	adc #CONFIG_PLAYER_HITBOX_BORDER_YMIN	; add 3 pixels
+	sta objectHitBox_Top_Y_0704				; store top Y
 
-	lda object_Y_Lo_0402			; get player's Y position
-	adc objectHeight_0601			; add object's height
-	sbc #$04						; subtract 4 pixels
-	sta objectHitBox_Bottom_Y_0705	; store bottom Y
+	lda object_Y_Lo_0402					; get player's Y position
+	adc objectHeight_0601					; add object's height
+	sbc #CONFIG_PLAYER_HITBOX_BORDER_YMAX	; subtract 4 pixels
+	sta objectHitBox_Bottom_Y_0705			; store bottom Y
 
 	rts
 .endproc
@@ -1178,10 +1186,10 @@ doneLoadingEnemyBatch:
 		bcs doStoreHitPointsAndLeave
 		pha
 
-		COPY16 Data_at8BD7, someObjProperty_0501 ; and 0502, word address
+		ADDRESS_TO_RAM Animation_PlayerFlying_8BD7, animationTable_Lo_0501 ; and 0502, word address
 
 		lda #ZERO
-		sta someObjProperty_0503
+		sta animationTable_Index_0503
 		sta someObjProperty_0504
 		sta someObjProperty_0505
 		pla
@@ -1286,8 +1294,8 @@ doneLoadingEnemyBatch:
 		beq skipHandlingCollision
 
 		; Sound effect =================
-		ResetSoundEngine 
-		PlaySoundOnce #SFX_ENEMY_DEATH
+		SOUNDENGINE_RESET 
+		SOUNDENGINE_PLAY_ONCE #SFX_ENEMY_DEATH
 		; ==============================
 
 		jmp skipHandlingCollision
@@ -1301,7 +1309,6 @@ doneLoadingEnemyBatch:
 	rts
 .endproc
 ;
-; $854C
 .define OBJTYPE_ARROW		$06
 
 .define OBJTYPE_ENEMY		$1F
@@ -1317,6 +1324,7 @@ doneLoadingEnemyBatch:
 .define SPAWNTYPE_PUFF		$02
 .define SPAWNTYPE_PLAYERDEATH $03
 
+; $854C
 .proc HandleCollisionEffects
 ; Checks if object with index X collided with something important.
 ; 	X = 0 is the player
@@ -1354,9 +1362,9 @@ doneLoadingEnemyBatch:
 			bne handlePlayerGotPowerUp	; if pickup is not ExtraLife, skip to next
 			
 			; Sound effect =================
-			WaitUntilSoundFinishes
-			ResetSoundEngine	
-			PlaySoundOnce #SFX_EXTRA_LIFE
+			SOUNDENGINE_WAIT_SOUND_FINISHES
+			SOUNDENGINE_RESET	
+			SOUNDENGINE_PLAY_ONCE #SFX_EXTRA_LIFE
 			; ==============================
 
 			inc livesCounter_11
@@ -1367,17 +1375,17 @@ doneLoadingEnemyBatch:
 			bne handlePlayerGotHeart 
 
 			; Sound effect =================
-			WaitUntilSoundFinishes
-			ResetSoundEngine
-			PlaySoundOnce #SFX_GAME_START
+			SOUNDENGINE_WAIT_SOUND_FINISHES
+			SOUNDENGINE_RESET
+			SOUNDENGINE_PLAY_ONCE #SFX_GAME_START
 			; ==============================
 
 			lda powerLevel_64
-			cmp #PLAYER_MAX_POWER
+			cmp #CONFIG_PLAYER_MAX_POWER
 
 			bcc :+ 	; if didn't reach maximum power, continue to power increase
 					; else play sound cue and exit
-			ResetSoundEngine
+			SOUNDENGINE_RESET
 		
 			jmp doneWithObjectCollision
 		
@@ -1390,9 +1398,9 @@ doneLoadingEnemyBatch:
 			bne handlePlayerGotSpeedUp
 
 			; Sound effect =================
-			WaitUntilSoundFinishes
-			ResetSoundEngine
-			PlaySoundOnce #SFX_GAME_START
+			SOUNDENGINE_WAIT_SOUND_FINISHES
+			SOUNDENGINE_RESET
+			SOUNDENGINE_PLAY_ONCE #SFX_GAME_START
 			; ==============================
 
 			jsr AddOneHeart
@@ -1403,12 +1411,12 @@ doneLoadingEnemyBatch:
 			bne handlePlayerGotMagicLamp
 
 			; Sound effect =================
-			WaitUntilSoundFinishes
-			ResetSoundEngine
-			PlaySoundOnce #SFX_GAME_START
+			SOUNDENGINE_WAIT_SOUND_FINISHES
+			SOUNDENGINE_RESET
+			SOUNDENGINE_PLAY_ONCE #SFX_GAME_START
 			; ==============================
 
-			lda #PLAYER_SPEED_FAST
+			lda #CONFIG_PLAYER_SPEED_FAST
 			sta speedLevel_66
 			jmp doneWithObjectCollision
 		
@@ -1422,16 +1430,16 @@ doneLoadingEnemyBatch:
 			:
 
 			; Sound effect =================
-			PlaySoundOnce #SFX_MAGIC_LAMP
+			SOUNDENGINE_PLAY_ONCE #SFX_MAGIC_LAMP
 			; ==============================
 
 			lda #MAGIC_LAMP_HEALTH_POINTS
 			sta healthPoints_0603
 
-			COPY16 Data_at8BBD, someObjProperty_0501 ; and 0502 word address
+			ADDRESS_TO_RAM Animation_PlayerFlashing_8BBD, animationTable_Lo_0501 ; and 0502 word address
 			
 			lda #ZERO
-			sta someObjProperty_0503
+			sta animationTable_Index_0503
 			sta someObjProperty_0504
 			sta someObjProperty_0505
 			lda #HEART_HUD_Y
@@ -1450,9 +1458,9 @@ doneLoadingEnemyBatch:
 	:
 	cmp #OBJTYPE_PLAYER; $1A
 	bne :+
-		WaitUntilSoundFinishes
-		ResetSoundEngine
-		PlaySoundOnce #SFX_PLAYER_DEATH
+		SOUNDENGINE_WAIT_SOUND_FINISHES
+		SOUNDENGINE_RESET
+		SOUNDENGINE_PLAY_ONCE #SFX_PLAYER_DEATH
 
 		lda #TRUE
 		sta flagPlaySFX_8F
@@ -1495,7 +1503,7 @@ doneLoadingEnemyBatch:
 	cmp #$24
 	bne doneWithObjectCollision
 
-	PlaySoundForever #SFX_BOSS_DEATH
+	SOUNDENGINE_PLAY_FOREVER #SFX_BOSS_DEATH
 
 
 	lda #$08
@@ -1560,7 +1568,7 @@ doneLoadingEnemyBatch:
 .proc SpawnObject
 	
 	jsr FindFreeObjectSlot_rX
-	cpx #$F0
+	cpx #ENEMY_OBJECT_END
 	bcc :+
 	
 	rts
@@ -1572,9 +1580,9 @@ doneLoadingEnemyBatch:
 	asl A
 	tay
 	lda Data_at8715+0,Y			; object VX table address
-	sta someObjProperty_0501,X	; object VX table address
+	sta animationTable_Lo_0501,X	; object VX table address
 	lda Data_at8715+1,Y			; object VY table address
-	sta someObjProperty_0502,X  ; object VY table address
+	sta animationTable_Hi_0502,X  ; object VY table address
 	lda Data_at8715+2,Y
 	sta attackPoints_0602,X
 	lda Data_at8715+3,Y
@@ -1597,7 +1605,7 @@ doneLoadingEnemyBatch:
 	sta object_Y_Hi_0403,X
 	
 	lda #ZERO
-	sta someObjProperty_0503,X
+	sta animationTable_Index_0503,X
 	sta someObjProperty_0504,X
 	sta someObjProperty_0505,X
 
@@ -1616,7 +1624,9 @@ Data_at8715:
 .include "objects/despawn/despawn_objects.inc"
 ;
 ; $8AEA
-.proc GenerateDrop ; Generate a random drop
+.proc GenerateDrop 
+; Generate a random drop
+
 	lda flagGenDrop_2E	  	; check drop flag
 	beq doneWithThisRoutine	; if flag not set, break.
 
@@ -1631,24 +1641,28 @@ Data_at8715:
 	; 	  6 0000 0110
 	;	  7 0000 0111
 
-	bne :+					; case 0: Extra life (1/8 chance)
-	lda #$32				; $0A + $28 
-	bne doneWithDrops
+	bne :+					
+		; case 0: Extra life (1/8 chance)
+		lda #($0A + $28)		; $0A + $28 
+		bne doneWithDrops
 	
 	:
-	bit BIT_0				; case 2, 4, 6: Power (3/8 chance)
+	bit BIT_0				
 	bne :+
-	lda #$33				; $0A + $29
-	bne doneWithDrops
+		; case 2, 4, 6: Power (3/8 chance)
+		lda #($0A + $29)		; $0A + $29
+		bne doneWithDrops
 	
 	:
-	bit BIT_1				; case 1, 5: Heart (2/8 chance)
+	bit BIT_1					
 	bne :+
-	lda #$34				; $0A + $2A
-	bne doneWithDrops
+		; case 1, 5: Heart (2/8 chance)
+		lda #($0A + $2A)		; $0A + $2A
+		bne doneWithDrops
 	
-	:						; case 3, 7: Speed (2/8 chance)
-	lda #$35				; $0A + $2B
+	:						
+		; case 3, 7: Speed (2/8 chance)
+		lda #($0A + $2B)		; $0A + $2B
 	
 	doneWithDrops:
 		pha
@@ -1664,20 +1678,26 @@ Data_at8715:
 ; $8B16
 .proc InitializePlayer
 
-	lda #PLAYER_START_X_Lo
+
+	; $0400-0400 holds the player's position
+	; X_Lo, X_Hi, Y_Lo, Y_Hi
+	;
+	lda #CONFIG_PLAYER_START_X_Lo
 	sta object_X_Lo_0400
-	lda #PLAYER_START_X_Hi
+	lda #CONFIG_PLAYER_START_X_Hi
 	sta object_X_Hi_0401
-	lda #PLAYER_START_Y_Lo
+	lda #CONFIG_PLAYER_START_Y_Lo
 	sta object_Y_Lo_0402
 
-	COPY16 Data_at8B7D, someObjProperty_0501
+	; Stores address for player's entering animation
+	ADDRESS_TO_RAM Animation_PlayerEntering_8B7D, animationTable_Lo_0501
 
+	; Player Status
 	lda #(FLAG_7+FLAG_5)			; $A0
 	sta object_Attrib_1_0404
 
 	lda #ZERO
-	sta someObjProperty_0503
+	sta animationTable_Index_0503
 	sta someObjProperty_0504
 	sta someObjProperty_0505
 
@@ -1705,15 +1725,16 @@ Data_at8715:
 	lda #$00
 	sta arrowsFlying_60
 	
-	lda flagNextLevel_1B		; check if level transitioning
-	bne :+						; if not, player has just died
-		lda #STARTING_HEALTH	; reset player's health
+	lda flagNextLevel_1B			; check if level transitioning
+	bne :+							; if not, player has just died
+		lda #CONFIG_STARTING_HEALTH	; reset player's health
 		sta healthPoints_0603
-		lda powerLevel_64		; check player's power
-		beq :+					; if power is 0, skip decreasing
-		dec powerLevel_64		; decrease player's power
-
+		
+		lda powerLevel_64			; check player's power
+		beq :+						; if power is 0, skip decreasing
+		dec powerLevel_64			; decrease player's power
 	:
+
 	rts
 	
 	unusedReturn:				; This part is unaccessible.
@@ -1722,7 +1743,8 @@ Data_at8715:
 .endproc
 ;
 ; $8B7D
-Data_at8B7D:
+; Player animation FLASHING and ENTERING the stage
+Animation_PlayerEntering_8B7D:
 .incbin "objects/data/misc/data-block-at8B7D.bin"
 ;.byte $0B, $10, $00, $81, $0C, $0C, $00, $81
 ;.byte $0D, $0B, $00, $81, $0B, $09, $00, $82
@@ -1733,45 +1755,55 @@ Data_at8B7D:
 ;.byte $C7, $18, $0B, $00, $00, $86, $0C, $00 
 ;.byte $00, $86, $0D, $00, $00, $86, $FE, $32
 
-Data_at8BBD:
+; $8BBD
+; Player animation FLASHING (magic lamp)
+Animation_PlayerFlashing_8BBD:
 .incbin "objects/data/misc/data-block-at8BBD.bin"
 ;.byte $0B, $00, $00, $81, $43, $00, $00, $83
 ;.byte $0C, $00, $00, $81, $43, $00, $00, $83
 ;.byte $0D, $00, $00, $81, $43, $00, $00, $83
 ;.byte $FE, $00
 
-Data_at8BD7:
+; $8BD7
+; Player animation NORMAL (not flashing)
+Animation_PlayerFlying_8BD7:
 .incbin "objects/data/misc/data-block-at8BD7.bin"
 ;.byte $0B, $00, $00, $86, $0C, $00, $00, $86, $0D, $00, $00, $86, $FE, $00
 ;
 ; $8BE5
 .proc InitializeHUD_Lives
-	ldy #OBJECT_BYTE_SIZE
+
+	ldy #OBJECT_BYTE_SIZE				; Position of HEART in object array
+
 	lda #LIVES_HUD_X
 	sta object_X_Lo_0400,Y
+	
 	lda #LIVES_HUD_Y
 	sta object_Y_Lo_0402,Y
+	
 	lda #(FLAG_5+FLAG_7)				; $A0
 	sta object_Attrib_1_0404,Y
+	
 	lda #ZERO
 	sta object_Attrib_2_0405,Y
-
-	sta someObjProperty_0503,Y
+	sta animationTable_Index_0503,Y
 	sta someObjProperty_0504,Y
 	sta someObjProperty_0505,Y
-
 	sta someObjProperty_0302,Y
 	sta someObjProperty_0303,Y
 	sta objectSpeed_X_0604,Y
 	sta objectSpeed_Y_0605,Y
 	sta attackPoints_0602,Y
-	lda #$FF
+
+	lda #FULL
 	sta healthPoints_0603,Y
 	lda #$07
 	sta objectWidth_0600,Y
-	lda #$07						; this LDA is pointless if the value didn't change.
+	lda #$07				
 	sta objectHeight_0601,Y
+	
 	rts
+
 .endproc
 ;
 ; $8C23
@@ -1781,7 +1813,7 @@ Data_at8BD7:
 	
 	lda flagNextLevel_1B
 	bne :+
-		lda #PLAYER_SPEED_SLOW
+		lda #CONFIG_PLAYER_SPEED_SLOW
 		sta speedLevel_66
 	
 	:
@@ -1891,8 +1923,8 @@ Data_at8BD7:
 	bne doneShooting
 	
 	; Sound effect =================
-	WaitUntilSoundFinishes
-	ResetSoundEngine 
+	SOUNDENGINE_WAIT_SOUND_FINISHES
+	SOUNDENGINE_RESET 
 	; ==============================
 	
 	beq :++
@@ -1902,7 +1934,7 @@ Data_at8BD7:
 	beq doneShooting
 	
 	:
-	PlaySoundOnce #SFX_ARROW_SHOT
+	SOUNDENGINE_PLAY_ONCE #SFX_ARROW_SHOT
 
 	doneShooting:
 		lda #$00
@@ -1945,9 +1977,9 @@ Data_at8BD7:
 	asl A						; Calculate offset for 8-byte stride
 	tay							; use A as index
 	lda Data_at8D1D+0,Y			; Movement Table lo byte
-	sta someObjProperty_0501,X
+	sta animationTable_Lo_0501,X
 	lda Data_at8D1D+1,Y			; Movement Table hi byte
-	sta someObjProperty_0502,X	
+	sta animationTable_Hi_0502,X	
 
 	lda Data_at8D1D+2,Y			; load byte 1
 	cpy #$00					; check if single arrow
@@ -1975,7 +2007,7 @@ Data_at8BD7:
 	sta object_Y_Lo_0402,X		; store arrow position
 	
 	lda #ZERO					; zero-out other properties
-	sta someObjProperty_0503,X
+	sta animationTable_Index_0503,X
 	sta someObjProperty_0504,X
 	sta someObjProperty_0505,X
 
@@ -2053,12 +2085,11 @@ Data_at8D45:
 .endproc
 ;
 ; $8D60
-; FindFreeObjectSlot_rX (return x)
-; Check if flags 7 and 4 are set in $0434
-; Starting at $0434 go over 32 slots stopping at
-; the first FREE slot.
-; Return the slot position in X
 .proc FindFreeObjectSlot_rX
+	; Check if flags 7 and 4 are set in $0434
+	; Starting at $0434 go over 32 slots stopping at
+	; the first FREE slot.
+	; Return the slot position in X
 	clc
 	ldx #ENEMY_OBJECT_START
 	:
@@ -2084,7 +2115,7 @@ Data_at8D45:
 
 	:
 	lda object_Attrib_1_0404,X
-	TurnOFF FLAG_3				; and #(ALL1-FLAG_3)
+	TURNOFF FLAG_3				; and #(ALL1-FLAG_3)
 	sta object_Attrib_1_0404,X
 
 	lda someObjProperty_0700,X
@@ -2296,7 +2327,7 @@ Data_at8E3F:
 
 	PushXY
 	jsr FindFreeObjectSlot_rX			; get free slot
-	cpx #$F0							; check if list is full
+	cpx #ENEMY_OBJECT_END				; check if list is full
 	bcs doneSpawningProjectiles			; if it's (full), break.
 
 	jsr HandleEnemyIA_Movement_X_Y
@@ -2355,13 +2386,13 @@ Data_at8E3F:
 .proc GetProjectileTrajectoryAddress_X_Y
 	
 	lda Projectile_Trajectories_at8EBE+0,Y
-	sta someObjProperty_0501,X
+	sta animationTable_Lo_0501,X
 	lda Projectile_Trajectories_at8EBE+1,Y
-	sta someObjProperty_0502,X
+	sta animationTable_Hi_0502,X
 	
 	lda #ZERO
 	sta someObjProperty_0505,X
-	sta someObjProperty_0503,X
+	sta animationTable_Index_0503,X
 	sta someObjProperty_0504,X
 
 	rts
@@ -2427,25 +2458,25 @@ Data_at92D4:
 .proc HandleBossAnimation_Shooting
 PushXY
 	lda #$05
-	sta someObjProperty_0333 ; unused variable
+	sta someObjProperty_0303+ENEMY_OBJECT_START
 
-	lda someObjProperty_0531
-	sta someObjProperty_0531+page_5_Gap
-	lda someObjProperty_0532
-	sta someObjProperty_0532+page_5_Gap
-	lda someObjProperty_0533
-	sta someObjProperty_0533+page_5_Gap
-	lda someObjProperty_0534
-	sta someObjProperty_0534+page_5_Gap
-	lda someObjProperty_0535
-	sta someObjProperty_0535+page_5_Gap
+	lda animationTable_Lo_0501+ENEMY_OBJECT_START
+	sta animationTable_Lo_0501+ENEMY_OBJECT_START+page_5_Gap
+	lda animationTable_Hi_0502+ENEMY_OBJECT_START
+	sta animationTable_Hi_0502+ENEMY_OBJECT_START+page_5_Gap
+	lda animationTable_Index_0503+ENEMY_OBJECT_START
+	sta animationTable_Index_0503+ENEMY_OBJECT_START+page_5_Gap
+	lda someObjProperty_0504+ENEMY_OBJECT_START
+	sta someObjProperty_0504+ENEMY_OBJECT_START+page_5_Gap
+	lda someObjProperty_0505+ENEMY_OBJECT_START
+	sta someObjProperty_0505+ENEMY_OBJECT_START+page_5_Gap
 	
 	lda #ZERO
-	sta someObjProperty_0533
-	sta someObjProperty_0534
-	sta someObjProperty_0535
+	sta animationTable_Index_0503+ENEMY_OBJECT_START
+	sta someObjProperty_0504+ENEMY_OBJECT_START
+	sta someObjProperty_0505+ENEMY_OBJECT_START
 
-	COPY16 Data_at932D, objectPtr_34 ; see data below
+	ADDRESS_TO_RAM Data_at932D, objectPtr_34 ; see data below
 
 	lda currentStage_15			; get stage index (starts at 1)
 	sec
@@ -2454,10 +2485,10 @@ PushXY
 	tay							; use as Y index
 
 	lda (objectPtr_34),Y		; boss shooting animation address (lo)
-	sta someObjProperty_0531 
+	sta animationTable_Lo_0501+ENEMY_OBJECT_START
 	iny
 	lda (objectPtr_34),Y		; boss shooting animation address (hi)
-	sta someObjProperty_0532 
+	sta animationTable_Hi_0502+ENEMY_OBJECT_START
 	
 	PullXY
 	rts
@@ -2481,9 +2512,9 @@ Data_at932D:
 	tax
 	ldy #$06
 	lda LivesGraphicData+0,X
-	sta someObjProperty_0501,Y
+	sta animationTable_Lo_0501,Y
 	lda LivesGraphicData+1,X
-	sta someObjProperty_0502,Y
+	sta animationTable_Hi_0502,Y
 	rts
 .endproc
 ;
@@ -2553,7 +2584,7 @@ LivesGraphicData:
 	jsr ClearPage_2_OAM			; Clear page 2 (objects)
 	pla							; Pull it back
 	sta OAM_0200				; Restore the current HEART_HUD_Y position.
-	Copy HeartHUDData, OAM_0200, #1, #4 ; Copy the rest of the HEART_HUD data.
+	COPY_DATA HeartHUDData, OAM_0200, #1, #4 ; Copy the rest of the HEART_HUD data.
 
 	lda healthPoints_0603		; Load the current health points.
 	pha							; Push it away
@@ -2755,21 +2786,22 @@ RepeatedTitles:
 ; $94F6
 ; LoadStage_A_X
 ; A : Name
-.proc LoadStage
-	jsr WaitVBlank
+.proc LoadStage_A_X
+	jsr WaitVBlank				; Wait for VBlank to start and end
 
 	ldy #$00
-	sty PpuMask_2001
-	sty PpuControl_2000
+	sty PpuMask_2001			; Mask off rendering
+	sty PpuControl_2000			; Turn off PPU
 	
-	asl A
-	tay
-	txa
-	pha
-	lda BackgroundData_E847+0,Y
-	sta addressPtr_32+0
-	lda BackgroundData_E847+1,Y
-	sta addressPtr_32+1
+	asl A						; Multiply by 2
+	tay							; Store A in Y
+	txa							; Transfer X to A
+	pha							; Store A(X) in stack
+
+	lda BackgroundData_E847+0,Y	; Load Lo byte of address of background data
+	sta addressPtr_32+0			; Store Lo byte of address of background data
+	lda BackgroundData_E847+1,Y	; Load Hi byte of address of background data
+	sta addressPtr_32+1			; Store Hi byte of address of background data
 	
 	lda #$00
 	ldy #$03
@@ -2824,21 +2856,27 @@ RepeatedTitles:
 ;
 ; $9559
 .proc WaitVBlank
-
+; Wait for the next VBlank to start and then for it to end.
 	pha
-	jsr CheckForVBlank
-	:
+	
+	jsr CheckForVBlank		; Check if VBlank is active
+	:						; Wait for VBlank to end
 		lda PpuStatus_2002
 		bpl :-
 	pla
+
 	rts
 .endproc
 ;
 ; $9564
 .proc CheckForVBlank
+; Check if VBlank is active
+;	PpuStatus_2002 (read only)
+; 	VSO- ----	vblank (V), sprite 0 hit (S), sprite overflow (O);
+; 	Bit7 (V) can be checked with either bmi (TRUE) or bpl (FALSE)
 	:
-	lda PpuStatus_2002
-	bmi :-
+		lda PpuStatus_2002
+		bmi :-
 	rts
 .endproc
 ;
@@ -2875,7 +2913,8 @@ RepeatedTitles:
 ; Configure PPU
 ; flagPPUMask_18
 ; flagPPUControl_17
-.proc RenderON
+.proc RenderingON
+	
 	lda #$00
 	sta PpuControl_2000
 	jsr WaitVBlank
@@ -2883,23 +2922,26 @@ RepeatedTitles:
 	sta PpuMask_2001
 	lda flagPPUControl_17
 	sta PpuControl_2000
+	
 	rts
 .endproc
 ;
 ; $9598
-; ReadControl_A
-; Reads 8 bits from control A
-; A control being read: 0 = player 1, 1 = player 2
-;
-; 	Since this function clobbers X and it
-; calls ShiftRegisterController_X, which clobbers A,
-; there doesn't seem to be a reason not to use X as controller 
-; index from the start.
 .proc ReadControl_A
+	; Reads 8 bits from control A
+	; A control being read: 0 = player 1, 1 = player 2
+	; Stores the result in input1_20
+	; 
+	; Comment:
+	; Since this function clobbers X and it
+	; calls ShiftRegisterController_X, which clobbers A,
+	; there doesn't seem to be a reason not to use X as controller 
+	; index from the start.
 
-	ldx #$01			; Strobe control port to reset its latch.
+	; Strobe control port to reset its latch.
+	ldx #$01			; High
 	stx Ctrl1_4016
-	ldx #$00
+	ldx #$00			; Low
 	stx Ctrl1_4016
 
 	tax					; Transfer A to X.
@@ -2913,7 +2955,7 @@ RepeatedTitles:
 .endproc
 ;
 ; $95AC
-; ShiftRegisterController_X
+.proc ShiftRegisterController_X
 ;	Strobe the controller port.
 ;	Each bit, in order, is a possible button press.
 ;	X : Controller 0 = Player 1, 1 = Player 2
@@ -2930,19 +2972,25 @@ RepeatedTitles:
 ;	+---------- Right
 ;
 ; Clobbers A
-.proc ShiftRegisterController_X
 
 	asl input1_20			; Shift bits to the left <<
-	lda Ctrl1_4016,X		; Strobe port 0 (player 1)
+	lda Ctrl1_4016,X		; retrieve controller port X
+
+	; A non-zero value means a button is pressed.
+	; Shift up to 6 times for more precision (avoid ghosting or input lost)
 	lsr A					; Shift bits to the left, with carry
 	bcs RegisterInput		; If carry set, proceed to register it.
+
 	lsr A					; else, shift again.
 	bcs RegisterInput		; If carry set, proceed to register it.
+
 	rts
 
 RegisterInput:
+
 	inc input1_20			; Add the bit corresponding to the pressed button 
 	rts
+
 .endproc
 ;
 ; $95BB
@@ -2967,10 +3015,7 @@ RegisterInput:
 			bne :-
 		lda flagPPUControl_19
 		sta PpuControl_2000
-		lda screenScrollX_29
-		sta PpuScroll_2005
-		lda #$00
-		sta PpuScroll_2005
+		SCROLL_XY screenScrollX_29, #$00
 		ldx #$00
 		loopDarkenONETone:
 			lda paletteRAM_E0,X
@@ -3006,14 +3051,14 @@ RegisterInput:
 	inc currentStage_15
 	lda #$0A
 	ldx #$00
-	jsr LoadStage
+	jsr LoadStage_A_X
 	lda #$88
 	ora #$18
 	sta flagPPUControl_17
 	sta flagPPUControl_19
-	jsr RenderON
+	jsr RenderingON
 	
-	PlaySoundForever #SONG_ENDING
+	SOUNDENGINE_PLAY_FOREVER #SONG_ENDING
 
 	loopPressANYButton:
 		lda input1_20
@@ -3025,7 +3070,7 @@ RegisterInput:
 		cmp inputPrev_22
 		beq :-
 	
-	StopSoundEngine
+	SOUNDENGINE_STOP
 
 	lda #$00
 	sta screenScrollX_29
@@ -3046,26 +3091,26 @@ RegisterInput:
 	tax
 	sta BankSwitching_FFF0,X
 	lda flagPPUControl_17
-	TurnOFF FLAG_4				; and #(ALL1-FLAG_4)
+	TURNOFF FLAG_4				; and #(ALL1-FLAG_4)
 	sta flagPPUControl_17
 	sta flagPPUControl_19
 	
 	lda #$0B
 	ldx #$00
-	jsr LoadStage
-	jsr RenderON
+	jsr LoadStage_A_X
+	jsr RenderingON
 	lda #$00
-	jsr RollEndCredits
+	jsr RollEndCredits_A
 	lda #$01
-	jsr RollEndCredits
+	jsr RollEndCredits_A
 	lda #$02
-	jsr RollEndCredits
+	jsr RollEndCredits_A
 	lda #$03
-	jsr RollEndCredits
+	jsr RollEndCredits_A
 	lda #$04
-	jsr RollEndCredits
+	jsr RollEndCredits_A
 	lda #$05
-	jsr RollEndCredits
+	jsr RollEndCredits_A
 
 	lda #$00
 	sta PpuScroll_2005  ; reset scrolling
@@ -3076,20 +3121,17 @@ RegisterInput:
 .endproc
 ;
 ; $96AC
-; RollEndCredits
-; Loads the End Credits from address EndCreditsData
-; A select which phrase to write (there are five)
-.proc RollEndCredits
-	; shifts left to compensate for the fact that
-	; each address is a word (16bit)
-	asl A
+.proc RollEndCredits_A
+	; Loads the End Credits from address EndCreditsData_9718
+	; Retrieves the address of the phrase to write.
+	; A select which phrase to write (the are six: 0 to 5).
+	asl A				; multiply by 2 since addresses are WORDs
 	tay
-	lda EndCreditsData+0,Y
-	sta addressPtr_32+0
-	lda EndCreditsData+1,Y
-	sta addressPtr_32+1
+
+	COPY_WORD_Y EndCreditsData_9718, addressPtr_32
+
 	; addressPtr_32 holds the address for the phrase
-	; the first two bytes are the coordinates where to write
+	; the first two bytes are the "coordinates" where to write
 	; (actually, the address in vram)
 	; Store the coordinates at vramAddress_67
 	ldy #$00
@@ -3099,39 +3141,40 @@ RegisterInput:
 	lda (addressPtr_32),Y
 	sta vramAddress_67+1
 	iny
+	
 	; Loop over all the caracters until
 	; until a control character $FF is found
 	loopLoadCredits:
+		
 		; move "cursor" to the correct position
 		lda vramAddress_67+0
 		sta PpuAddr_2006
 		lda vramAddress_67+1
 		sta PpuAddr_2006
-		; load the next character (ASCII code)
-		lda (addressPtr_32),Y
-		; if "EOF", finish writing line.
-		cmp #$FF
+		
+		
+		lda (addressPtr_32),Y	; load the next character (ASCII code)
+		
+		cmp #$FF				; if "EOF", finish writing line.
 		beq leaveEndCredits
-		; if "SPACE", write character $OO
-		cmp #$20
+		
+		
+		cmp #$20				; if "SPACE", write character $OO
 		bne :+
-		lda #$00
-		sta PpuData_2007
-		lda #$00
-		sta PpuScroll_2005 ; reset scrolling
-		sta PpuScroll_2005
-		beq :++
+
+			lda #$00
+			sta PpuData_2007
+			RESET_SCROLLING			; reset scrolling register
+			beq :++
 
 		: 	; writing a character
 		sec
 		sbc #$36 ; subtract offset to convert from ASCII to CHR
 		sta PpuData_2007
-		lda #$00
-		sta PpuScroll_2005 ; reset scrolling
-		sta PpuScroll_2005
+		RESET_SCROLLING			; reset scrolling register
 		
 		; play a sound effect
-		PlaySoundOnce #SFX_TYPE_WRITER
+		SOUNDENGINE_PLAY_ONCE #SFX_TYPE_WRITER
 
 		: ; advance to next screen position
 		lda vramAddress_67+1
@@ -3152,14 +3195,14 @@ RegisterInput:
 		bne loopLoadCredits
 	
 	; play another sound
-	ResetSoundEngine
+	SOUNDENGINE_RESET
 	
 	leaveEndCredits:
 	rts
 .endproc
 ;
 ; $9718
-EndCreditsData:
+EndCreditsData_9718:
 
 .addr EndingText_9724, EndingText_9733
 .addr EndingText_974F, EndingText_976B
@@ -3183,7 +3226,6 @@ EndingText_9785:
 EndingText_97A3:
 .byte $23, $4c, "THE END", $FF
 
-;.incbin "data/stages/EndCredits.bin"
 ;
 ; $97AD
 .proc ShowGameOver_WaitAnyButtonPress
@@ -3192,14 +3234,14 @@ EndingText_97A3:
 	sta PpuControl_2000
 	jsr WaitVBlank
 	lda flagPPUMask_18
-	TurnOFF FLAG_4 			; and #(ALL1-FLAG_4) $EF
+	TURNOFF FLAG_4 			; and #(ALL1-FLAG_4) $EF
 	sta PpuMask_2001
 	lda flagPPUControl_19
 	sta flagPPUControl_17
 	jsr WaitVBlank
 	jsr ClearPage_2_OAM
 
-	Copy Data_at97F5, OAM_0200, #$00, #$20
+	COPY_DATA Data_at97F5, OAM_0200, #$00, #$20
 
 	jsr UpdatePPUSettings
 	lda #$02				; Waits 2 seconds
@@ -3295,10 +3337,7 @@ Data_at97F5:
 
 	gameNotPaused:
 		jsr HandleScrollingControl
-		lda screenScrollX_29
-		sta PpuScroll_2005
-		lda #$00
-		sta PpuScroll_2005
+		SCROLL_XY screenScrollX_29, #$00
 		lda flagPPUControl_19
 		sta PpuControl_2000
 	
@@ -3313,13 +3352,13 @@ Data_at97F5:
 		beq :+
 
 		jsr HandleControllerInputs
-		jsr HandleObjectsUpdates
+		jsr HandleSpriteUpdates
 	
 	:
 		jsr PowerUpCheat
 
 	doUpdateSoundOnly:
-		UpdateSoundDuringVBlank
+		SOUNDENGINE_UPDATE_DURING_VBLANK
 
 	PullAXY
 	
@@ -3409,11 +3448,19 @@ Data_at97F5:
 .endproc
 ;
 ; $A46F
-; HandleObjectsUpdates
-; This routine updates every object of the game at every VBlank time.
-; THIS IS BAD PROGRAMMING!
-; This routine takes longer than vblank.
-.proc HandleObjectsUpdates
+.proc HandleSpriteUpdates
+; This routine updates every sprite of the game 
+; It is called 60 times per second, at every VBlank time.
+; Since it takes longer than vblank, its internal state is global
+
+; Globals
+;	objectIndex_5F 	Holds the next object index to be updated
+;					It maybe be reset by TriggerNextLevel
+
+;	oamAddressPtr_3E Restarts from #FIRST_OBJECT_SLOT at every call
+; 	beingUpdated_3D	 Holds the object being worked on
+;					 Necessary to check if objectIndex_5F was changed 
+;					 externally.
 
 	lda #FIRST_OBJECT_SLOT		; Updates start AFTER heart icon
 	sta oamAddressPtr_3E		; Store first OAM address
@@ -3433,27 +3480,27 @@ Data_at97F5:
 		ldy someObjProperty_0504,X
 		beq :+ 
 		
-		dec someObjProperty_0504,X
-		dec someObjProperty_0503,X
-		jmp ReplaceMeLabel_2
+			dec someObjProperty_0504,X
+			dec animationTable_Index_0503,X
+			jmp ReplaceMeLabel_2
 	
 	:
-		lda someObjProperty_0501,X	; Loads XXX address (Lo)
+		lda animationTable_Lo_0501,X	; Loads ANIMATION address (Lo)
 		sta objectPtr_36+0
-		lda someObjProperty_0502,X	; Loads XXX address (Hi)
+		lda animationTable_Hi_0502,X	; Loads ANIMATION address (Hi)
 		sta objectPtr_36+1
 		
-		ldy someObjProperty_0503,X	; Loads index into XXX address
+		ldy animationTable_Index_0503,X	; Loads ANIMATION frame index
 	
 	ReplaceMeLabel_7:
 	
-		lda (objectPtr_36),Y ; reads control byte Y of table XXX
-		bmi :+				 ; if BIT7 is set, don't retreive object
-			jmp RetrieveObject   ; if  BIT7 is NOT set, will load
+		lda (objectPtr_36),Y 		; reads next animation instruction
+		bmi :+				 		; if BIT7 is set, this is a control byte
+			jmp LoadAnimationFrame  ; if  BIT7 is NOT set, will load
 	
 		:
 		asl A
-			bmi ReplaceMeLabel_1	; if BIT6 is set, jump to ReplaceMeLabel_1
+		bmi ReplaceMeLabel_1		; if BIT6 is set, jump to ReplaceMeLabel_1
 
 		lsr A						; return to original value (sans BIT7)
 		sbc #$00					; optimization for subtracting 1 since 
@@ -3463,7 +3510,9 @@ Data_at97F5:
 	
 	ReplaceMeLabel_2:
 		lda object_Attrib_2_0405,X
-		bpl ReplaceMeLabel_4
+		bpl ReplaceMeLabel_4		; if BIT7 is not set, 
+									; go to ReplaceMeLabel_4
+
 		lda objectDeltaX_0C
 		bpl :+
 
@@ -3479,11 +3528,11 @@ Data_at97F5:
 		clc
 		adc object_X_Lo_0400,X
 		sta object_X_Lo_0400,X
-		sta var_40
+		sta tempTile_X_Lo_40
 		lda tile_X_Hi_47
 		adc object_X_Hi_0401,X
 		sta object_X_Hi_0401,X
-		sta var_41
+		sta tempTile_X_Hi_41
 		lda objectDeltaY_0D
 		bpl :+
 
@@ -3508,28 +3557,29 @@ Data_at97F5:
 	
 	ReplaceMeLabel_4:
 		lda object_X_Lo_0400,X
-		sta var_40
+		sta tempTile_X_Lo_40
 		lda object_X_Hi_0401,X
-		sta var_41
+		sta tempTile_X_Hi_41
 		lda object_Y_Lo_0402,X
 		sta tile_Y_Lo_42
 		lda object_Y_Hi_0403,X
 		sta tile_Y_Hi_43
 	
 	ReplaceMeLabel_5:
-		inc someObjProperty_0503,X
+		inc animationTable_Index_0503,X
 		lda someObjProperty_0701,X
 		tax
-		lda Data_atA895+0,X
+		lda AnimationAtlas_A895+0,X
 		sta addressPtr_32+0
-		lda Data_atA895+1,X
+		lda AnimationAtlas_A895+1,X
 		sta addressPtr_32+1
 		ldx objectIndex_5F
 		jmp ReplaceMeLabel_6
 	
 	ReplaceMeLabel_1:
-		asl A
-		bmi loopTest
+		asl A						; multiply by 2 to index a WORD
+		bmi checkForControl			; if BIT7 is set, go into loop
+
 		dec someObjProperty_0505,X
 		lda someObjProperty_0505,X
 		bne :+
@@ -3545,27 +3595,25 @@ Data_at97F5:
 		sta someObjProperty_0505,X
 		
 		loop:
-			iny
-			lda (objectPtr_36),Y
+			iny						; advance to next index in animation table
+			lda (objectPtr_36),Y	; read new index in animation table
 			tay
-			lda (objectPtr_36),Y
-			jmp RetrieveObject
+			lda (objectPtr_36),Y	; loads next animation frame index
+			jmp LoadAnimationFrame	; retrieve frame
 			
-			loopTest:
+			checkForControl:
 			cmp #$F8
 			beq loop
 		
 		asl A
 		bmi :+
 
-		lsr A
-		lsr A
-		lsr A
-		and #$0F
-		lda object_Attrib_1_0404,X
-		ora #$08
-		sta object_Attrib_1_0404,X
-		jmp NextObjectIndex
+			DIV8 A
+			and #LOWER
+			lda object_Attrib_1_0404,X
+			TURNON FLAG_3
+			sta object_Attrib_1_0404,X
+			jmp NextObjectIndex
 	
 	:
 		lda someObjProperty_0303,X
@@ -3574,10 +3622,11 @@ Data_at97F5:
 		beq :++
 	
 	:
-		cmp #$04
+		cmp #$04					; Boss Death
 		bne :++
-		lda #$01
-		sta flagNextLevel_1B
+
+			lda #$01
+			sta flagNextLevel_1B
 	
 	:
 		lda #$00
@@ -3585,7 +3634,7 @@ Data_at97F5:
 		sta someObjProperty_0303,X
 	
 	:
-		cmp #$05
+		cmp #$05					; Boss Shooting
 		bne :+ 
 		jsr Copy_5BytesPage05_FromEnd_ToBeginning
 		jmp :++
@@ -3597,71 +3646,73 @@ Data_at97F5:
 	:
 		jmp NextObjectIndex
 	
-	RetrieveObject:					; A holds index for object to be loaded
-		asl A						; index is doubled since addresses are 16bit (double stride)
-		sta someObjProperty_0701,X 	; store obj index
-		tax							; start using index as X offset
-		lda Data_atA895+0,X 		; Data_atA895 is the animation frames book.
+	LoadAnimationFrame:						; A holds index for object's animation frame to be loaded
+		asl A								; index is doubled since addresses are WORDS.
+		sta someObjProperty_0701,X 			; Stores animation frame index.
+		tax									; start using index as X offset
+		lda AnimationAtlas_A895+0,X 		; AnimationAtlas_A895 is the animation atlas.
 		sta addressPtr_32+0
-		lda Data_atA895+1,X
-		sta addressPtr_32+1 		; Now addressPtr_32 points to the animation frame
-		iny
-		ldx objectIndex_5F
-		lda object_Attrib_2_0405,X
-		bpl :+
-
-		lda (objectPtr_36),Y
-		clc
-		adc objectDeltaX_0C
-		jmp :++
+		lda AnimationAtlas_A895+1,X
+		sta addressPtr_32+1 				; Now addressPtr_32 points to the animation frame
+		iny									; advance to next index in animation table
+		ldx objectIndex_5F					; Stores new object index
+		lda object_Attrib_2_0405,X			
+		bpl :+								; Branch if BIT7 of object_Attrib_2_0405 is ZERO
+			
+			lda (objectPtr_36),Y			; Load next control byte from ANIMATION TABLE
+			clc								
+			adc objectDeltaX_0C				; Add it to objectDeltaX_0C
+			jmp :++
 	
-	:
-	lda (objectPtr_36),Y
+			:								; It BIT7 of object_Attrib_2_0405 is ONE
+			lda (objectPtr_36),Y			; Load next control byte from ANIMATION TABLE
 	
-	:
+		:
 		sta tile_X_Lo_46
 		bpl :+
 
-		lda #FULL
-		bne :++
+			lda #FULL						; Places sprite off screen
+			bne :++
 	
-	:
+		:
 		lda #ZERO
 	
-	:
-		sta tile_X_Hi_47
-		lda tile_X_Lo_46
-		clc
-		adc object_X_Lo_0400,X
-		sta object_X_Lo_0400,X
-		sta var_40
-		lda tile_X_Hi_47
-		adc object_X_Hi_0401,X
-		sta object_X_Hi_0401,X
-		sta var_41
-		iny
+		:
+		sta tile_X_Hi_47					; stores x position hi-byte
+
+		lda tile_X_Lo_46					; loads x position lo-byte
+		clc		
+		adc object_X_Lo_0400,X				; adds object's X position to sprite's X position
+		sta object_X_Lo_0400,X				; stores it
+		sta tempTile_X_Lo_40				; also stores it in temp variable
+
+		lda tile_X_Hi_47					; loads x position hi-byte
+		adc object_X_Hi_0401,X				; adds to object's X position hi-byte
+		sta object_X_Hi_0401,X				; stores it back
+		sta tempTile_X_Hi_41				; also stores it in temp variable
+
+		iny									; next index in ANIMATION TABLE
 		lda object_Attrib_2_0405,X
 		bpl :+
+			lda (objectPtr_36),Y
+			clc
+			adc objectDeltaY_0D
+			jmp :++
 
-		lda (objectPtr_36),Y
-		clc
-		adc objectDeltaY_0D
-		jmp :++
-	
-	:
-		lda (objectPtr_36),Y
-	
-	:
+		:
+			lda (objectPtr_36),Y
+		
+		:
 		sta var_48
 		bpl :+
-	
-		lda #FULL
-		bne :++
-	
-	:
+
+			lda #FULL
+			bne :++
+
+		:
 		lda #ZERO
 	
-	:
+		:
 		sta var_49
 		lda var_48
 		clc
@@ -3672,9 +3723,10 @@ Data_at97F5:
 		adc object_Y_Hi_0403,X
 		sta object_Y_Hi_0403,X
 		sta tile_Y_Hi_43
-		iny
-		tya
-		sta someObjProperty_0503,X
+		
+		iny							; advance to next index in ANIMATION TABLE
+		tya							; stores index in Y
+		sta animationTable_Index_0503,X	; stores index in object's animation frame index
 	
 	ReplaceMeLabel_6:
 		lda object_Attrib_1_0404,X
@@ -3708,18 +3760,18 @@ Data_at97F5:
 		lda (addressPtr_32),Y ; reads object WIDTH in pixels
 		bpl :+				  ; if positive, continue
 
-		jmp ReplaceMeLabel_8  ; if negative, do something else
+		jmp WriteOAMEntry  ; if negative, do something else
 	
 	:
 		sta objectWidth_0600,X		; stores WIDTH in pixels
-		Div8 A						; divide by 8 (get size in tiles)		
+		DIV8 A						; divide by 8 (get size in tiles)		
 		clc		
 		adc #$01					; add 1
 		sta var_44  				; store W+1 in temp variable
 		iny							; next value
 		lda (addressPtr_32),Y		; reads	object HEIGHT in pixels
 		sta objectHeight_0601,X		; store HEIGHT in pixels
-		Div8 A						; divide by 8 (get size in tiles)
+		DIV8 A						; divide by 8 (get size in tiles)
 		clc
 		adc #$01					; add 1
 		sta counter_H_45			; store H+1 in temp variable
@@ -3729,9 +3781,9 @@ Data_at97F5:
 	ReplaceMeLabel_11:
 		lda var_44
 		sta counter_W_3C			; counts tiles in X
-		lda var_40					; X position LO
+		lda tempTile_X_Lo_40					; X position LO
 		sta tile_X_Lo_46
-		lda var_41					; X position HI
+		lda tempTile_X_Hi_41		; X position HI
 		sta tile_X_Hi_47
 	
 	
@@ -3757,7 +3809,7 @@ Data_at97F5:
 		txa
 		clc
 		adc #OAM_STRIDE				; 4-byte stride in OAM
-		beq ReplaceMeLabel_9		; break if overflow
+		beq FinishingSpriteUpdates	; break if overflow
 		tax	
 	
 	; also arive here if found a blank tile
@@ -3807,65 +3859,73 @@ Data_at97F5:
 		ResetIndex:
 			lda #$00
 		
-	ContinueUpdating:
-		sta objectIndex_5F
-		cmp beingUpdated_3D
-		beq ReplaceMeLabel_12
+		ContinueUpdating:
 
-		jmp loopOverObjects
-	
-	ReplaceMeLabel_8:
-		ldx oamAddressPtr_3E
-		lda var_41
-		bne NextObjectIndex
+			sta objectIndex_5F
+			cmp beingUpdated_3D
+			beq ClearRemainingOAM
 
-		lda tile_Y_Hi_43
-		bne NextObjectIndex
+			jmp loopOverObjects		
 
-		lda tile_Y_Lo_42
-		sta OAM_0200+OAM_Y,X
-		iny
-		lda (addressPtr_32),Y
-		sta OAM_0200+OAM_TILE,X
-		iny
-		lda (addressPtr_32),Y
-		sta OAM_0200+OAM_ATT,X
-		lda var_40
-		sta OAM_0200+OAM_X,X
-
-		txa
-		clc
-		adc #OAM_STRIDE
-		beq ReplaceMeLabel_9
-
-		sta oamAddressPtr_3E
-		jmp NextObjectIndex
-	
-	ReplaceMeLabel_12:
-		ldx oamAddressPtr_3E
-		cpx #ZERO
-		beq ReplaceMeLabel_9
+			WriteOAMEntry:
 		
-		lda #ZERO
-	
-	loopZeroRemainderOAM:
-		sta OAM_0200,X
-		inx
-		bne loopZeroRemainderOAM
-	
-	ReplaceMeLabel_9:
-		lda objectIndex_5F
-		cmp beingUpdated_3D
-		bne :+
+				ldx oamAddressPtr_3E
+				
+				lda tempTile_X_Hi_41	; get high byte of sprite's X position
+				bne NextObjectIndex		; if not zero, skip sprite.
+										; this ensures that the sprite is on screen.
 
-	; reverse the indexing
-		lda #ZERO				
-		sta objectIndex_5F		; reset object index
-		sec
-		sbc objIndexStep_59		; convert +6 into -6
-		sta objIndexStep_59
+				lda tile_Y_Hi_43		; get high byte of sprite's Y position
+				bne NextObjectIndex		; if not zero, skip sprite.
+										; this ensures that the sprite is on screen.
+				
+				; writing 4 byte per sprite 		
+				lda tile_Y_Lo_42		; Y position
+				sta OAM_0200+OAM_Y,X		
+				iny
 
-	:
+				lda (addressPtr_32),Y	; tile chr
+				sta OAM_0200+OAM_TILE,X
+				iny
+				
+				lda (addressPtr_32),Y	; tile attribute
+				sta OAM_0200+OAM_ATT,X
+
+				lda tempTile_X_Lo_40	; X position
+				sta OAM_0200+OAM_X,X
+				
+				txa						; move to next sprite
+				clc
+				adc #OAM_STRIDE
+				beq FinishingSpriteUpdates	; if overflow, finish
+
+				sta oamAddressPtr_3E	; store next OAM free address
+				jmp NextObjectIndex		; loop over next object
+		
+		ClearRemainingOAM:
+			ldx oamAddressPtr_3E		; get next OAM free address
+			cpx #ZERO					; if zero, finish
+			beq FinishingSpriteUpdates
+			
+			lda #ZERO					
+			:
+				sta OAM_0200,X			; clear remaining OAM
+				inx						; loop over the remaining OAM
+				bne :-
+		
+		FinishingSpriteUpdates:
+			lda objectIndex_5F
+			cmp beingUpdated_3D
+			bne :+
+
+		; reverse the indexing
+			lda #ZERO				
+			sta objectIndex_5F		; reset object index
+			sec
+			sbc objIndexStep_59		; convert +6 into -6
+			sta objIndexStep_59
+
+		:
 
 	rts
 
@@ -3873,16 +3933,16 @@ Data_at97F5:
 ;
 ; $A709
 .proc Copy_5BytesPage05_FromEnd_ToBeginning
-	lda someObjProperty_0531+page_5_Gap
-	sta someObjProperty_0531
-	lda someObjProperty_0532+page_5_Gap
-	sta someObjProperty_0532
-	lda someObjProperty_0533+page_5_Gap
-	sta someObjProperty_0533
-	lda someObjProperty_0534+page_5_Gap
-	sta someObjProperty_0534
-	lda someObjProperty_0535+page_5_Gap
-	sta someObjProperty_0535
+	lda animationTable_Lo_0501+ENEMY_OBJECT_START+page_5_Gap
+	sta animationTable_Lo_0501+ENEMY_OBJECT_START
+	lda animationTable_Hi_0502+ENEMY_OBJECT_START+page_5_Gap
+	sta animationTable_Hi_0502+ENEMY_OBJECT_START
+	lda animationTable_Index_0503+ENEMY_OBJECT_START+page_5_Gap
+	sta animationTable_Index_0503+ENEMY_OBJECT_START
+	lda someObjProperty_0504+ENEMY_OBJECT_START+page_5_Gap
+	sta someObjProperty_0504+ENEMY_OBJECT_START
+	lda someObjProperty_0505+ENEMY_OBJECT_START+page_5_Gap
+	sta someObjProperty_0505+ENEMY_OBJECT_START
 	rts
 .endproc
 ;
@@ -3895,7 +3955,7 @@ Data_at97F5:
 	beq :+
 	inc powerLevel_64
 	lda powerLevel_64
-	cmp #PLAYER_MAX_POWER+1
+	cmp #CONFIG_PLAYER_MAX_POWER+1
 	bcc :+
 	lda #ZERO
 	sta powerLevel_64
@@ -3940,7 +4000,7 @@ Data_at97F5:
 		beq checkInputLeft
 
 		lda object_X_Lo_0400
-		cmp #PLAYER_X_MAX
+		cmp #CONFIG_PLAYER_X_MAX
 		bcs checkInputDown
 		adc speedLevel_66
 		bcc :+
@@ -3949,7 +4009,7 @@ Data_at97F5:
 		bit BIT_BUTTON_LEFT
 		beq checkInputDown
 		lda object_X_Lo_0400
-		cmp #PLAYER_X_MIN
+		cmp #CONFIG_PLAYER_X_MIN
 		bcc checkInputDown
 		sbc speedLevel_66
 
@@ -3961,7 +4021,7 @@ Data_at97F5:
 		bit BIT_BUTTON_DOWN
 		beq checkInputUp
 		lda object_Y_Lo_0402
-		cmp #PLAYER_Y_MAX
+		cmp #CONFIG_PLAYER_Y_MAX
 		bcs checkInputA
 		adc speedLevel_66
 		bcc :+
@@ -3970,7 +4030,7 @@ Data_at97F5:
 		bit BIT_BUTTON_UP
 		beq checkInputA
 		lda object_Y_Lo_0402
-		cmp #PLAYER_Y_MIN
+		cmp #CONFIG_PLAYER_Y_MIN
 		bcc checkInputA
 		sbc speedLevel_66
 
@@ -3991,18 +4051,18 @@ Data_at97F5:
 		sta flagPlayerHasShot_62
 		
 		lda healthPoints_0603
-		cmp #PLAYER_FLASHING_HEALTH			; if the player is with over health
+		cmp #CONFIG_PLAYER_FLASHING_HEALTH	; if the player is with over health
 		bcc :+
 		
-		COPY16 Data_atA80A, someObjProperty_0501		
+		ADDRESS_TO_RAM Data_atA80A, animationTable_Lo_0501		
 		lda #ZERO
-		sta someObjProperty_0503
+		sta animationTable_Index_0503
 		beq checkOnlyForPause
 	
 	:
-		COPY16 Data_atA7F0, someObjProperty_0501
+		ADDRESS_TO_RAM Data_atA7F0, animationTable_Lo_0501
 		lda #ZERO
-		sta someObjProperty_0503
+		sta animationTable_Index_0503
 		
 	checkOnlyForPause:
 		jsr CheckForPause
@@ -4059,21 +4119,21 @@ Data_atA80A:
 		sta flagPause_1C
 		beq :+
 	
-		StopSoundEngine
-		PlaySoundOnce #SFX_GAME_PAUSE
+		SOUNDENGINE_STOP
+		SOUNDENGINE_PLAY_ONCE #SFX_GAME_PAUSE
 
 		jmp exitPauseRoutine
 	
 	:
-		ResetSoundEngine 
+		SOUNDENGINE_RESET 
 		lda flagBossFight_1A
 		beq :+
 
-		PlaySoundForever #SONG_BOSSES
+		SOUNDENGINE_PLAY_FOREVER #SONG_BOSSES
 		rts
 
 	:
-		PlaySoundForever #SONG_STAGES
+		SOUNDENGINE_PLAY_FOREVER #SONG_STAGES
 	
 	exitPauseRoutine:
 		rts

@@ -32,14 +32,19 @@ function printInfo()
 		x=54+i*6
 		y=24
 		
+		-- Check if object is active
 		hasObj = 0x80 & emu.read(0x0434+i*6,emu.memType.nesMemory);    
 		
+		-- Draw empty slot as default
 		emu.drawRectangle(x,y ,4,4, 0x8000FFFF, false)
 	
+		-- If object is active, draw it
 		if(hasObj~=0) then 
+			
 			emu.drawRectangle(x,y ,4,4,0x0000FFFF, true)
 			nObj = nObj+1
 			
+			-- Get object's X and Y position (lo-byte only)
 			xo=emu.read(0x0430+i*6,emu.memType.nesMemory)
 			yo=emu.read(0x0432+i*6,emu.memType.nesMemory)
 		  
@@ -47,21 +52,26 @@ function printInfo()
 			colorPoint= 0x00FFFF
 	
 			if(emu.read(0x0431+i*6,emu.memType.nesMemory)>0) then
+				-- If object is offscreen, use transparent colors
 				colorText = 0x80FFFFFF
 				colorPoint= 0x80FFFF00	     
 			end
 	
-			emu.drawPixel(xo, yo,colorPoint, true)
-			emu.drawString(xo+1, yo-8,i , colorText, 0xFF000000)
+			emu.drawPixel(xo, yo,colorPoint, true) -- Draw object's position
+			emu.drawString(xo+1, yo-8,  i, colorText, 0xFF000000) -- Write the object's index
+			
+			animAddress = emu.read(0x0531+i*6,emu.memType.nesMemory)
+			animAddress = animAddress+256*emu.read(0x0532+i*6,emu.memType.nesMemory)
 		  
 			if(emu.read(0x0431+i*6,emu.memType.nesMemory)==0 and (emu.read(0x0433+i*6,emu.memType.nesMemory)==0) )then
-			h1xo=emu.read(0x732+i*6,emu.memType.nesMemory)
-			h2xo=emu.read(0x733+i*6,emu.memType.nesMemory)
-			h1yo=emu.read(0x734+i*6,emu.memType.nesMemory)
-			h2yo=emu.read(0x735+i*6,emu.memType.nesMemory)
-			wo=h2xo-h1xo
-			ho=h2yo-h1yo 
-			emu.drawRectangle(h1xo,h1yo,wo,ho,0x0000FFFF,false)
+				emu.drawString(xo+16, yo+1, string.format("$%02X", animAddress), colorText, 0xFF000000)
+				h1xo=emu.read(0x732+i*6,emu.memType.nesMemory)
+				h2xo=emu.read(0x733+i*6,emu.memType.nesMemory)
+				h1yo=emu.read(0x734+i*6,emu.memType.nesMemory)
+				h2yo=emu.read(0x735+i*6,emu.memType.nesMemory)
+				wo=h2xo-h1xo
+				ho=h2yo-h1yo 
+				emu.drawRectangle(h1xo,h1yo,wo,ho,0x0000FFFF,false)
 			end
 		end
 	

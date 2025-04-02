@@ -1,9 +1,9 @@
-; macro GetObjectsIndexTable_Y
-; Read the current stage index from currentStage_15
-; Calculates the correct index on the object data file:
-; Y(index) = (stage-1)*4
-; Clobbers A and Y
-.macro GetObjectsIndexTable_Y
+.macro GAMEENGINE_OBJECTS_INDEX_rY
+	; Read the current stage index from currentStage_15
+	; Calculates the correct index on the object data file:
+	; Y(index) = (stage-1)*4
+	; Clobbers A and Y
+
 	ldy currentStage_15
 	dey
 	tya
@@ -12,30 +12,15 @@
 	tay
 .endmacro
 
-; macro Copy
-; Copy data from <source> to <destination>
-; Starts at an offset <begin> from <source>
-; Ends at an offset <end> from <source>
-; Clobbers A and Y
-.macro Copy source,destination,begin,end
-	ldy begin
-:
-	lda source,y
-	sta destination,y
-	iny
-	cpy end
-	bne :-
-.endmacro
-
 ; macro TurnOFF
 ; Turns OFF a given flag
-.macro TurnOFF flag
+.macro TURNOFF flag
 	and #(FULL-flag)
 .endmacro
 
 ; macro TurnON
 ; Turns off a given flag
-.macro TurnON flag
+.macro TURNON flag
 	ora #flag
 .endmacro
 
@@ -45,9 +30,8 @@
 	eor #flag
 .endmacro
 
-; macro Div8
+.macro DIV8 variable
 ; Divides value or accumulator by 8
-.macro Div8 variable
 	lsr variable
 	lsr variable
 	lsr variable
@@ -115,15 +99,52 @@
 	tay
 .endmacro
 
-.macro COPY16 source, destination
+; Game Engine Macros =====================
+
+; macro COPY_DATA
+; COPY_DATA data from <source> to <destination>
+; Starts at an offset <begin> from <source>
+; Ends at an offset <end> from <source>
+; Clobbers A and Y
+.macro COPY_DATA source, destination, begin, end
+	ldy begin
+:
+	lda source,y
+	sta destination,y
+	iny
+	cpy end
+	bne :-
+.endmacro
+
+.macro ADDRESS_TO_RAM source, destination
 	lda #<source
 	sta destination+0
 	lda #>source
 	sta destination+1
 .endmacro
 
+.macro COPY_WORD_Y addressOrigin, addressDestination
+	lda addressOrigin+0,Y
+	sta addressDestination+0
+	lda addressOrigin+1,Y
+	sta addressDestination+1
+.endmacro
+
+.macro SCROLL_XY scrollX, scrollY
+	lda scrollX
+	sta PpuScroll_2005
+	lda scrollY
+	sta PpuScroll_2005
+.endmacro
+
+.macro RESET_SCROLLING
+	lda #$00
+	sta PpuScroll_2005
+	sta PpuScroll_2005
+.endmacro
+
 ; Sound Engine Macros =====================
-.macro PlaySoundOnce index
+.macro SOUNDENGINE_PLAY_ONCE index
 .if DISABLE_SOUND = 1
 	lda index
 	sta soundIndex_8D
@@ -137,7 +158,7 @@
 .endif
 .endmacro
 
-.macro PlaySoundForever index
+.macro SOUNDENGINE_PLAY_FOREVER index
 .if DISABLE_SOUND = 1
 	lda index
 	sta soundIndex_8D
@@ -151,7 +172,7 @@
 .endif
 .endmacro
 
-.macro StopSoundEngine
+.macro SOUNDENGINE_STOP
 .if DISABLE_SOUND = 1
 	nop
 	nop
@@ -161,7 +182,7 @@
 .endif
 .endmacro
 
-.macro StartSoundEngine
+.macro SOUNDENGINE_START
 .if DISABLE_SOUND = 1
 	nop
 	nop
@@ -171,7 +192,7 @@
 .endif
 .endmacro
 
-.macro ResetSoundEngine
+.macro SOUNDENGINE_RESET
 .if DISABLE_SOUND = 1
 	nop
 	nop
@@ -181,7 +202,7 @@
 .endif
 .endmacro
 
-.macro UpdateSoundDuringVBlank
+.macro SOUNDENGINE_UPDATE_DURING_VBLANK
 .if DISABLE_SOUND = 1
 	nop
 	nop
@@ -191,7 +212,7 @@
 .endif
 .endmacro
 
-.macro WaitUntilSoundFinishes
+.macro SOUNDENGINE_WAIT_SOUND_FINISHES
 .if DISABLE_SOUND = 1
 	nop
 	nop

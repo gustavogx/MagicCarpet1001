@@ -1,14 +1,13 @@
 ; Game Configuration =================
 .define STARTING_LIVES			 $06
 .define STARTING_POWER			 $00
-.define STARTING_HEALTH			 $01
-.define PLAYER_SPEED_SLOW		 $02
-.define PLAYER_SPEED_FAST		 $03
+.define CONFIG_STARTING_HEALTH			 $01
+.define CONFIG_PLAYER_SPEED_SLOW		 $02
+.define CONFIG_PLAYER_SPEED_FAST		 $03
 .define HEART_HEALTH_POINTS 	 $04
-.define PLAYER_MAX_POWER		 $04
+.define CONFIG_PLAYER_MAX_POWER		 $04
 .define MAGIC_LAMP_HEALTH_POINTS $50
-.define PLAYER_FLASHING_HEALTH	 $14
-
+.define CONFIG_PLAYER_FLASHING_HEALTH	 $14
 ; ====================================
 
 ; Engine Configuration ===============
@@ -33,15 +32,21 @@
 .define LIVES_HUD_Y		$D8
 
 ; Player starting position and stats
-.define PLAYER_START_X_Lo	$F2
-.define PLAYER_START_X_Hi	$FF
-.define PLAYER_START_Y_Lo	$70
+.define CONFIG_PLAYER_START_X_Lo	$F2
+.define CONFIG_PLAYER_START_X_Hi	$FF
+.define CONFIG_PLAYER_START_Y_Lo	$70
+
+; Player hitbox
+.define CONFIG_PLAYER_HITBOX_BORDER_XMIN	$08
+.define CONFIG_PLAYER_HITBOX_BORDER_XMAX	$08
+.define CONFIG_PLAYER_HITBOX_BORDER_YMIN	$03
+.define CONFIG_PLAYER_HITBOX_BORDER_YMAX	$04
 
 ; Player screen limits
-.define PLAYER_X_MIN	18
-.define PLAYER_X_MAX	220
-.define PLAYER_Y_MIN	20
-.define PLAYER_Y_MAX	184
+.define CONFIG_PLAYER_X_MIN	18
+.define CONFIG_PLAYER_X_MAX	220
+.define CONFIG_PLAYER_Y_MIN	20
+.define CONFIG_PLAYER_Y_MAX	184
 
 ; Other objects go after HEART
 .define FIRST_OBJECT_SLOT $04

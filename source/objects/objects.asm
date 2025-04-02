@@ -6,7 +6,7 @@
 .addr	Data_atC50D,	Data_atC8B9 ; stage 3
 .addr	Data_atE3A6,	Data_atC8B9 ; stage 4 (same enemies as Stage 3)
 
-Data_atA895:
+AnimationAtlas_A895:
 
 ; Number digits from 0 to 9
 .word NUMBER_ADDR_00, NUMBER_ADDR_01, NUMBER_ADDR_02, NUMBER_ADDR_03, NUMBER_ADDR_04
@@ -19,16 +19,29 @@ Data_atA895:
 .word DATA_ADDR_11, DATA_ADDR_12, DATA_ADDR_13  ; Player Flying (3 frames)
 .word DATA_ADDR_14                              ; Player Shooting
 .word DATA_ADDR_15, DATA_ADDR_16                ; Player Death (2 frames)
+.word DATA_ADDR_17                              ; Player projectiles horizontal
 
-.word DATA_ADDR_17, DATA_ADDR_18, DATA_ADDR_19
-.word DATA_ADDR_20, DATA_ADDR_21, DATA_ADDR_22, DATA_ADDR_23
-.word DATA_ADDR_24, DATA_ADDR_25, DATA_ADDR_26, DATA_ADDR_27
-.word DATA_ADDR_28, DATA_ADDR_29, DATA_ADDR_30, DATA_ADDR_31
-.word DATA_ADDR_32, DATA_ADDR_33, DATA_ADDR_34, DATA_ADDR_35
-.word DATA_ADDR_36, DATA_ADDR_37, DATA_ADDR_38, DATA_ADDR_39
-.word DATA_ADDR_40, DATA_ADDR_41, DATA_ADDR_42, DATA_ADDR_43
-.word DATA_ADDR_44, DATA_ADDR_45, DATA_ADDR_46, DATA_ADDR_47
-.word DATA_ADDR_48, DATA_ADDR_49, DATA_ADDR_50, DATA_ADDR_51
+.word DATA_ADDR_18, DATA_ADDR_19                ; Enemy hit puff
+.word DATA_ADDR_20                              ; 1up icon
+.word DATA_ADDR_21                              ; P power up
+.word DATA_ADDR_22                              ; Bubble enemy projectile
+.word DATA_ADDR_23                              ; Fireball 1
+.word DATA_ADDR_24                              ; Fireball 2
+
+.word DATA_ADDR_25, DATA_ADDR_26                ; Enemy rocket-bedouins
+.word DATA_ADDR_27, DATA_ADDR_28                ; Enemy heads
+.word DATA_ADDR_29, DATA_ADDR_30                ; Enemy bees
+.word DATA_ADDR_31, DATA_ADDR_32, DATA_ADDR_33  ; Enemy ducks
+.word DATA_ADDR_34, DATA_ADDR_35                ; Skull Boss (Idle and flashing)
+.word DATA_ADDR_36, DATA_ADDR_37                ; Player diagonal projectiles (up and down)
+.word DATA_ADDR_38                              ; Heart power up
+.word DATA_ADDR_39                              ; Speed Power up
+.word DATA_ADDR_40, DATA_ADDR_41                ; Witch Boss (Idle and flashing)
+.word DATA_ADDR_42, DATA_ADDR_43                ; Crock Boss (Idle and shooting)
+.word DATA_ADDR_44                              ; Straight comet projectile
+.word DATA_ADDR_45, DATA_ADDR_46, DATA_ADDR_47  ; Enemy Bats
+.word DATA_ADDR_48                              ; Single Falling Sparkle
+.word DATA_ADDR_49, DATA_ADDR_50, DATA_ADDR_51
 .word DATA_ADDR_52, DATA_ADDR_53, DATA_ADDR_54, DATA_ADDR_55
 .word DATA_ADDR_56, DATA_ADDR_57, DATA_ADDR_58, DATA_ADDR_59
 .word DATA_ADDR_60, DATA_ADDR_61, DATA_ADDR_62, DATA_ADDR_63
@@ -129,7 +142,7 @@ DATA_ADDR_21: ; $aa17 - offset $0a
 .byte $07, $07, $4c, $01		;	P power up
 
 DATA_ADDR_22: ; $aa1b - offset $04
-.byte $04, $04, $4d, $01		;   Bubble enemy shot
+.byte $04, $04, $4d, $01		;   Bubble enemy projectile
 
 DATA_ADDR_23: ; $aa1f - offset $04
 .byte $07, $07, $4e, $00		;   Fireball 1
@@ -138,16 +151,16 @@ DATA_ADDR_24: ; $aa23 - offset $04
 .byte $07, $07, $4f, $03		;   Fireball 2
 
 DATA_ADDR_25: ; $aa27 - offset $04
-.incbin "objects/animation/data-object-atAA27.bin" ;  Enemy flying rocket-bedouin Frame 1/2
+.incbin "objects/animation/data-object-atAA27.bin" ;  Enemy rocket-bedouin Frame 1/2
 
 DATA_ADDR_26: ; $aa39 - offset $12
-.incbin "objects/animation/data-object-atAA39.bin" ;  Enemy flying rocket-bedouin Frame 1/2
+.incbin "objects/animation/data-object-atAA39.bin" ;  Enemy rocket-bedouin Frame 1/2
 
 DATA_ADDR_27: ; $aa47 - offset $0e
-.incbin "objects/animation/data-object-atAA47.bin" ;  Enemy flying heads Frame 1/2
+.incbin "objects/animation/data-object-atAA47.bin" ;  Enemy heads Frame 1/2
 
 DATA_ADDR_28: ; $aa51 - offset $0a
-.incbin "objects/animation/data-object-atAA51.bin" ;  Enemy flying heads Frame 2/2
+.incbin "objects/animation/data-object-atAA51.bin" ;  Enemy heads Frame 2/2
 
 DATA_ADDR_29: ; $aa5b - offset $0a
 .incbin "objects/animation/data-object-atAA5B.bin" ;  Enemy bee Frame 1/2
