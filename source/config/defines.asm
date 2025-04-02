@@ -55,3 +55,5 @@
 .define FALSE	$00
 .define LOWER	%00001111
 .define UPPER	%11110000
+
+.define EOL	$FF

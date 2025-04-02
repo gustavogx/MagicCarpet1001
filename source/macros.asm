@@ -12,6 +12,21 @@
 	tay
 .endmacro
 
+.macro GAMEENGINE_INITIALIZE_MAPPER
+	; Initialize the mapper
+	lda BankSwitching_FFF0	; Loads #$00 from ROM filling (dangerous!)
+	sta BankSwitching_FFF0  ; Set mapper to Bank0
+.endmacro
+
+.macro GAMEENGINE_PPU_WARMUP
+	; PPU Warm up
+	ldx #$10 ; Wait 16 cycles for PPU to reach its stable state
+	:	
+		lda PpuStatus_2002
+		dex
+		bne :-
+.endmacro
+
 ; macro TurnOFF
 ; Turns OFF a given flag
 .macro TURNOFF flag

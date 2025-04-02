@@ -11,6 +11,9 @@
 ; ====================================
 
 ; Engine Configuration ===============
+.define ASCII_TO_CHR_OFFSET	$36
+.define TYPEWRITER_FRAME_INTERVAL $07
+
 .define ENEMY_WAVES_TO_FIRST	$0A
 .define ENEMY_WAVES_TRIGGER		$FA
 .define ENEMY_WAVES_TO_NEXT		$F0
@@ -110,3 +113,19 @@
 .define SHOOT_3_COMETS			$06
 .define SHOOT_3_COMETS_2_AMBERS	$07
 .define SHOOT_3_COMETS_5_AMBERS	$08
+
+; buttons =============================
+.define BUTTON_RIGHT	FLAG_0
+.define BUTTON_LEFT		FLAG_1
+.define BUTTON_DOWN		FLAG_2
+.define BUTTON_UP		FLAG_3
+.define BUTTON_START	FLAG_4
+.define BUTTON_SELECT	FLAG_5
+.define BUTTON_B		FLAG_6
+.define BUTTON_A		FLAG_7
+
+; APU Frame Counter ===================
+.define APU_FRAMECOUNTER_MODE_4STEPS	ZERO
+.define APU_FRAMECOUNTER_MODE_5STEPS	FLAG_7
+.define APU_FRAMECOUNTER_IRQ_DISABLE	FLAG_6
+.define APU_FRAMECOUNTER_IRQ_ENABLE		ZERO

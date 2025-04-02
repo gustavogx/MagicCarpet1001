@@ -248,8 +248,6 @@ paletteRAM_E0:			.res 32	; $E0 ; 4
 .define someObjProperty_0302 $0302 ; #6 of 10-byte file
 .define someObjProperty_0303 $0303
 
-;.define someObjProperty_0333 $0333 ; unused variable
-
 ; page 04
 .define object_X_Lo_0400 $0400 ; object_X_Lo_0400
 .define object_X_Hi_0401 $0401 ; object_X_Hi_0401
@@ -294,20 +292,14 @@ paletteRAM_E0:			.res 32	; $E0 ; 4
 .define BIT_OBJPROP_CAN_COLLIDE	BIT_6
 
 ; page 05
-.define someObjProperty_0500 $0500
-.define animationTable_Lo_0501 		$0501 ; lo-byte of object AI??? address
-.define animationTable_Hi_0502 		$0502 ; hi-byte of object AI??? address
+.define someObjProperty_0500 		$0500
+.define animationTable_Lo_0501 		$0501 
+.define animationTable_Hi_0502 		$0502 
 .define animationTable_Index_0503 	$0503
-.define someObjProperty_0504 $0504
-.define someObjProperty_0505 $0505
+.define someObjProperty_0504 		$0504
+.define someObjProperty_0505 		$0505
 
 ; ENEMY_OBJECT_START = $30
-;.define someObjProperty_0531 $0531
-;.define someObjProperty_0532 $0532
-;.define someObjProperty_0533 $0533
-;.define someObjProperty_0534 $0534
-;.define someObjProperty_0535 $0535
-
 .define page_5_Gap		 	RAMPage_6-(someObjProperty_0505+ENEMY_OBJECT_START+1)
 
 ; page 06
@@ -353,14 +345,7 @@ BIT_7:	.byte FLAG_7
 .define BIT_BUTTON_B		BIT_6
 .define BIT_BUTTON_A		BIT_7
 
-.define BUTTON_RIGHT	FLAG_0
-.define BUTTON_LEFT		FLAG_1
-.define BUTTON_DOWN		FLAG_2
-.define BUTTON_UP		FLAG_3
-.define BUTTON_START	FLAG_4
-.define BUTTON_SELECT	FLAG_5
-.define BUTTON_B		FLAG_6
-.define BUTTON_A		FLAG_7
+
 ; $8008
 HeartHUDData:
 .byte HEART_HUD_Y, HEART_HUD_TILE, HEART_HUD_ATT, HEART_HUD_X
@@ -370,21 +355,15 @@ BankSequenceArray:
 .byte Stage1Bank, Stage2Bank, Stage3Bank, Stage4Bank
 
 ; $8010
-; Reset handler, called by reset interrupt
 HandleReset:
-	lda #(FLAG_7+FLAG_6)		; flags %1100 0000
+	; Reset handler, called by reset interrupt
+	
+	lda #(APU_FRAMECOUNTER_MODE_5STEPS+APU_FRAMECOUNTER_IRQ_DISABLE)
 	sta Ctrl2_FrameCtr_4017
 	
-	; PPU Warm up
-	ldx #$10 ; Wait 16 cycles for PPU to reach its stable state
-	:	
-		lda PpuStatus_2002
-		dex
-		bne :-
+	GAMEENGINE_PPU_WARMUP
+	GAMEENGINE_INITIALIZE_MAPPER	
 
-	lda BankSwitching_FFF0	; Loads #$00 from ROM filling (dangerous!)
-	sta BankSwitching_FFF0  ; Set mapper to Bank0
-	
 	ldx #$00
 	jsr SetupAfterReset	
 	jsr InitializeObjectIndexStep
@@ -410,7 +389,7 @@ HandleReset:
 	lda #(FLAG_4+FLAG_3+FLAG_2)
 	sta flagPPUMask_18
 
-	lda #$00 ; Start at the opening screen
+	lda #$00 				; Start at the opening screen
 	sta currentStage_15
 	
 	lda #STARTING_POWER
@@ -618,27 +597,28 @@ StartingNewStage:
 ;==================================
 
 ; $8170
-; Why use a JSR call for this?
-; It is used only once during Reset and
-; having these 2 lines, it is of no consequence.
-; Maybe it was a last minute fix done on the ROM itself.
-; This step is used to add or subtract from the objectIndex_5F
-; It has two possible values: 6 or -6
-; objectIndex_5F counts up from 0 to 240
-; and then counts down from 240 back to 0
 .proc InitializeObjectIndexStep
+	; Why use a JSR call for this?
+	; It is used only once during Reset and
+	; having these 2 lines, it is of no consequence.
+	; Maybe it was a last minute fix done on the ROM itself.
+	; This step is used to add or subtract from the objectIndex_5F
+	; It has two possible values: 6 or -6
+	; objectIndex_5F counts up from 0 to 240
+	; and then counts down from 240 back to 0
+
 	lda #OBJECT_BYTE_SIZE	
 	sta objIndexStep_59
 	rts
 .endproc
 ;
 ; $8175
-; LoadEnemyWave
-; Loads a Batch of Enemies
-; Inputs: nextEnemyWave_5C, currentEnemyWave_5B
-; Variable nextEnemyWave_5C holds the timer for loading next enemy batch.
-; If timer larger than or equal to $FA, spawn new batch.
 .proc LoadEnemyWave
+	; Loads a Batch of Enemies
+	; Inputs: nextEnemyWave_5C, currentEnemyWave_5B
+	; Variable nextEnemyWave_5C holds the timer for loading next enemy batch.
+	; If timer larger than or equal to $FA, spawn new batch.
+
 	lda nextEnemyWave_5C 		; count down until next batch load
 	cmp #ENEMY_WAVES_TRIGGER	; will load next batch if counter >= $FA 
 	bcs :+						; continue if it is time to load
@@ -657,11 +637,11 @@ StartingNewStage:
 	asl A
 	tay
 	lda (objectPtr_34),Y		; lo-byte of current enemy batch
-	cmp #$FF					; check if end-of-line (EOL)
+	cmp #EOL					; check if end-of-line (EOL)
 	bne :++						; if !EOL skip far ahead
 	iny							
 	lda (objectPtr_34),Y		; hi-byte of current enemy batch
-	cmp #$FF					; check if end-of-file (EOF=FFFF)
+	cmp #EOL					; check if end-of-file (EOF=FFFF)
 	bne :+						; if !EOF skip ahead
 		jmp doneLoadingEnemyBatch	; exit if EOF
 
@@ -1773,7 +1753,7 @@ Animation_PlayerFlying_8BD7:
 ; $8BE5
 .proc InitializeHUD_Lives
 
-	ldy #OBJECT_BYTE_SIZE				; Position of HEART in object array
+	ldy #OBJECT_BYTE_SIZE		; Position of HEART in object array
 
 	lda #LIVES_HUD_X
 	sta object_X_Lo_0400,Y
@@ -1781,7 +1761,7 @@ Animation_PlayerFlying_8BD7:
 	lda #LIVES_HUD_Y
 	sta object_Y_Lo_0402,Y
 	
-	lda #(FLAG_5+FLAG_7)				; $A0
+	lda #(FLAG_5+FLAG_7)		; %1010 0000
 	sta object_Attrib_1_0404,Y
 	
 	lda #ZERO
@@ -1795,11 +1775,11 @@ Animation_PlayerFlying_8BD7:
 	sta objectSpeed_Y_0605,Y
 	sta attackPoints_0602,Y
 
-	lda #FULL
+	lda #FULL					; the HEART icon doesn't really need health points
 	sta healthPoints_0603,Y
-	lda #$07
+	lda #$07					; sprite-1 (for no apparent reason)
 	sta objectWidth_0600,Y
-	lda #$07				
+	lda #$07					; sprite-1
 	sta objectHeight_0601,Y
 	
 	rts
@@ -1817,21 +1797,20 @@ Animation_PlayerFlying_8BD7:
 		sta speedLevel_66
 	
 	:
-	lda #FULL		; optimize to TRUE
+	lda #FULL		; it could just be TRUE ($01)
 	sta flagUpdateObjectsOnVBlank_5A
 	rts
 .endproc
 ;
 ; $8C34
-; HandlePlayerShots
-; Shoots arrows according to flagLoadShots_4E
-; and to the player's current power level.
-; powerLevel_64 = 	1 - single arrow, shoot once
-;					2 - single arrow, shoot twice
-;					3 - triple arrow, shoot one
-;					4 - triple arrow, shoot twice
-; Clobbers A
 .proc HandlePlayerShots
+	; Shoots arrows according to flagLoadShots_4E
+	; and to the player's current power level.
+	; powerLevel_64 = 	1 - single arrow, shoot once
+	;					2 - single arrow, shoot twice
+	;					3 - triple arrow, shoot one
+	;					4 - triple arrow, shoot twice
+	; Clobbers A
 
 	txa
 	pha
@@ -3122,9 +3101,9 @@ RegisterInput:
 ;
 ; $96AC
 .proc RollEndCredits_A
-	; Loads the End Credits from address EndCreditsData_9718
-	; Retrieves the address of the phrase to write.
+	; Write the End Credits from address EndCreditsData_9718
 	; A select which phrase to write (the are six: 0 to 5).
+
 	asl A				; multiply by 2 since addresses are WORDs
 	tay
 
@@ -3143,33 +3122,33 @@ RegisterInput:
 	iny
 	
 	; Loop over all the caracters until
-	; until a control character $FF is found
+	; a control character EOL($FF) is found
 	loopLoadCredits:
 		
 		; move "cursor" to the correct position
-		lda vramAddress_67+0
-		sta PpuAddr_2006
+		lda vramAddress_67+0	
+		sta PpuAddr_2006		; hi-byte write
 		lda vramAddress_67+1
-		sta PpuAddr_2006
+		sta PpuAddr_2006		; lo-byte write
 		
 		
 		lda (addressPtr_32),Y	; load the next character (ASCII code)
 		
-		cmp #$FF				; if "EOF", finish writing line.
-		beq leaveEndCredits
+		cmp #EOL				; if "EOF", finish writing line.
+		beq doneWriting
 		
 		
-		cmp #$20				; if "SPACE", write character $OO
+		cmp #" "				; if "SPACE", write character $OO
 		bne :+
 
 			lda #$00
 			sta PpuData_2007
-			RESET_SCROLLING			; reset scrolling register
+			RESET_SCROLLING		; reset scrolling register
 			beq :++
 
-		: 	; writing a character
+		: 						; writing a character
 		sec
-		sbc #$36 ; subtract offset to convert from ASCII to CHR
+		sbc #ASCII_TO_CHR_OFFSET; subtract offset to convert from ASCII to CHR
 		sta PpuData_2007
 		RESET_SCROLLING			; reset scrolling register
 		
@@ -3186,7 +3165,7 @@ RegisterInput:
 		sta vramAddress_67+0
 
 		; wait 7 vblanks between characters
-		ldx #$07
+		ldx #TYPEWRITER_FRAME_INTERVAL
 		:
 			jsr WaitVBlank
 			dex
@@ -3194,11 +3173,11 @@ RegisterInput:
 		iny
 		bne loopLoadCredits
 	
-	; play another sound
 	SOUNDENGINE_RESET
 	
-	leaveEndCredits:
+	doneWriting:
 	rts
+
 .endproc
 ;
 ; $9718
@@ -3209,22 +3188,22 @@ EndCreditsData_9718:
 .addr EndingText_9785, EndingText_97A3
 
 EndingText_9724:
-.byte $20, $6d, "STAFF       ", $FF
+.byte $20, $6d, "STAFF       ", EOL
 
 EndingText_9733:
-.byte $21, $06, "PROGRAM  BY  PATRICK     ", $FF
+.byte $21, $06, "PROGRAM  BY  PATRICK     ", EOL
 
 EndingText_974F:
-.byte $21, $86, "GRAPHIC  BY  JULIA       ", $FF
+.byte $21, $86, "GRAPHIC  BY  JULIA       ", EOL
 
 EndingText_976B:
-.byte $22, $08, "MUSIC  BY  RUTH        ", $FF
+.byte $22, $08, "MUSIC  BY  RUTH        ", EOL
 
 EndingText_9785:
-.byte $22, $a4, "SPECIAL THANKS  MARTINO    ", $FF
+.byte $22, $a4, "SPECIAL THANKS  MARTINO    ", EOL
 
 EndingText_97A3:
-.byte $23, $4c, "THE END", $FF
+.byte $23, $4c, "THE END", EOL
 
 ;
 ; $97AD
