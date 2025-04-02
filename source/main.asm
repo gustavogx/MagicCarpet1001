@@ -3138,7 +3138,7 @@ RegisterInput:
 		beq doneWriting
 		
 		
-		cmp #" "				; if "SPACE", write character $OO
+		cmp #$20				; if "SPACE", write character $OO
 		bne :+
 
 			lda #$00
