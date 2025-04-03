@@ -11,8 +11,9 @@
 ; ====================================
 
 ; Engine Configuration ===============
-.define ASCII_TO_CHR_OFFSET	$36
+.define ASCII_TO_CHR_OFFSET		$36
 .define TYPEWRITER_FRAME_INTERVAL $07
+.define FRAMES_TO_SECOND		63	; 1s = f mod 62
 
 .define ENEMY_WAVES_TO_FIRST	$0A
 .define ENEMY_WAVES_TRIGGER		$FA

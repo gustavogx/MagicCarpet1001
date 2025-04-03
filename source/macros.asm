@@ -27,6 +27,13 @@
 		bne :-
 .endmacro
 
+.macro GAMEENGINE_DMA page
+	lda #$00			
+	sta OamAddr_2003		; reset DMA pointer to begining of OAM
+	lda page				; setup page number of OAM mirror in RAM
+	sta SpriteDma_4014		; trigger sprite DMA from RAM to OAM
+.endmacro
+
 ; macro TurnOFF
 ; Turns OFF a given flag
 .macro TURNOFF flag

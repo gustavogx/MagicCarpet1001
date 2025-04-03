@@ -244,7 +244,7 @@ paletteRAM_E0:			.res 32	; $E0 ; 4
 
 ; page 03
 .define someObjProperty_0300 $0300 ; #10 of 10-byte file (also $0700)
-.define someObjProperty_0301 $0301 ; #7 of 10-byte file
+.define someObjProperty_0301 $0301 ; #7 of 10-byte file (What kind of ATTACK?)
 .define someObjProperty_0302 $0302 ; #6 of 10-byte file
 .define someObjProperty_0303 $0303
 
@@ -292,23 +292,23 @@ paletteRAM_E0:			.res 32	; $E0 ; 4
 .define BIT_OBJPROP_CAN_COLLIDE	BIT_6
 
 ; page 05
-.define someObjProperty_0500 		$0500
+;.define someObjProperty_0500 		$0500
 .define animationTable_Lo_0501 		$0501 
 .define animationTable_Hi_0502 		$0502 
 .define animationTable_Index_0503 	$0503
-.define someObjProperty_0504 		$0504
-.define someObjProperty_0505 		$0505
+.define animationDelay_0504 		$0504
+.define animationLoopCounter_0505 	$0505
 
 ; ENEMY_OBJECT_START = $30
-.define page_5_Gap		 	RAMPage_6-(someObjProperty_0505+ENEMY_OBJECT_START+1)
+.define page_5_Gap		 	RAMPage_6-(animationLoopCounter_0505+ENEMY_OBJECT_START+1)
 
 ; page 06
 .define objectWidth_0600 		$0600 ; #3 of 10-byte file
 .define objectHeight_0601 		$0601 ; #4 of 10-byte file
 .define attackPoints_0602 		$0602 ; #1 of 10-byte file
 .define healthPoints_0603 	 	$0603 ; #5 of 10-byte file
-.define objectSpeed_X_0604 		$0604 ; #8 of 10-byte file 
-.define objectSpeed_Y_0605 		$0605 ; #9 of 10-byte file
+.define objectShooter_X_0604 		$0604 ; #8 of 10-byte file 
+.define objectShooter_Y_0605 		$0605 ; #9 of 10-byte file
 
 ; page 07
 .define someObjProperty_0700 		$0700 	; #10 of 10-byte file (also $0300)
@@ -811,16 +811,21 @@ doneLoadingEnemyBatch:
 	sta someObjProperty_0302,X	; stores #6 byte of 10
 	iny
 
-	lda (objectPtr_38),Y		; loads #7 byte of 10
+	; What kind of ATTACK?
+	lda (objectPtr_38),Y		; loads #7 byte of 10 
 	sta someObjProperty_0301,X	; stores #7 byte of 10
 	iny
+	
+	; Shooter Position: X Offset from Enemy's position
 	lda (objectPtr_38),Y		; loads #8 byte of 10
-	sta objectSpeed_X_0604,X	; stores #8 byte of 10
+	sta objectShooter_X_0604,X	; stores #8 byte of 10
 	iny
 
+	; Shooter Position: Y Offset from Enemy's position
 	lda (objectPtr_38),Y		; loads #9 byte of 10
-	sta objectSpeed_Y_0605,X	; stores #9 byte of 10
+	sta objectShooter_Y_0605,X	; stores #9 byte of 10
 	iny
+	
 	lda (objectPtr_38),Y		; loads #10 byte of 10
 	sta someObjProperty_0700,X	; stores #10 byte of 10
 	sta someObjProperty_0300,X	; stores #10 byte of 10
@@ -836,8 +841,8 @@ doneLoadingEnemyBatch:
 	
 	lda #ZERO
 	sta animationTable_Index_0503,X	; zero out 
-	sta someObjProperty_0504,X	; zero out 
-	sta someObjProperty_0505,X	; zero out 
+	sta animationDelay_0504,X	; zero out 
+	sta animationLoopCounter_0505,X	; zero out 
 	sta someObjProperty_0303,X	; zero out 
 
 	lda #FLAG_7
@@ -1170,8 +1175,8 @@ doneLoadingEnemyBatch:
 
 		lda #ZERO
 		sta animationTable_Index_0503
-		sta someObjProperty_0504
-		sta someObjProperty_0505
+		sta animationDelay_0504
+		sta animationLoopCounter_0505
 		pla
 		cmp #$01
 		bne doStoreHitPointsAndLeave
@@ -1420,8 +1425,8 @@ doneLoadingEnemyBatch:
 			
 			lda #ZERO
 			sta animationTable_Index_0503
-			sta someObjProperty_0504
-			sta someObjProperty_0505
+			sta animationDelay_0504
+			sta animationLoopCounter_0505
 			lda #HEART_HUD_Y
 			sta OAM_0200
 
@@ -1586,8 +1591,8 @@ doneLoadingEnemyBatch:
 	
 	lda #ZERO
 	sta animationTable_Index_0503,X
-	sta someObjProperty_0504,X
-	sta someObjProperty_0505,X
+	sta animationDelay_0504,X
+	sta animationLoopCounter_0505,X
 
 	sta someObjProperty_0700,X
 	sta someObjProperty_0300,X
@@ -1678,8 +1683,8 @@ Data_at8715:
 
 	lda #ZERO
 	sta animationTable_Index_0503
-	sta someObjProperty_0504
-	sta someObjProperty_0505
+	sta animationDelay_0504
+	sta animationLoopCounter_0505
 
 	sta flagTimerInSeconds_14
 	sta soundIndex_8D
@@ -1695,9 +1700,9 @@ Data_at8715:
 	sta objectHeight_0601
 	
 	lda #$18
-	sta objectSpeed_X_0604
+	sta objectShooter_X_0604
 	lda #$0E
-	sta objectSpeed_Y_0605
+	sta objectShooter_Y_0605
 
 	lda #ZERO
 	sta object_Attrib_2_0405
@@ -1767,12 +1772,12 @@ Animation_PlayerFlying_8BD7:
 	lda #ZERO
 	sta object_Attrib_2_0405,Y
 	sta animationTable_Index_0503,Y
-	sta someObjProperty_0504,Y
-	sta someObjProperty_0505,Y
+	sta animationDelay_0504,Y
+	sta animationLoopCounter_0505,Y
 	sta someObjProperty_0302,Y
 	sta someObjProperty_0303,Y
-	sta objectSpeed_X_0604,Y
-	sta objectSpeed_Y_0605,Y
+	sta objectShooter_X_0604,Y
+	sta objectShooter_Y_0605,Y
 	sta attackPoints_0602,Y
 
 	lda #FULL					; the HEART icon doesn't really need health points
@@ -1987,8 +1992,8 @@ Animation_PlayerFlying_8BD7:
 	
 	lda #ZERO					; zero-out other properties
 	sta animationTable_Index_0503,X
-	sta someObjProperty_0504,X
-	sta someObjProperty_0505,X
+	sta animationDelay_0504,X
+	sta animationLoopCounter_0505,X
 
 	sta object_X_Hi_0401,X
 	sta object_Y_Hi_0403,X
@@ -2087,8 +2092,8 @@ Data_at8D45:
 ; $8D73
 .proc HandleEnemyIA_Shooting_X
 	
-	lda someObjProperty_0301,X	; what kind of attack?
-	bne :+						; if not ZERO, continue
+	lda someObjProperty_0301,X	; Is the enemy ready to shoot?
+	bne :+						; if TRUE, continue
 	
 	rts
 
@@ -2166,7 +2171,7 @@ doneHandlingShooting:
 .endproc
 ;
 ; $8DDB
-; ShootAtPlayer_X
+.proc ShootAtPlayer_X
 ;
 ; Shoots a single projectile in the direction closest 
 ; to the player's current position, using one of 8 shooting 
@@ -2187,7 +2192,6 @@ doneHandlingShooting:
 ;	In this case, both X and Y velocities must be negative.
 ;
 ; Clobbers A
-.proc ShootAtPlayer_X
 
 	lda #$00
 	sta velocityCarry_4B	; starts with positive vX
@@ -2260,10 +2264,10 @@ doneHandlingShooting:
 	clc
 	adc Data_at8E25,Y			; Add the LUT value to the division result
 	asl A						; 2*A since addresses are 16-bit words.
-	sta projectileIndex_4A		; Store the index for the HandleSpawnProjectile_Y.
+	sta projectileIndex_4A		; Store the index for the SpawnProjectile_Y.
 	txa
 	tay							; Transfer the Enemy index to Y.
-	jsr HandleSpawnProjectile_Y ; Spawn the projectile.
+	jsr SpawnProjectile_Y ; Spawn the projectile.
 	rts
 .endproc
 ;
@@ -2278,7 +2282,7 @@ doneHandlingShooting:
 	:
 		lda address,X
 		sta projectileIndex_4A
-		jsr HandleSpawnProjectile_Y
+		jsr SpawnProjectile_Y
 		inx
 		cpx #number
 		bne :-
@@ -2300,33 +2304,35 @@ Data_at8E3F:
 .byte $00, $08, $0a, $44, $46, $1c, $14, $30
 ;
 ; $8E47
-; HandleSpawnProjectile_Y
-; Spawn a projectile from Enemy Y
-.proc HandleSpawnProjectile_Y
-
+.proc SpawnProjectile_Y
+	; Spawn a projectile from Enemy Y
 	PushXY
 	jsr FindFreeObjectSlot_rX			; get free slot
 	cpx #ENEMY_OBJECT_END				; check if list is full
-	bcs doneSpawningProjectiles			; if it's (full), break.
+	bcs doneSpawningProjectiles			; if TRUE, break.
 
-	jsr HandleEnemyIA_Movement_X_Y
-	ldy projectileIndex_4A
-	jsr GetProjectileTrajectoryAddress_X_Y
+		jsr GetShooterPosition_X_Y		; Retrieve's the shoorter's position and allocate the projectile's vertex
+		
+		ldy projectileIndex_4A
+		jsr AllocateNewProjectile_X_Y
 
-	lda #$01
-	sta attackPoints_0602,X
-	lda #(FLAG_5+FLAG_6)
-	sta object_Attrib_2_0405,X
-	lda #$04
-	sta objectWidth_0600,X
-	sta objectHeight_0601,X
-	
-	lda #ZERO
-	sta healthPoints_0603,X
-	sta someObjProperty_0301,X
-	sta someObjProperty_0302,X
-	lda #FLAG_7
-	sta object_Attrib_1_0404,X
+		lda #$01
+		sta attackPoints_0602,X
+		
+		lda #(FLAG_5+FLAG_6)
+		sta object_Attrib_2_0405,X
+		
+		lda #$04
+		sta objectWidth_0600,X
+		sta objectHeight_0601,X
+		
+		lda #ZERO
+		sta healthPoints_0603,X
+		sta someObjProperty_0301,X
+		sta someObjProperty_0302,X
+		
+		lda #FLAG_7
+		sta object_Attrib_1_0404,X
 	
 	doneSpawningProjectiles:
 	PullXY
@@ -2334,45 +2340,44 @@ Data_at8E3F:
 .endproc
 ;
 ; $8E81
-; HandleEnemyIA_Movement_X_Y
-; Updates the position of an Object (X)
-; by adding a displacement from an
-; Enemy (Y) A.I.
-.proc HandleEnemyIA_Movement_X_Y
+.proc GetShooterPosition_X_Y
+	; Updates the position of an object X
+	; by adding a displacement from an Enemy (Y) A.I.
 
-	; Add16 $0604 to $0400
-	lda object_X_Lo_0400,Y 		; positionX_Lo
+	; Calculate Shooter's X
+	lda object_X_Lo_0400,Y 		; Get Enemy's X_Lo
 	clc
-	adc objectSpeed_X_0604,Y 	; X velocity
-	sta object_X_Lo_0400,X 
-	lda object_X_Hi_0401,Y 		; positionX_Hi
-	adc #$00
-	sta object_X_Hi_0401,X
+	adc objectShooter_X_0604,Y 	; Add OFFSET in X
+	sta object_X_Lo_0400,X 		; Store in Projectile's X_Lo
+	lda object_X_Hi_0401,Y 		; Get Enemy's X_Hi
+	adc #$00					; Add carry to X_Hi
+	sta object_X_Hi_0401,X		; Stores in Projectile's X_Hi
 
-	; Add16 $0605 to $0402
-	lda object_Y_Lo_0402,Y 		; positionY_Lo
-	clc
-	adc objectSpeed_Y_0605,Y 	; Y velocity 
-	sta object_Y_Lo_0402,X
-	lda object_Y_Hi_0403,Y 		; positionY_Hi
-	adc #$00
-	sta object_Y_Hi_0403,X
+	; Calculate Shooter's Y
+	lda object_Y_Lo_0402,Y 		; Get Enemy's Y_Lo
+	clc							
+	adc objectShooter_Y_0605,Y 	; Add OFFSET in Y
+	sta object_Y_Lo_0402,X		; Store in Projectile's Y_Lo
+	lda object_Y_Hi_0403,Y 		; Get Enemy's Y_Hi
+	adc #$00					; Add carry to Y_Hi
+	sta object_Y_Hi_0403,X		; Stores in Projectile's Y_Hi
 
 	rts
 .endproc
 ;
 ; $8EA6
-.proc GetProjectileTrajectoryAddress_X_Y
-	
+.proc AllocateNewProjectile_X_Y
+	; Allocate a new projectile from offset Y
+	; into object position X
 	lda Projectile_Trajectories_at8EBE+0,Y
 	sta animationTable_Lo_0501,X
 	lda Projectile_Trajectories_at8EBE+1,Y
 	sta animationTable_Hi_0502,X
 	
 	lda #ZERO
-	sta someObjProperty_0505,X
+	sta animationLoopCounter_0505,X
 	sta animationTable_Index_0503,X
-	sta someObjProperty_0504,X
+	sta animationDelay_0504,X
 
 	rts
 .endproc
@@ -2445,15 +2450,15 @@ PushXY
 	sta animationTable_Hi_0502+ENEMY_OBJECT_START+page_5_Gap
 	lda animationTable_Index_0503+ENEMY_OBJECT_START
 	sta animationTable_Index_0503+ENEMY_OBJECT_START+page_5_Gap
-	lda someObjProperty_0504+ENEMY_OBJECT_START
-	sta someObjProperty_0504+ENEMY_OBJECT_START+page_5_Gap
-	lda someObjProperty_0505+ENEMY_OBJECT_START
-	sta someObjProperty_0505+ENEMY_OBJECT_START+page_5_Gap
+	lda animationDelay_0504+ENEMY_OBJECT_START
+	sta animationDelay_0504+ENEMY_OBJECT_START+page_5_Gap
+	lda animationLoopCounter_0505+ENEMY_OBJECT_START
+	sta animationLoopCounter_0505+ENEMY_OBJECT_START+page_5_Gap
 	
 	lda #ZERO
 	sta animationTable_Index_0503+ENEMY_OBJECT_START
-	sta someObjProperty_0504+ENEMY_OBJECT_START
-	sta someObjProperty_0505+ENEMY_OBJECT_START
+	sta animationDelay_0504+ENEMY_OBJECT_START
+	sta animationLoopCounter_0505+ENEMY_OBJECT_START
 
 	ADDRESS_TO_RAM Data_at932D, objectPtr_34 ; see data below
 
@@ -3224,7 +3229,7 @@ EndingText_97A3:
 
 	jsr UpdatePPUSettings
 	lda #$02				; Waits 2 seconds
-	jsr WaitForSeconds_A		; before respawning the player
+	jsr WaitForSeconds_A	; before respawning the player
 	lda #$00
 	sta timerInSeconds_13
 	
@@ -3269,29 +3274,26 @@ Data_at97F5:
 
 	PushAXY
 	
+	; Check if only sound should be updated
 	lda updateDuringVBlank_0E
 	cmp #$57
-	beq :+
-	
-	jmp doUpdateSoundOnly
-
-	:
-		lda updateDuringVBlank_0F
-		cmp #$75
-		beq :+
-
+	beq :+	
 		jmp doUpdateSoundOnly
 
-	:						; Setup OAM DMA
-		lda #$00			
-		sta OamAddr_2003		; reset DMA pointer to begining of OAM
-		lda #>OAM_0200			; setup page number of OAM mirror in RAM
-		sta SpriteDma_4014		; trigger sprite DMA from RAM to OAM
+	:
+	lda updateDuringVBlank_0F
+	cmp #$75
+	beq :+
+		jmp doUpdateSoundOnly
+
+	; Proceed with regular VBLANK updates
+	:	; Setup OAM DMA
+		GAMEENGINE_DMA #>OAM_0200	; DMA from RAM page 2 to OAM
 
 		lda PpuStatus_2002
 		inc frameCounter_12
 		lda frameCounter_12
-		and #63 				; $3F = every 62 frames, increase aliveTimer
+		and #FRAMES_TO_SECOND 		; $3F = every 62 frames, increase aliveTimer
 		bne :+
 
 		inc flagTimerInSeconds_14
@@ -3300,6 +3302,7 @@ Data_at97F5:
 	:
 		lda flagNextLevel_1B
 		bne doLevelTransition
+		
 		ldy currentStage_15
 		bne dontLevelTransition
 
@@ -3316,28 +3319,29 @@ Data_at97F5:
 
 	gameNotPaused:
 		jsr HandleScrollingControl
+		
 		SCROLL_XY screenScrollX_29, #$00
+		
 		lda flagPPUControl_19
 		sta PpuControl_2000
 	
 		lda frameCounter_12
-		and #$01 				; Checking if this is an ODD frame
-		bne :+					; Skip if ODD
+		and #$01 				 ; Checking if this is an ODD frame
+		bne :+					 ; Skip if ODD
+			dec nextEnemyWave_5C ; Decrement the counter for next enemy batch on EVEN frames
 
-		dec nextEnemyWave_5C	; Decrement the counter for next enemy batch on EVEN frames
-
-	:
+	:	; Check if objects should be updated
 		lda flagUpdateObjectsOnVBlank_5A
 		beq :+
 
-		jsr HandleControllerInputs
-		jsr HandleSpriteUpdates
+		jsr HandleControllerInputs	
+		jsr HandleSpriteUpdates		; Most expensive
 	
 	:
 		jsr PowerUpCheat
 
 	doUpdateSoundOnly:
-		SOUNDENGINE_UPDATE_DURING_VBLANK
+		SOUNDENGINE_UPDATE_DURING_VBLANK	; Sound is always very expensive
 
 	PullAXY
 	
@@ -3378,14 +3382,14 @@ Data_at97F5:
 	lda screenScrollX_29
 	bne doneWithScrolling
 
-	ldx levelProgression_16	
-	cpx #BG_SCROLL_LIMIT		; test if reached end of stage
-	bcc doKeepScrollingStage
+		ldx levelProgression_16	
+		cpx #BG_SCROLL_LIMIT		; test if reached end of stage
+		bcc doKeepScrollingStage
 
-	lda #GAMEMODE_BOSSFIGHT
-	sta flagGameMode_26
+		lda #GAMEMODE_BOSSFIGHT
+		sta flagGameMode_26
 	
-	doKeepScrollingStage:
+		doKeepScrollingStage:
 		clc
 		inc levelProgression_16
 		lda flagPPUControl_19
@@ -3393,7 +3397,8 @@ Data_at97F5:
 		sta flagPPUControl_19
 	
 	doneWithScrolling:
-		rts
+	rts
+
 .endproc
 ;
 ; $A458
@@ -3456,10 +3461,10 @@ Data_at97F5:
 			jmp NextObjectIndex		; else move forward.
 	
 	: 
-		ldy someObjProperty_0504,X
+		ldy animationDelay_0504,X
 		beq :+ 
 		
-			dec someObjProperty_0504,X
+			dec animationDelay_0504,X
 			dec animationTable_Index_0503,X
 			jmp ReplaceMeLabel_2
 	
@@ -3485,7 +3490,7 @@ Data_at97F5:
 		sbc #$00					; optimization for subtracting 1 since 
 									; the carry flag C will always be set by
 									; the first bmi 
-		sta someObjProperty_0504,X
+		sta animationDelay_0504,X
 	
 	ReplaceMeLabel_2:
 		lda object_Attrib_2_0405,X
@@ -3559,8 +3564,8 @@ Data_at97F5:
 		asl A						; multiply by 2 to index a WORD
 		bmi checkForControl			; if BIT7 is set, go into loop
 
-		dec someObjProperty_0505,X
-		lda someObjProperty_0505,X
+		dec animationLoopCounter_0505,X
+		lda animationLoopCounter_0505,X
 		bne :+
 		iny
 		iny
@@ -3571,7 +3576,7 @@ Data_at97F5:
 
 		lda (objectPtr_36),Y
 		and #(FLAG_4+LOWER)
-		sta someObjProperty_0505,X
+		sta animationLoopCounter_0505,X
 		
 		loop:
 			iny						; advance to next index in animation table
@@ -3918,10 +3923,10 @@ Data_at97F5:
 	sta animationTable_Hi_0502+ENEMY_OBJECT_START
 	lda animationTable_Index_0503+ENEMY_OBJECT_START+page_5_Gap
 	sta animationTable_Index_0503+ENEMY_OBJECT_START
-	lda someObjProperty_0504+ENEMY_OBJECT_START+page_5_Gap
-	sta someObjProperty_0504+ENEMY_OBJECT_START
-	lda someObjProperty_0505+ENEMY_OBJECT_START+page_5_Gap
-	sta someObjProperty_0505+ENEMY_OBJECT_START
+	lda animationDelay_0504+ENEMY_OBJECT_START+page_5_Gap
+	sta animationDelay_0504+ENEMY_OBJECT_START
+	lda animationLoopCounter_0505+ENEMY_OBJECT_START+page_5_Gap
+	sta animationLoopCounter_0505+ENEMY_OBJECT_START
 	rts
 .endproc
 ;
