@@ -38,8 +38,8 @@ function printInfo()
 	for i=0,31,1
 	do
 	
-		--x=54+i*listStep
-		--y=24
+		x=54+i*listStep
+		y=24
 		
 		-- Check if object is active
 		hasObj = 0x80 & emu.read(attributes+listStart+i*listStep,emu.memType.nesMemory);    

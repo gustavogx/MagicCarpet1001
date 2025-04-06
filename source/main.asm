@@ -87,8 +87,8 @@ tile_X_Hi_47:			.res 1	; $47 ; 7
 var_48:					.res 1	; $48 ; 2
 var_49:					.res 1	; $49 ; 4
 projectileIndex_4A:		.res 1	; $4A ; 7
-velocityCarry_4B:		.res 1	; $4B ; 5
-velocityComponent_4C:	.res 1	; $4C ; 6
+dirDelta_4B:		.res 1	; $4B ; 5
+dirDeltaSmallest_4C:	.res 1	; $4C ; 6
 iterator_4D:			.res 1	; $4D ; 6
 flagLoadShots_4E:		.res 1	; $4E ; 3
 hitboxXRight_4F:		.res 1	; $4F ; 2
@@ -2173,102 +2173,136 @@ doneHandlingShooting:
 ; $8DDB
 .proc ShootAtPlayer_X
 ;
-; Shoots a single projectile in the direction closest 
-; to the player's current position, using one of 8 shooting 
-; directions pre-calculated (LUT).
+; Return which of the 8 available directions is closest to the player,
+; From enemy X to the player.
 ; This routine decides which one of those 8 directions
 ; the projectile should follow.
 ;
 ; 	X register is the enemy that is going to shoot.
 ;
-;					  \ 	|	  /
-;					   \	|	 /
+;					\ 		|	    /
+;					  \		|	  /
 ;						\	|	/
 ;					----- Enemy ------
 ;			  			/	|	\
-;			   		   /	|	 \
-;					  /		|	  \
+;			   		  /		|	  \
+;					/		|	    \
 ;
 ;	In this case, both X and Y velocities must be negative.
 ;
-; Clobbers A
+; 	Clobbers A
 
 	lda #$00
-	sta velocityCarry_4B	; starts with positive vX
+	sta dirDelta_4B			; reset result
 	
-	; X direction
-	lda object_X_Lo_0400,X		; load enemy X position
+	; deltaX
+	lda object_X_Lo_0400,X	; load enemy X position
 	sec
-	sbc object_X_Lo_0400		; subtract player's X position
-	bcs :+						; if Enemy_X >= Player_X, skip ahead.
-	eor #$FF					; if not (Enemy_X < Player_X), bit-flip result.
+	sbc object_X_Lo_0400	; subtract player's X position
+	bcs :+					; if Enemy_X >= Player_X, skip ahead.
+		eor #FULL			; if not (Enemy_X < Player_X), get the complement.
 	:
-	rol velocityCarry_4B		; Store the carry (sign)
-	sta velocityComponent_4C	; Store the value (VX)
+	rol dirDelta_4B			; roll in the carry (sign) into dirDelta_4B.
+	sta dirDeltaSmallest_4C	; store the difference between the two X positions.
 
-	; Y direction
-	lda object_Y_Lo_0402,X		; load enemy Y position
+	; At this point, dirDeltaSmallest_4C is the absolute value of the distance in X
+	; dirDelta_4B is the sign of the distance in X (1 = positive, 0 = negative)
+	; In other words, dirDelta_4B tell us if the player is to the left (1) or right (0) of the enemy.
+
+	; deltaY
+	lda object_Y_Lo_0402,X	; load enemy Y position
 	sec
-	sbc object_Y_Lo_0402		; subtract player's Y position
-	bcs :+						; if Enemy_Y >= Player_Y, skip ahead.
-	eor #$FF					; if not (Enemy_Y < Player_Y), bit-flip result.	
+	sbc object_Y_Lo_0402	; subtract player's Y position
+	bcs :+					; if Enemy_Y >= Player_Y, skip ahead.
+		eor #FULL			; if not (Enemy_Y < Player_Y), get the complement.
 	:
-	rol velocityCarry_4B		; Store the carry (sign)
-								; A still holds VY
+	rol dirDelta_4B			; roll in the carry (sign) into dirDelta_4B.
+							; A still holds the difference betweem the two Y poitions.
 
-	;	There are 4 possibilities for the Carry:
+	; At this point, BIT0 of dirDelta_4B is the sign of the distance in Y (1 = positive, 0 = negative)
+	; In other words, dirDelta_4B tell us if the player is above (1) or below (0) the enemy.
 	;
-	;				eY >= pY	eY < pY
-	;	eX >= pX	 11 (3)		 10 (2)
-	;	eX <  pX	 00 (0)		 01 (1)
+	; When combined, there are 4 possibilities for dirDelta_4B:
 	;
-
-	cmp velocityComponent_4C	; Which component is larger?
-	bcs :+						; If (VY>=VX), dont't swap them.
-	ldy velocityComponent_4C	; else (VY<VX), swap them.
-	sta velocityComponent_4C	; this holds the SMALEST component
-	tya							; and A holds the LARGEST component	
+	;					    	|	  
+	;					 11 	|	 01
+	;						 	|	
+	;					----- Enemy ------
+	;			  			 	|	
+	;			   		 10 	|	 00
+	;					   		|	  
+	; In other words, dirDelta_4B is the QUADRANT of the player relative to the enemy.
+	;
+	; To calculate the OCTANT, we need to know which component is larger: deltaX or deltaY.
+	;
+	cmp dirDeltaSmallest_4C		; Compare the deltaX(dirDeltaSmallest_4C) and deltaY(A).
+	bcs :+						; If (deltaY>=deltaX), dont't swap them.
+		ldy dirDeltaSmallest_4C	; else (deltaY<deltaX), swap them.
+		sta dirDeltaSmallest_4C	; this holds the SMALEST component
+		tya						; and A holds the LARGEST component	
 	:	
-	rol velocityCarry_4B
+	rol dirDelta_4B				; roll in the carry (sign) into dirDelta_4B.
 
-	;	There are now 8 possibilities for the Carry:
+	; At this point, dirDelta_4B is the OCTANT of the player relative to the enemy.
+	; The new BIT0 indicate which "cone" the player is in relative to the enemy.
 	;
-	;	if   (VY>=VX):
-	;				eY >= pY	eY < pY
-	;	eX >= pX	111 (7)		101 (5)
-	;	eX <  pX	001 (1)		011 (3)
-	; 
-	;	else (VY<VX):
-	;				eY >= pY	eY < pY
-	;	eX >= pX	110 (6)		100 (4)
-	;	eX <  pX	000 (0)		010 (2)
-	;
+	;					\ 	 dY>=dX		/
+	;					  \		1 	  /
+	;						\		/
+	;			dX>dY	0	  Enemy 	0	dX>dY
+	;						/		\
+	;			   		  /		1	  \
+	;					/	 dY>=dX	    \
 
-	; 
+	; When combined, the 3 bits of dirDelta_4B are the OCTANT of the player relative to the enemy.
+	;
+	;					 	  
+	;					\111(7) | 011(3)/
+	;			  	 	 \		|	  /		
+	;				110(6) \	|	/ 010(2)
+	;					----- Enemy ------
+	;			  	100(4)	/	|	\ 000(0)
+	;			  		  /		|	  \		
+	;					/101(5)	| 001(1)\
+	;					 			  
+	;
+	; So that dirDelta_4B indexes a table of octants, 
+	; pointing to the correct data in projectiles.inc
+	;
 	sec
-	sbc velocityComponent_4C
+	sbc dirDeltaSmallest_4C
 	
 	; Division
-	ldy #$00					; This divides the largest component 	
-	:							; by the smallest one.
-	sec							; Division is just counting how
-	sbc velocityComponent_4C	; many times one can subtract
-	bcc :+						; a value before the result becomes
-	iny							; legative.
-	cpy #$04					; If division is larger than 4, break.
-	bcc :-
+	; This divides the largest component by the smallest one.
+	ldy #$00					
+	:							; 
+		sec						; Division is just counting how
+		sbc dirDeltaSmallest_4C	; many times one can subtract
+		bcc :+					; the divisor from the dividend,
+		iny						; before the result becomes negative.
+		cpy #$04				; This division is limited to 4.
+		bcc :-
 	:
 	tya							; Store the result of the division in A.
+	;
+	;	At this point, A holds how many times the largest delta
+	;	is larger than the smallest one, limited to 4.
+	;
+	;	So, every octant has 5 possible values: A=0,1,2,3,4
+	
+	ldy dirDelta_4B			; Use the sign as LUT index
 
-	ldy velocityCarry_4B		; Use the Carry as LUT index
+
 	clc
-	adc Data_at8E25,Y			; Add the LUT value to the division result
-	asl A						; 2*A since addresses are 16-bit words.
-	sta projectileIndex_4A		; Store the index for the SpawnProjectile_Y.
+	adc Data_at8E25,Y		; Add the LUT value to the division result
+	asl A					; 2*A since addresses are 16-bit words.
+	sta projectileIndex_4A	; Store the index for the SpawnProjectile_Y.
 	txa
-	tay							; Transfer the Enemy index to Y.
-	jsr SpawnProjectile_Y ; Spawn the projectile.
+	tay						; Transfer the Enemy index to Y.
+	jsr SpawnProjectile_Y 	; Spawn the projectile.
+	
 	rts
+
 .endproc
 ;
 ; macro SpawnMultipleProjectiles_X
@@ -2289,8 +2323,11 @@ doneHandlingShooting:
 .endmacro
 ;
 ; $8E25
+	; 	LUT of OFFSETS
 Data_at8E25:
-.byte $0f, $23, $0a, $19, $05, $1e, $00, $1e
+;offset	$00	 $01	$02	$03	$04	 $05	$06	$07
+.byte 	$0f, $23, $0a, $19, $05, $1e, $00, $1e; <- this is a legit error in the original code!
+; Octant 7 should have $14 instead of $1e on the table above.
 ;
 ; $8E2D
 ; Shoot Bubbles 8 directions
@@ -2307,6 +2344,7 @@ Data_at8E3F:
 .proc SpawnProjectile_Y
 	; Spawn a projectile from Enemy Y
 	PushXY
+	
 	jsr FindFreeObjectSlot_rX			; get free slot
 	cpx #ENEMY_OBJECT_END				; check if list is full
 	bcs doneSpawningProjectiles			; if TRUE, break.
@@ -2385,7 +2423,7 @@ Data_at8E3F:
 ; $8EBE
 ; Projectile Trajectories Table
 Projectile_Trajectories_at8EBE:
-.include "objects/misc/trajectories.inc"
+.include "objects/misc/projectiles.inc"
 ;
 ;
 ; $927F
