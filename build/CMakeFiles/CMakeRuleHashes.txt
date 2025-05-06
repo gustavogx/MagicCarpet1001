@@ -1,0 +1,5 @@
+# Hashes of file build rules.
+64c77482888c66198b73a7e9b4a5b3ee /home/gvaldivi/Games/MagicCarpet1001/rom/MagicCarpet.nes
+9d7c0416420ecb9e1aa192269c0b7770 CMakeFiles/clean_build
+681f4aead9834c1d71bab47bcc802e30 CMakeFiles/rom
+fe80aa850ae90ed980f25f3b5d85473b main.o

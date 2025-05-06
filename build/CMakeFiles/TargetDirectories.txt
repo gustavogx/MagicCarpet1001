@@ -1,0 +1,4 @@
+/home/gvaldivi/Games/MagicCarpet1001/build/CMakeFiles/rom.dir
+/home/gvaldivi/Games/MagicCarpet1001/build/CMakeFiles/clean_build.dir
+/home/gvaldivi/Games/MagicCarpet1001/build/CMakeFiles/edit_cache.dir
+/home/gvaldivi/Games/MagicCarpet1001/build/CMakeFiles/rebuild_cache.dir

@@ -1,0 +1,3 @@
+/home/gvaldivi/Games/MagicCarpet1001/tools/compare/build/CMakeFiles/compare.dir
+/home/gvaldivi/Games/MagicCarpet1001/tools/compare/build/CMakeFiles/edit_cache.dir
+/home/gvaldivi/Games/MagicCarpet1001/tools/compare/build/CMakeFiles/rebuild_cache.dir
