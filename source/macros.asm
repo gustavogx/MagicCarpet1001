@@ -121,6 +121,32 @@
 	tay
 .endmacro
 
+; macro AddByte2Word_A_X
+; Adds a byte to a word, using X as index
+; For optimization purpuses, the byte needs to start in A
+.macro AddByte2Word_A_X byte, wordLo, wordHi, tempLo, tempHi, work
+		bpl :+
+
+		lda #$FF
+		bne :++
+	
+	:
+		lda #$00
+	
+	:
+		sta work
+		lda byte
+		clc
+		adc wordLo,X
+		sta wordLo,X
+		sta tempLo
+
+		lda work
+		adc wordHi,X
+		sta wordHi,X
+		sta tempHi
+.endmacro
+
 ; Game Engine Macros =====================
 
 ; macro COPY_DATA
@@ -149,6 +175,13 @@
 	lda addressOrigin+0,Y
 	sta addressDestination+0
 	lda addressOrigin+1,Y
+	sta addressDestination+1
+.endmacro
+
+.macro COPY_WORD_X addressOrigin, addressDestination
+	lda addressOrigin+0,X
+	sta addressDestination+0
+	lda addressOrigin+1,X
 	sta addressDestination+1
 .endmacro
 

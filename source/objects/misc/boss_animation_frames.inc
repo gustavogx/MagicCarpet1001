@@ -3,15 +3,35 @@
 .addr Data_at9345	; Boss 3 Shooting
 .addr Data_at934D	; Boss 4 Shooting
 
+.define afWitchFlashing $29
+.define afCrockShooting $2B
+.define afSkullFlashing $23
+.define afMouthOpening1 $37
+.define afMouthOpening2 $38
+.define afMouthOpening3 $39
+
+;.define anTimer %10000000
+
 Data_at9335: ; Boss 1 shoot animation (one frame)
-.byte $29, $00, $00, $86, $29, $00, $00, $FF 
+.byte afWitchFlashing, $00, $00, anTimer+6
+.byte afWitchFlashing, $00, $00
+.byte $FF 
 
 Data_at933D: ; Boss 2 shoot animation (one frame)
-.byte $2B, $00, $00, $86, $2B, $00, $00, $FF 
+.byte afCrockShooting, $00, $00, anTimer+6
+.byte afCrockShooting, $00, $00
+.byte $FF 
 
 Data_at9345: ; Boss 3 shoot animation (one frame)
-.byte $23, $00, $00, $87, $23, $00, $00, $FF 
+.byte afSkullFlashing, $00, $00, anTimer+7
+.byte afSkullFlashing, $00, $00
+.byte $FF 
 
 Data_at934D: ; Boss 4 shoot animation (five frames)
-.byte $37, $00, $00, $83, $38, $00, $00, $84, $39, $00, $00, $8C, $38, $00, $00, $85, $37, $00, $00, $86, $FF
+.byte afMouthOpening1, $00, $00, anTimer+3
+.byte afMouthOpening2, $00, $00, anTimer+4
+.byte afMouthOpening3, $00, $00, anTimer+12
+.byte afMouthOpening2, $00, $00, anTimer+5
+.byte afMouthOpening1, $00, $00, anTimer+6
+.byte $FF
 

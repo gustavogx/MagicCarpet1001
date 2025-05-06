@@ -1,3 +1,5 @@
+.feature force_range 	; enable hardcoding negative numbers for animations
+
 .define DISABLE_SOUND 0
 .include "macros.asm"
 .include "config/defines.asm"
@@ -20,10 +22,10 @@
 .res 1 ; $09
 .res 1 ; $0a
 .res 1 ; $0b
-objectDeltaX_0C:	.res 1 ; $0c THIS HAS SOMETHING TO DO WITH THE MAGIC LAMP
-objectDeltaY_0D:	.res 1 ; $0d
-updateDuringVBlank_0E:	.res 1 ; $0e
-updateDuringVBlank_0F:	.res 1 ; $0f
+objDeltaX_0C:		.res 1 ; $0c 
+objDeltaY_0D:		.res 1 ; $0d
+updateAtVBlank_0E:	.res 1 ; $0e
+updateAtVBlank_0F:	.res 1 ; $0f
 
 .res 1 ; $10
 livesCounter_11:		.res 1	; $11 ; 5
@@ -76,16 +78,16 @@ beingUpdated_3D:		.res 1	; $3D ; 3
 oamAddressPtr_3E:		.res 2	; $3E ; 6 (word address)
 ; $3F low byte of $3E
 
-tempTile_X_Lo_40:		.res 1	; $40 ; 5
-tempTile_X_Hi_41:		.res 1	; $41 ; 5
-tile_Y_Lo_42:			.res 1	; $42 ; 7
-tile_Y_Hi_43:			.res 1	; $43 ; 6
-var_44:					.res 1	; $44 ; 2
+tPositionXLo_40:		.res 1	; $40 ; 5
+tPositionXHi_41:		.res 1	; $41 ; 5
+tPositionYLo_42:			.res 1	; $42 ; 7
+tPositionYHi_43:			.res 1	; $43 ; 6
+tilesWidth_44:					.res 1	; $44 ; 2
 counter_H_45:			.res 1	; $45 ; 2
 tile_X_Lo_46:			.res 1	; $46 ; 6 
-tile_X_Hi_47:			.res 1	; $47 ; 7
-var_48:					.res 1	; $48 ; 2
-var_49:					.res 1	; $49 ; 4
+temp_47:			.res 1	; $47 ; 7
+delta_Y_Lo_48:			.res 1	; $48 ; 2
+temp_49:			.res 1	; $49 ; 4
 projectileIndex_4A:		.res 1	; $4A ; 7
 dirDelta_4B:		.res 1	; $4B ; 5
 dirDeltaSmallest_4C:	.res 1	; $4C ; 6
@@ -108,7 +110,7 @@ currentEnemyWave_5B:	.res 1	; $5B ; 3
 nextEnemyWave_5C:		.res 1	; $5C ; 5
 .res 1 ; $5D
 flagUpdateObjectsOnVBlank_5A: .res 1	; $5E ; 2 is FALSE only on NEW GAME ore RESET
-objectIndex_5F:			.res 1	; $5F ; 9
+objIndex_5F:			.res 1	; $5F ; 9
 
 arrowsFlying_60:		.res 1	; $60 ; 7
 .res 1 ; $61
@@ -254,8 +256,8 @@ paletteRAM_E0:			.res 32	; $E0 ; 4
 .define object_Y_Lo_0402 $0402 ; object_Y_Lo_0402
 .define object_Y_Hi_0403 $0403 ; object_Y_Hi_0403
 
-.define object_Attrib_1_0404 $0404
-; object_Attrib_1_0404   7654 3210
+.define objAttributes_1_0404 $0404
+; objAttributes_1_0404   7654 3210
 ; 						 |||| |||+-- 0:
 ;						 |||| ||+--- 1:
 ;						 |||| |+---- 2:
@@ -269,8 +271,8 @@ paletteRAM_E0:			.res 32	; $E0 ; 4
 .define OBJPROP_VALID	FLAG_7
 .define BIT_OBJPROP_SHOT	BIT_5
 
-.define object_Attrib_2_0405 $0405 ; #2 of 10-byte file (flags) 
-; object_Attrib_2_0405   7654 3210
+.define objAttributes_2_0405 $0405 ; #2 of 10-byte file (flags) 
+; objAttributes_2_0405   7654 3210
 ; 						 |||| |||+-- 0: Enemy is part of SET 0
 ;						 |||| ||+--- 1: Enemy is part of SET 1
 ;						 |||| |+---- 2:
@@ -278,18 +280,20 @@ paletteRAM_E0:			.res 32	; $E0 ; 4
 ;						 |||+------- 4: Obj is enemy or pickup (not boss)
 ;						 ||+-------- 5:
 ;						 |+--------- 6: Obj can collide
-;						 +---------- 7:
+;						 +---------- 7: Obj is fixed (doesn't move)
 .define OBJPROP_PARTOF_SET0 FLAG_0
 .define OBJPROP_PARTOF_SET1 FLAG_1
 .define OBJPROP_UNUSED 		FLAG_3
 .define OBJPROP_IS_NOT_BOSS	FLAG_4
 .define OBJPROP_CAN_COLLIDE	FLAG_6
+.define OBJPROP_IS_FIXED	FLAG_7		; ??? TEST MORE
 
 .define BIT_OBJPROP_PARTOF_SET0 BIT_0
 .define BIT_OBJPROP_PARTOF_SET1 BIT_1
 .define BIT_OBJPROP_UNUSED 		BIT_3
 .define BIT_OBJPROP_IS_NOT_BOSS	BIT_4
 .define BIT_OBJPROP_CAN_COLLIDE	BIT_6
+.define BIT_OBJPROP_IS_FIXED	BIT_7	; ??? TEST MORE
 
 ; page 05
 ;.define someObjProperty_0500 		$0500
@@ -303,20 +307,20 @@ paletteRAM_E0:			.res 32	; $E0 ; 4
 .define page_5_Gap		 	RAMPage_6-(animationLoopCounter_0505+ENEMY_OBJECT_START+1)
 
 ; page 06
-.define objectWidth_0600 		$0600 ; #3 of 10-byte file
-.define objectHeight_0601 		$0601 ; #4 of 10-byte file
-.define attackPoints_0602 		$0602 ; #1 of 10-byte file
-.define healthPoints_0603 	 	$0603 ; #5 of 10-byte file
-.define objectShooter_X_0604 		$0604 ; #8 of 10-byte file 
-.define objectShooter_Y_0605 		$0605 ; #9 of 10-byte file
+.define objWidthPixels_0600 		$0600 ; #3 of 10-byte file
+.define objHeightPixels_0601 		$0601 ; #4 of 10-byte file
+.define objAttackPoints_0602 		$0602 ; #1 of 10-byte file
+.define objHealthPoints_0603 	 	$0603 ; #5 of 10-byte file
+.define objShooterPosX_0604 		$0604 ; #8 of 10-byte file 
+.define objShooterPoxY_0605 		$0605 ; #9 of 10-byte file
 
 ; page 07
 .define someObjProperty_0700 		$0700 	; #10 of 10-byte file (also $0300)
-.define someObjProperty_0701 		$0701
-.define objectHitBox_Left_X_0702 	$0702	; vertices of hit box
-.define objectHitBox_Right_X_0703 	$0703	; vertices of hit box
-.define objectHitBox_Top_Y_0704 	$0704	; vertices of hit box
-.define objectHitBox_Bottom_Y_0705 	$0705	; vertices of hit box
+.define objCurrentFrameOffset_0701 	$0701	; current animation frame offset in AnimationAtlas
+.define objHitBox_Left_X_0702 		$0702	; vertices of hit box
+.define objHitBox_Right_X_0703 		$0703	; vertices of hit box
+.define objHitBox_Top_Y_0704 		$0704	; vertices of hit box
+.define objHitBox_Bottom_Y_0705 	$0705	; vertices of hit box
 
 .segment "BANK0"
 
@@ -481,7 +485,7 @@ StartingNewStage:
 	jsr LoadStage_A_X
 	
 	lda #FULL
-	sta objectDeltaX_0C
+	sta objDeltaX_0C
 	
 	lda #GAMEMODE_STAGE
 	sta flagGameMode_26
@@ -569,8 +573,8 @@ StartingNewStage:
 		jsr PaletteFading
 		jsr RenderingOFF
 		lda #FULL
-		sta updateDuringVBlank_0E
-		sta updateDuringVBlank_0F
+		sta updateAtVBlank_0E
+		sta updateAtVBlank_0F
 		jmp HandleReset
 		; ==================================
 		
@@ -602,9 +606,9 @@ StartingNewStage:
 	; It is used only once during Reset and
 	; having these 2 lines, it is of no consequence.
 	; Maybe it was a last minute fix done on the ROM itself.
-	; This step is used to add or subtract from the objectIndex_5F
+	; This step is used to add or subtract from the objIndex_5F
 	; It has two possible values: 6 or -6
-	; objectIndex_5F counts up from 0 to 240
+	; objIndex_5F counts up from 0 to 240
 	; and then counts down from 240 back to 0
 
 	lda #OBJECT_BYTE_SIZE	
@@ -789,23 +793,23 @@ doneLoadingEnemyBatch:
 	iny
 
 	lda (objectPtr_38),Y		; loads #1 byte of 10
-	sta attackPoints_0602,X		; stores #1 byte of 10
+	sta objAttackPoints_0602,X		; stores #1 byte of 10
 	iny
 	lda (objectPtr_38),Y		; loads #2 byte of 10
 	ora #(FLAG_5+FLAG_6)		; turn ON flags 5 and 6
 	ora var_2D					; turn ON other flags from var_2D (see previous routine)
-	sta object_Attrib_2_0405,X	; store #2 byte of 10
+	sta objAttributes_2_0405,X	; store #2 byte of 10
 	iny
 
 	lda (objectPtr_38),Y		; loads #3 byte of 10
-	sta objectWidth_0600,X		; stores #3 byte of 10
+	sta objWidthPixels_0600,X			; stores #3 byte of 10
 	iny
 	lda (objectPtr_38),Y		; loads #4 byte of 10
-	sta objectHeight_0601,X		; stores #4 byte of 10
+	sta objHeightPixels_0601,X		; stores #4 byte of 10
 	iny
 
 	lda (objectPtr_38),Y		; loads #5 byte of 10 
-	sta healthPoints_0603,X		; stores #5 byte of 10
+	sta objHealthPoints_0603,X		; stores #5 byte of 10
 	iny
 	lda (objectPtr_38),Y		; loads #6 byte of 10
 	sta someObjProperty_0302,X	; stores #6 byte of 10
@@ -818,12 +822,12 @@ doneLoadingEnemyBatch:
 	
 	; Shooter Position: X Offset from Enemy's position
 	lda (objectPtr_38),Y		; loads #8 byte of 10
-	sta objectShooter_X_0604,X	; stores #8 byte of 10
+	sta objShooterPosX_0604,X	; stores #8 byte of 10
 	iny
 
 	; Shooter Position: Y Offset from Enemy's position
 	lda (objectPtr_38),Y		; loads #9 byte of 10
-	sta objectShooter_Y_0605,X	; stores #9 byte of 10
+	sta objShooterPoxY_0605,X	; stores #9 byte of 10
 	iny
 	
 	lda (objectPtr_38),Y		; loads #10 byte of 10
@@ -846,7 +850,7 @@ doneLoadingEnemyBatch:
 	sta someObjProperty_0303,X	; zero out 
 
 	lda #FLAG_7
-	sta object_Attrib_1_0404,X ; Set as VALID OBJECT
+	sta objAttributes_1_0404,X ; Set as VALID OBJECT
 
 	pla
 	tay
@@ -867,7 +871,7 @@ doneLoadingEnemyBatch:
 	loopCheckCollisions:
 
 		ldx iterator_4D
-		lda object_Attrib_1_0404,X
+		lda objAttributes_1_0404,X
 		bit BIT_4
 		beq :++
 
@@ -883,7 +887,7 @@ doneLoadingEnemyBatch:
 			:
 			jmp doneWithPhysics
 		:
-		lda object_Attrib_1_0404,X
+		lda objAttributes_1_0404,X
 		bpl doneWithPhysics		; test BIT_7 for unresolved collision
 
 		lda object_X_Hi_0401,X
@@ -894,7 +898,7 @@ doneLoadingEnemyBatch:
 		
 		lda object_X_Lo_0400,X
 		clc
-		adc objectWidth_0600,X
+		adc objWidthPixels_0600,X
 		bcc SecondPart
 
 		:
@@ -906,37 +910,37 @@ doneLoadingEnemyBatch:
 		
 		lda object_Y_Lo_0402,X
 		clc
-		adc objectHeight_0601,X
+		adc objHeightPixels_0601,X
 		bcs AI_EnemyWillShoot
 	
 		SecondPart:
-		lda object_Attrib_2_0405,X
+		lda objAttributes_2_0405,X
 		and #FLAG_4
 		beq :+
 
-		lda object_Attrib_1_0404,X
+		lda objAttributes_1_0404,X
 		and #FLAG_5
 		beq :++
 
 		:
 		lda #FLAG_4
-		sta object_Attrib_1_0404,X
+		sta objAttributes_1_0404,X
 		jmp doneWithPhysics
 
 		:
-		lda object_Attrib_1_0404,X
+		lda objAttributes_1_0404,X
 		TURNOFF FLAG_5					;	and #(ALL1-FLAG_5)
-		sta object_Attrib_1_0404,X
+		sta objAttributes_1_0404,X
 		jmp doneWithPhysics
 	
 		AI_EnemyWillShoot:
-			lda object_Attrib_1_0404,X
+			lda objAttributes_1_0404,X
 			ora #FLAG_5
-			sta object_Attrib_1_0404,X
+			sta objAttributes_1_0404,X
 			
 			jsr CalculateEnemyHitBox_X
 			
-			lda object_Attrib_1_0404,X
+			lda objAttributes_1_0404,X
 			and #FLAG_3
 			beq doneWithPhysics
 			
@@ -968,21 +972,21 @@ doneLoadingEnemyBatch:
 	lda object_X_Lo_0400					; get player's X position
 	clc
 	adc #CONFIG_PLAYER_HITBOX_BORDER_XMIN	; add 8 pixels
-	sta objectHitBox_Left_X_0702			; store left X
+	sta objHitBox_Left_X_0702			; store left X
 	
 	lda object_X_Lo_0400					; get player's X position
-	adc objectWidth_0600					; add object's width (in pixels)
+	adc objWidthPixels_0600					; add object's width (in pixels)
 	sbc #CONFIG_PLAYER_HITBOX_BORDER_XMAX 	; subtract 8 pixels
-	sta objectHitBox_Right_X_0703			; store right X
+	sta objHitBox_Right_X_0703			; store right X
 
 	lda object_Y_Lo_0402					; get player's Y position
 	adc #CONFIG_PLAYER_HITBOX_BORDER_YMIN	; add 3 pixels
-	sta objectHitBox_Top_Y_0704				; store top Y
+	sta objHitBox_Top_Y_0704				; store top Y
 
 	lda object_Y_Lo_0402					; get player's Y position
-	adc objectHeight_0601					; add object's height
+	adc objHeightPixels_0601					; add object's height
 	sbc #CONFIG_PLAYER_HITBOX_BORDER_YMAX	; subtract 4 pixels
-	sta objectHitBox_Bottom_Y_0705			; store bottom Y
+	sta objHitBox_Bottom_Y_0705			; store bottom Y
 
 	rts
 .endproc
@@ -990,7 +994,7 @@ doneLoadingEnemyBatch:
 ; $8391
 .proc CalculateEnemyHitBox_X
 
-	lda object_Attrib_2_0405,X
+	lda objAttributes_2_0405,X
 	and #OBJPROP_IS_NOT_BOSS
 	beq objectIsBoss
 
@@ -1003,7 +1007,7 @@ doneLoadingEnemyBatch:
 	lda object_X_Lo_0400,X
 	
 	:
-	sta objectHitBox_Left_X_0702,X
+	sta objHitBox_Left_X_0702,X
 	lda object_Y_Hi_0403,X
 	beq :+
 	lda #$00
@@ -1013,39 +1017,39 @@ doneLoadingEnemyBatch:
 	lda object_Y_Lo_0402,X
 	
 	:
-	sta objectHitBox_Top_Y_0704,X
+	sta objHitBox_Top_Y_0704,X
 	lda object_X_Lo_0400,X
 	clc
-	adc objectWidth_0600,X
-	cmp objectHitBox_Left_X_0702,X
+	adc objWidthPixels_0600,X
+	cmp objHitBox_Left_X_0702,X
 	bcs :+
 	lda #$FF
 	
 	:
-	sta objectHitBox_Right_X_0703,X
+	sta objHitBox_Right_X_0703,X
 	lda object_Y_Lo_0402,X
 	clc
-	adc objectHeight_0601,X
-	cmp objectHitBox_Top_Y_0704,X
+	adc objHeightPixels_0601,X
+	cmp objHitBox_Top_Y_0704,X
 	bcs :+
 	lda #$FF
 	
 	:
-	sta objectHitBox_Bottom_Y_0705,X
+	sta objHitBox_Bottom_Y_0705,X
 	rts
 
 	objectIsBoss: ; make the hit box the same size as the sprite
 	
 	lda object_X_Lo_0400,X
-	sta objectHitBox_Left_X_0702,X
+	sta objHitBox_Left_X_0702,X
 	clc
-	adc objectWidth_0600,X
-	sta objectHitBox_Right_X_0703,X
+	adc objWidthPixels_0600,X
+	sta objHitBox_Right_X_0703,X
 	lda object_Y_Lo_0402,X
-	sta objectHitBox_Top_Y_0704,X
+	sta objHitBox_Top_Y_0704,X
 	clc
-	adc objectHeight_0601,X
-	sta objectHitBox_Bottom_Y_0705,X
+	adc objHeightPixels_0601,X
+	sta objHitBox_Bottom_Y_0705,X
 	rts
 
 .endproc
@@ -1069,39 +1073,39 @@ doneLoadingEnemyBatch:
 	
 	loopOverPlayerObjects:
 
-		lda object_Attrib_1_0404,Y
+		lda objAttributes_1_0404,Y
 		bmi :+						; if FLAG_7 this is a VALID object
 
 		jmp nextCollisionCheck
 	
 	:
-		lda object_Attrib_2_0405,Y	; object flags
+		lda objAttributes_2_0405,Y	; object flags
 		bit BIT_OBJPROP_CAN_COLLIDE	; test for BIT 6: object can collide
 		bne :+						; if flag set, continue
 		
 		jmp nextCollisionCheck		; if not, break
 	
 	:	
-		lda objectHitBox_Left_X_0702,Y 
+		lda objHitBox_Left_X_0702,Y 
 		sta hitboxXRight_4F
-		lda objectHitBox_Right_X_0703,Y
+		lda objHitBox_Right_X_0703,Y
 		sta hitboxXLeft_50
-		lda objectHitBox_Top_Y_0704,Y
+		lda objHitBox_Top_Y_0704,Y
 		sta hitboxYBottom_51
-		lda objectHitBox_Bottom_Y_0705,Y
+		lda objHitBox_Bottom_Y_0705,Y
 		sta hitboxYTop_52	
 		
 		ldx #ENEMY_OBJECT_START 	; start of enemies slots
 	
 	loopOverEnemies:
 		
-		lda object_Attrib_1_0404,X
+		lda objAttributes_1_0404,X
 		bpl noCollisionDetected
 		
 		and #OBJPROP_SHOT
 		beq noCollisionDetected
 		
-		lda object_Attrib_2_0405,X
+		lda objAttributes_2_0405,X
 		bit BIT_OBJPROP_CAN_COLLIDE
 		beq noCollisionDetected
 	
@@ -1115,25 +1119,25 @@ doneLoadingEnemyBatch:
 		jmp nextEnemyObject ; mid-code drain to next enemy check
 	
 	:
-		lda objectHitBox_Left_X_0702,X
+		lda objHitBox_Left_X_0702,X
 		cmp hitboxXLeft_50
 		bcs noCollisionDetected
 
 		lda hitboxXRight_4F
-		cmp objectHitBox_Right_X_0703,X
+		cmp objHitBox_Right_X_0703,X
 		bcs noCollisionDetected
 
-		lda objectHitBox_Top_Y_0704,X
+		lda objHitBox_Top_Y_0704,X
 		cmp hitboxYTop_52
 		bcs noCollisionDetected
 
 		lda hitboxYBottom_51
-		cmp objectHitBox_Bottom_Y_0705,X
+		cmp objHitBox_Bottom_Y_0705,X
 		bcs noCollisionDetected
 
-		lda healthPoints_0603,X
+		lda objHealthPoints_0603,X
 		sec
-		sbc attackPoints_0602,Y
+		sbc objAttackPoints_0602,Y
 		beq :+
 		bcs :++
 	
@@ -1142,7 +1146,7 @@ doneLoadingEnemyBatch:
 		jmp :++
 	
 	:
-		sta healthPoints_0603,X
+		sta objHealthPoints_0603,X
 		lda flagBossFight_1A
 		bne :+
 		
@@ -1159,9 +1163,9 @@ doneLoadingEnemyBatch:
 		bne :+
 	
 	:
-		lda healthPoints_0603,Y
+		lda objHealthPoints_0603,Y
 		sec
-		sbc attackPoints_0602,X
+		sbc objAttackPoints_0602,X
 		beq doHandleObjCollision
 		bcc doHandleObjCollision
 	
@@ -1187,7 +1191,7 @@ doneLoadingEnemyBatch:
 		pla
 	
 	doStoreHitPointsAndLeave:
-		sta healthPoints_0603,Y
+		sta objHealthPoints_0603,Y
 		jmp nextCollisionCheck
 	
 	doHandleObjCollision:
@@ -1227,7 +1231,7 @@ doneLoadingEnemyBatch:
 
 	PushXY
 
-	lda object_Attrib_2_0405,X
+	lda objAttributes_2_0405,X
 	bit BIT_OBJPROP_IS_NOT_BOSS	
 	bne :+						
 		jmp doHandleObjCollision ; handle object pickup
@@ -1315,7 +1319,7 @@ doneLoadingEnemyBatch:
 ; 	X = 0 is the player
 	
 	PushXY
-	lda object_Attrib_2_0405,X		; Object status flags
+	lda objAttributes_2_0405,X		; Object status flags
 	bit BIT_OBJPROP_CAN_COLLIDE			; check if the object is tangible (flag 6)
 	bne :+							; if TANGIBLE (can collide), continue
 	jmp doneWithObjectCollision		; else exit
@@ -1419,7 +1423,7 @@ doneLoadingEnemyBatch:
 			; ==============================
 
 			lda #MAGIC_LAMP_HEALTH_POINTS
-			sta healthPoints_0603
+			sta objHealthPoints_0603
 
 			ADDRESS_TO_RAM Animation_PlayerFlashing_8BBD, animationTable_Lo_0501 ; and 0502 word address
 			
@@ -1499,7 +1503,7 @@ doneLoadingEnemyBatch:
 	handleDespawning:
 		sta objectType_58			; death animation index
 		
-		lda object_Attrib_1_0404,X
+		lda objAttributes_1_0404,X
 		and #FLAG_5 ; check if this object spawns another?
 		beq doneWithObjectCollision
 
@@ -1521,7 +1525,7 @@ doneLoadingEnemyBatch:
 
 		PullXY
 		lda #ZERO
-		sta object_Attrib_1_0404,X
+		sta objAttributes_1_0404,X
 
 	rts
 .endproc
@@ -1531,7 +1535,7 @@ doneLoadingEnemyBatch:
 ; Adds ONE HEART equivalent in health points to player.
 ; 
 .proc AddOneHeart
-	lda healthPoints_0603
+	lda objHealthPoints_0603
 	clc
 	adc #HEART_HEALTH_POINTS
 	
@@ -1539,7 +1543,7 @@ doneLoadingEnemyBatch:
 	lda #$FF				; if overflowed, set it to maximum
 	
 	:			
-	sta healthPoints_0603	; store it into player's health
+	sta objHealthPoints_0603	; store it into player's health
 	
 	updateHeartDisplay:
 		lda #HEART_HUD_Y
@@ -1569,13 +1573,13 @@ doneLoadingEnemyBatch:
 	lda Data_at8715+1,Y			; object VY table address
 	sta animationTable_Hi_0502,X  ; object VY table address
 	lda Data_at8715+2,Y
-	sta attackPoints_0602,X
+	sta objAttackPoints_0602,X
 	lda Data_at8715+3,Y
-	sta object_Attrib_2_0405,X
+	sta objAttributes_2_0405,X
 	lda Data_at8715+4,Y
-	sta objectWidth_0600,X
+	sta objWidthPixels_0600,X
 	lda Data_at8715+5,Y
-	sta objectHeight_0601,X
+	sta objHeightPixels_0601,X
 	lda Data_at8715+6,Y
 	sta someObjProperty_0302,X
 	lda Data_at8715+7,Y
@@ -1598,7 +1602,7 @@ doneLoadingEnemyBatch:
 	sta someObjProperty_0300,X
 	sta someObjProperty_0301,X
 	lda #FLAG_7
-	sta object_Attrib_1_0404,X ; Set VALID OBJECT
+	sta objAttributes_1_0404,X ; Set VALID OBJECT
 
 	rts
 .endproc
@@ -1679,7 +1683,7 @@ Data_at8715:
 
 	; Player Status
 	lda #(FLAG_7+FLAG_5)			; $A0
-	sta object_Attrib_1_0404
+	sta objAttributes_1_0404
 
 	lda #ZERO
 	sta animationTable_Index_0503
@@ -1692,20 +1696,20 @@ Data_at8715:
 	lda #$1A
 	sta someObjProperty_0302
 	lda #$03
-	sta attackPoints_0602
+	sta objAttackPoints_0602
 	
 	lda #$14
-	sta objectWidth_0600
+	sta objWidthPixels_0600
 	lda #$18
-	sta objectHeight_0601
+	sta objHeightPixels_0601
 	
 	lda #$18
-	sta objectShooter_X_0604
+	sta objShooterPosX_0604
 	lda #$0E
-	sta objectShooter_Y_0605
+	sta objShooterPoxY_0605
 
 	lda #ZERO
-	sta object_Attrib_2_0405
+	sta objAttributes_2_0405
 
 	lda #$00
 	sta arrowsFlying_60
@@ -1713,7 +1717,7 @@ Data_at8715:
 	lda flagNextLevel_1B			; check if level transitioning
 	bne :+							; if not, player has just died
 		lda #CONFIG_STARTING_HEALTH	; reset player's health
-		sta healthPoints_0603
+		sta objHealthPoints_0603
 		
 		lda powerLevel_64			; check player's power
 		beq :+						; if power is 0, skip decreasing
@@ -1767,25 +1771,25 @@ Animation_PlayerFlying_8BD7:
 	sta object_Y_Lo_0402,Y
 	
 	lda #(FLAG_5+FLAG_7)		; %1010 0000
-	sta object_Attrib_1_0404,Y
+	sta objAttributes_1_0404,Y
 	
 	lda #ZERO
-	sta object_Attrib_2_0405,Y
+	sta objAttributes_2_0405,Y
 	sta animationTable_Index_0503,Y
 	sta animationDelay_0504,Y
 	sta animationLoopCounter_0505,Y
 	sta someObjProperty_0302,Y
 	sta someObjProperty_0303,Y
-	sta objectShooter_X_0604,Y
-	sta objectShooter_Y_0605,Y
-	sta attackPoints_0602,Y
+	sta objShooterPosX_0604,Y
+	sta objShooterPoxY_0605,Y
+	sta objAttackPoints_0602,Y
 
 	lda #FULL					; the HEART icon doesn't really need health points
-	sta healthPoints_0603,Y
+	sta objHealthPoints_0603,Y
 	lda #$07					; sprite-1 (for no apparent reason)
-	sta objectWidth_0600,Y
+	sta objWidthPixels_0600,Y
 	lda #$07					; sprite-1
-	sta objectHeight_0601,Y
+	sta objHeightPixels_0601,Y
 	
 	rts
 
@@ -1794,7 +1798,7 @@ Animation_PlayerFlying_8BD7:
 ; $8C23
 .proc TriggerNextLevel
 	lda #ZERO
-	sta objectIndex_5F		; reset object handling index
+	sta objIndex_5F		; reset object handling index
 	
 	lda flagNextLevel_1B
 	bne :+
@@ -1972,13 +1976,13 @@ Animation_PlayerFlying_8BD7:
 	adc #$02					; add 2
 	
 	:
-	sta attackPoints_0602,X		; store A (byte 1) #$02 single, #$04 triple
+	sta objAttackPoints_0602,X		; store A (byte 1) #$02 single, #$04 triple
 	lda Data_at8D1D+3,Y			; load byte 2
 	sta someObjProperty_0302,X	; store byte 2
 	lda Data_at8D1D+4,Y			; load byte 3
-	sta objectWidth_0600,X		; store byte 3
+	sta objWidthPixels_0600,X		; store byte 3
 	lda Data_at8D1D+5,Y			; load byte 4
-	sta objectHeight_0601,X		; store byte 4
+	sta objHeightPixels_0601,X		; store byte 4
 	
 	lda object_X_Lo_0400		; load player X position from RAM
 	clc
@@ -1997,13 +2001,13 @@ Animation_PlayerFlying_8BD7:
 
 	sta object_X_Hi_0401,X
 	sta object_Y_Hi_0403,X
-	sta healthPoints_0603,X
+	sta objHealthPoints_0603,X
 
 	lda #FLAG_6					; SET COLLISION ON
-	sta object_Attrib_2_0405,X
+	sta objAttributes_2_0405,X
 
 	lda #FLAG_7					; VALID OBJECT
-	sta object_Attrib_1_0404,X
+	sta objAttributes_1_0404,X
 	
 	rts
 
@@ -2056,7 +2060,7 @@ Data_at8D45:
 	ldx #SHOT_OBJECT_START ; $0C
 	
 	:
-		lda object_Attrib_1_0404,X
+		lda objAttributes_1_0404,X
 		and #(FLAG_7+FLAG_4)
 		beq :+
 		txa
@@ -2077,7 +2081,7 @@ Data_at8D45:
 	clc
 	ldx #ENEMY_OBJECT_START
 	:
-		lda object_Attrib_1_0404,X
+		lda objAttributes_1_0404,X
 		and #(FLAG_7+FLAG_4) ;%10010000 ; #$90
 		beq :+
 		txa
@@ -2098,9 +2102,9 @@ Data_at8D45:
 	rts
 
 	:
-	lda object_Attrib_1_0404,X
+	lda objAttributes_1_0404,X
 	TURNOFF FLAG_3				; and #(ALL1-FLAG_3)
-	sta object_Attrib_1_0404,X
+	sta objAttributes_1_0404,X
 
 	lda someObjProperty_0700,X
 	sta someObjProperty_0300,X
@@ -2112,15 +2116,15 @@ Data_at8D45:
 	; single bubble at the player direction
 	cmp #SHOOT_SINGLE_BUBBLE
 	bne :+
-	jsr ShootAtPlayer_X
-	jmp doneHandlingShooting
+		jsr ShootAtPlayer_X
+		jmp doneHandlingShooting
 	
 	; multidirectional ring of bubbles
 	:
-	cmp #SHOOT_RING_BUBBLES
+	cmp #SHOOT_EIGHT_BUBBLES
 	bne :+
-	jsr SpawnProjectiles_8_1
-	jmp doneHandlingShooting
+		jsr SpawnProjectiles_8_X
+		jmp doneHandlingShooting
 	
 	; COMPLEX BOSS SHOTS
 
@@ -2129,22 +2133,22 @@ Data_at8D45:
 	cmp #SHOOT_5_BUBBLES
 	bne :+++
 	
-	lda #LOWER
-	bit frameCounter_12		; uses timer for diversity
-	beq :+
+		lda #LOWER
+		bit frameCounter_12		; uses timer for diversity
+		beq :+
 
-	; 3 in 4 attacks are SHOOT_5_BUBBLES
-	jsr Level_1_Attack
-	jmp :++
+			; 3 in 4 attacks are SHOOT_5_BUBBLES
+			jsr Level_1_Attack
+			jmp :++
 	
-	; 1 in 4 attacks is just SHOOT_SINGLE_BUBBLE
-	:
-	jsr ShootAtPlayer_X
+		; 1 in 4 attacks is just SHOOT_SINGLE_BUBBLE
+		:
+		jsr ShootAtPlayer_X
 	
-	:
-	lda flagBossFight_1A
-	beq :+
-	jsr HandleBossAnimation_Shooting
+		:
+		lda flagBossFight_1A
+		beq :+
+		jsr HandleBossAnimation_Shooting
 	
 	:
 	cmp #SHOOT_3_COMETS
@@ -2331,7 +2335,7 @@ Data_at8E25:
 ;
 ; $8E2D
 ; Shoot Bubbles 8 directions
-.proc SpawnProjectiles_8_1
+.proc SpawnProjectiles_8_X
 	SpawnMultipleProjectiles_X Data_at8E3F, $08
 	rts
 .endproc
@@ -2355,22 +2359,22 @@ Data_at8E3F:
 		jsr AllocateNewProjectile_X_Y
 
 		lda #$01
-		sta attackPoints_0602,X
+		sta objAttackPoints_0602,X
 		
 		lda #(FLAG_5+FLAG_6)
-		sta object_Attrib_2_0405,X
+		sta objAttributes_2_0405,X
 		
 		lda #$04
-		sta objectWidth_0600,X
-		sta objectHeight_0601,X
+		sta objWidthPixels_0600,X
+		sta objHeightPixels_0601,X
 		
 		lda #ZERO
-		sta healthPoints_0603,X
+		sta objHealthPoints_0603,X
 		sta someObjProperty_0301,X
 		sta someObjProperty_0302,X
 		
 		lda #FLAG_7
-		sta object_Attrib_1_0404,X
+		sta objAttributes_1_0404,X
 	
 	doneSpawningProjectiles:
 	PullXY
@@ -2385,7 +2389,7 @@ Data_at8E3F:
 	; Calculate Shooter's X
 	lda object_X_Lo_0400,Y 		; Get Enemy's X_Lo
 	clc
-	adc objectShooter_X_0604,Y 	; Add OFFSET in X
+	adc objShooterPosX_0604,Y 	; Add OFFSET in X
 	sta object_X_Lo_0400,X 		; Store in Projectile's X_Lo
 	lda object_X_Hi_0401,Y 		; Get Enemy's X_Hi
 	adc #$00					; Add carry to X_Hi
@@ -2394,7 +2398,7 @@ Data_at8E3F:
 	; Calculate Shooter's Y
 	lda object_Y_Lo_0402,Y 		; Get Enemy's Y_Lo
 	clc							
-	adc objectShooter_Y_0605,Y 	; Add OFFSET in Y
+	adc objShooterPoxY_0605,Y 	; Add OFFSET in Y
 	sta object_Y_Lo_0402,X		; Store in Projectile's Y_Lo
 	lda object_Y_Hi_0403,Y 		; Get Enemy's Y_Hi
 	adc #$00					; Add carry to Y_Hi
@@ -2608,11 +2612,11 @@ LivesGraphicData:
 	sta OAM_0200				; Restore the current HEART_HUD_Y position.
 	COPY_DATA HeartHUDData, OAM_0200, #1, #4 ; Copy the rest of the HEART_HUD data.
 
-	lda healthPoints_0603		; Load the current health points.
+	lda objHealthPoints_0603		; Load the current health points.
 	pha							; Push it away
 	jsr ClearPages_3_to_7		; Clear pages 3 to 7
 	pla							; Pull it back
-	sta healthPoints_0603		; Restore the current health points.
+	sta objHealthPoints_0603		; Restore the current health points.
 
 	jmp StartingNewStage		
 .endproc
@@ -2640,9 +2644,9 @@ LivesGraphicData:
 
 	jsr ClearPages_3_to_7
 	lda #$57
-	sta updateDuringVBlank_0E
+	sta updateAtVBlank_0E
 	lda #$75
-	sta updateDuringVBlank_0F
+	sta updateAtVBlank_0F
 	rts 
 .endproc
 ;
@@ -3313,13 +3317,13 @@ Data_at97F5:
 	PushAXY
 	
 	; Check if only sound should be updated
-	lda updateDuringVBlank_0E
+	lda updateAtVBlank_0E
 	cmp #$57
 	beq :+	
 		jmp doUpdateSoundOnly
 
 	:
-	lda updateDuringVBlank_0F
+	lda updateAtVBlank_0F
 	cmp #$75
 	beq :+
 		jmp doUpdateSoundOnly
@@ -3476,25 +3480,26 @@ Data_at97F5:
 ; Since it takes longer than vblank, its internal state is global
 
 ; Globals
-;	objectIndex_5F 	Holds the next object index to be updated
+;	objIndex_5F 	Holds the next object index to be updated
 ;					It maybe be reset by TriggerNextLevel
 
 ;	oamAddressPtr_3E Restarts from #FIRST_OBJECT_SLOT at every call
 ; 	beingUpdated_3D	 Holds the object being worked on
-;					 Necessary to check if objectIndex_5F was changed 
+;					 Necessary to check if objIndex_5F was changed 
 ;					 externally.
 
 	lda #FIRST_OBJECT_SLOT		; Updates start AFTER heart icon
 	sta oamAddressPtr_3E		; Store first OAM address
 	
-	lda objectIndex_5F			; Get current objetc index
+	lda objIndex_5F				; Get current objetc index
 								; It counts from 0 to 240 or 240 to 0, 
 								; depending on objIndexStep_59
 	sta beingUpdated_3D			; Store current object index
 	
 	loopOverObjects:
-		ldx objectIndex_5F			; load object index into X
-		lda object_Attrib_1_0404,X	; check if object should be handled
+
+		ldx objIndex_5F			; load object index into X
+		lda objAttributes_1_0404,X	; check if object should be handled
 		bmi :+						; if BIT7 is set, handle object		
 			jmp NextObjectIndex		; else move forward.
 	
@@ -3504,7 +3509,7 @@ Data_at97F5:
 		
 			dec animationDelay_0504,X
 			dec animationTable_Index_0503,X
-			jmp ReplaceMeLabel_2
+			jmp UpdateMovementFromDeltas
 	
 	:
 		lda animationTable_Lo_0501,X	; Loads ANIMATION address (Lo)
@@ -3514,395 +3519,348 @@ Data_at97F5:
 		
 		ldy animationTable_Index_0503,X	; Loads ANIMATION frame index
 	
-	ReplaceMeLabel_7:
-	
-		lda (objectPtr_36),Y 		; reads next animation instruction
-		bmi :+				 		; if BIT7 is set, this is a control byte
-			jmp LoadAnimationFrame  ; if  BIT7 is NOT set, will load
-	
-		:
-		asl A
-		bmi ReplaceMeLabel_1		; if BIT6 is set, jump to ReplaceMeLabel_1
 
-		lsr A						; return to original value (sans BIT7)
-		sbc #$00					; optimization for subtracting 1 since 
-									; the carry flag C will always be set by
-									; the first bmi 
-		sta animationDelay_0504,X
-	
-	ReplaceMeLabel_2:
-		lda object_Attrib_2_0405,X
-		bpl ReplaceMeLabel_4		; if BIT7 is not set, 
-									; go to ReplaceMeLabel_4
-
-		lda objectDeltaX_0C
-		bpl :+
-
-		lda #FULL
-		bne :++
-	
-	:
-		lda #$00
-	
-	:
-		sta tile_X_Hi_47
-		lda objectDeltaX_0C
-		clc
-		adc object_X_Lo_0400,X
-		sta object_X_Lo_0400,X
-		sta tempTile_X_Lo_40
-		lda tile_X_Hi_47
-		adc object_X_Hi_0401,X
-		sta object_X_Hi_0401,X
-		sta tempTile_X_Hi_41
-		lda objectDeltaY_0D
-		bpl :+
-
-		lda #FULL
-		bne :++
-	
-	:
-		lda #ZERO
-	
-	:
-		sta var_49
-		lda objectDeltaY_0D
-		clc
-		adc object_Y_Lo_0402,X
-		sta object_Y_Lo_0402,X
-		sta tile_Y_Lo_42
-		lda var_49
-		adc object_Y_Hi_0403,X
-		sta object_Y_Hi_0403,X
-		sta tile_Y_Hi_43
-		jmp ReplaceMeLabel_5
-	
-	ReplaceMeLabel_4:
-		lda object_X_Lo_0400,X
-		sta tempTile_X_Lo_40
-		lda object_X_Hi_0401,X
-		sta tempTile_X_Hi_41
-		lda object_Y_Lo_0402,X
-		sta tile_Y_Lo_42
-		lda object_Y_Hi_0403,X
-		sta tile_Y_Hi_43
-	
-	ReplaceMeLabel_5:
-		inc animationTable_Index_0503,X
-		lda someObjProperty_0701,X
-		tax
-		lda AnimationAtlas_A895+0,X
-		sta addressPtr_32+0
-		lda AnimationAtlas_A895+1,X
-		sta addressPtr_32+1
-		ldx objectIndex_5F
-		jmp ReplaceMeLabel_6
-	
-	ReplaceMeLabel_1:
-		asl A						; multiply by 2 to index a WORD
-		bmi checkForControl			; if BIT7 is set, go into loop
-
-		dec animationLoopCounter_0505,X
-		lda animationLoopCounter_0505,X
-		bne :+
-		iny
-		iny
-		jmp ReplaceMeLabel_7
-	
-	:
-		bpl loop
-
-		lda (objectPtr_36),Y
-		and #(FLAG_4+LOWER)
-		sta animationLoopCounter_0505,X
+		ReplaceMeLabel_7:
 		
-		loop:
-			iny						; advance to next index in animation table
-			lda (objectPtr_36),Y	; read new index in animation table
-			tay
-			lda (objectPtr_36),Y	; loads next animation frame index
-			jmp LoadAnimationFrame	; retrieve frame
+			;	Let's analyze one case: shooting 
+			;	lda (objectPtr_36),Y reading the animation table at 8F3F
+			; 	$16, $FF, $FF, $C2, $00, $16, $FF, $00, $81, $FE, $00
+			;
+			;	$16 doesn't have bit7, so it will load the animation/movement.
+			;	UpdateAnimationFrame
+			;	$16 is a offset and need to be doubled (word)
+			; 
+
+			lda (objectPtr_36),Y 		; reads next animation instruction
+			bmi :+				 		; if BIT7 is set, this is a control byte
+				jmp UpdateAnimationFrame  ; if  BIT7 is NOT set, will load
+		
+			:
+			asl A						; remove BIT7
+			bmi ReplaceMeLabel_1		; if BIT6 is set, jump to ReplaceMeLabel_1
+
+			; If ONLY BIT7 is set (and not BIT6), then this is the animation delay.
+			lsr A						; return to original value (sans BIT7)
+			sbc #$00					; optimization for subtracting 1 since 
+										; the carry flag C will always be cleared
+										; by the las bmi
 			
-			checkForControl:
-			cmp #$F8
-			beq loop
+			sta animationDelay_0504,X	; This is the animation delay, or how many frames
+										; need to be waited before updating both animation
+										; and movement of projectiles and enemies.
 		
-		asl A
-		bmi :+
+		UpdateMovementFromDeltas:
+			lda objAttributes_2_0405,X
+			bpl MaintainPosition		; test BIT_OBJPROP_IS_FIXED
 
-			DIV8 A
-			and #LOWER
-			lda object_Attrib_1_0404,X
-			TURNON FLAG_3
-			sta object_Attrib_1_0404,X
-			jmp NextObjectIndex
-	
-	:
-		lda someObjProperty_0303,X
-		cmp #$03
-		bne :+
-		beq :++
-	
-	:
-		cmp #$04					; Boss Death
-		bne :++
+				lda objDeltaX_0C
+				AddByte2Word_A_X objDeltaX_0C, object_X_Lo_0400, object_X_Hi_0401, tPositionXLo_40, tPositionXHi_41, temp_47
 
-			lda #$01
-			sta flagNextLevel_1B
-	
-	:
-		lda #$00
-		sta someObjProperty_0302,X
-		sta someObjProperty_0303,X
-	
-	:
-		cmp #$05					; Boss Shooting
-		bne :+ 
-		jsr Copy_5BytesPage05_FromEnd_ToBeginning
-		jmp :++
-	
-	:
-		lda #$10
-		sta object_Attrib_1_0404,X
-	
-	:
-		jmp NextObjectIndex
-	
-	LoadAnimationFrame:						; A holds index for object's animation frame to be loaded
-		asl A								; index is doubled since addresses are WORDS.
-		sta someObjProperty_0701,X 			; Stores animation frame index.
-		tax									; start using index as X offset
-		lda AnimationAtlas_A895+0,X 		; AnimationAtlas_A895 is the animation atlas.
-		sta addressPtr_32+0
-		lda AnimationAtlas_A895+1,X
-		sta addressPtr_32+1 				; Now addressPtr_32 points to the animation frame
-		iny									; advance to next index in animation table
-		ldx objectIndex_5F					; Stores new object index
-		lda object_Attrib_2_0405,X			
-		bpl :+								; Branch if BIT7 of object_Attrib_2_0405 is ZERO
+				lda objDeltaY_0D
+				AddByte2Word_A_X objDeltaY_0D, object_Y_Lo_0402, object_Y_Hi_0403, tPositionYLo_42, tPositionYHi_43, temp_49
+
+				jmp ReplaceMeLabel_5
+		
+		MaintainPosition:				; just copy position from object to temp variables
+			lda object_X_Lo_0400,X
+			sta tPositionXLo_40
+			lda object_X_Hi_0401,X
+			sta tPositionXHi_41
+			lda object_Y_Lo_0402,X
+			sta tPositionYLo_42
+			lda object_Y_Hi_0403,X
+			sta tPositionYHi_43
+		
+
+		ReplaceMeLabel_5:
+			inc animationTable_Index_0503,X
+			lda objCurrentFrameOffset_0701,X
+			tax
+			lda AnimationAtlas_A895+0,X
+			sta addressPtr_32+0
+			lda AnimationAtlas_A895+1,X
+			sta addressPtr_32+1
+			ldx objIndex_5F
+			jmp ReplaceMeLabel_6
+		
+		ReplaceMeLabel_1:
+			asl A						; remove BIT7 (formaly BIT6)
+			bmi checkForControl			; if BIT7 is set, check for control byte
+
+			dec animationLoopCounter_0505,X
+			lda animationLoopCounter_0505,X
+			bne :+
+				iny
+				iny
+				jmp ReplaceMeLabel_7
+		
+		:
+			bpl loopReadingAnimation
+
+			lda (objectPtr_36),Y
+			and #(FLAG_4+LOWER)
+			sta animationLoopCounter_0505,X
 			
-			lda (objectPtr_36),Y			; Load next control byte from ANIMATION TABLE
-			clc								
-			adc objectDeltaX_0C				; Add it to objectDeltaX_0C
-			jmp :++
-	
-			:								; It BIT7 of object_Attrib_2_0405 is ONE
-			lda (objectPtr_36),Y			; Load next control byte from ANIMATION TABLE
-	
-		:
-		sta tile_X_Lo_46
-		bpl :+
+			loopReadingAnimation:
+				iny							; advance to next index in animation table
+				lda (objectPtr_36),Y		; read new index in animation table
+				tay
+				lda (objectPtr_36),Y		; loads next animation frame index
+				jmp UpdateAnimationFrame	; retrieve frame
+				
+				checkForControl:
+					cmp #$F8
+					beq loopReadingAnimation
+			
+			asl A
+			bmi :+
 
-			lda #FULL						; Places sprite off screen
-			bne :++
-	
-		:
-		lda #ZERO
-	
-		:
-		sta tile_X_Hi_47					; stores x position hi-byte
-
-		lda tile_X_Lo_46					; loads x position lo-byte
-		clc		
-		adc object_X_Lo_0400,X				; adds object's X position to sprite's X position
-		sta object_X_Lo_0400,X				; stores it
-		sta tempTile_X_Lo_40				; also stores it in temp variable
-
-		lda tile_X_Hi_47					; loads x position hi-byte
-		adc object_X_Hi_0401,X				; adds to object's X position hi-byte
-		sta object_X_Hi_0401,X				; stores it back
-		sta tempTile_X_Hi_41				; also stores it in temp variable
-
-		iny									; next index in ANIMATION TABLE
-		lda object_Attrib_2_0405,X
-		bpl :+
-			lda (objectPtr_36),Y
-			clc
-			adc objectDeltaY_0D
-			jmp :++
-
-		:
-			lda (objectPtr_36),Y
+				DIV8 A
+				and #LOWER
+				lda objAttributes_1_0404,X
+				TURNON FLAG_3
+				sta objAttributes_1_0404,X
+				jmp NextObjectIndex
 		
 		:
-		sta var_48
-		bpl :+
-
-			lda #FULL
+			lda someObjProperty_0303,X
+			cmp #$03
+			bne :+
+			beq :++
+		
+		:
+			cmp #$04					; Boss Death
 			bne :++
 
-		:
-		lda #ZERO
-	
-		:
-		sta var_49
-		lda var_48
-		clc
-		adc object_Y_Lo_0402,X
-		sta object_Y_Lo_0402,X
-		sta tile_Y_Lo_42
-		lda var_49
-		adc object_Y_Hi_0403,X
-		sta object_Y_Hi_0403,X
-		sta tile_Y_Hi_43
+				lda #$01
+				sta flagNextLevel_1B
 		
-		iny							; advance to next index in ANIMATION TABLE
-		tya							; stores index in Y
-		sta animationTable_Index_0503,X	; stores index in object's animation frame index
-	
-	ReplaceMeLabel_6:
-		lda object_Attrib_1_0404,X
-		and #OBJPROP_SHOT
-		bne :+
-
-		jmp NextObjectIndex
-	
-	:
-		lda object_Attrib_2_0405,X
-		and #(OBJPROP_UNUSED+OBJPROP_IS_NOT_BOSS)
-		beq :+
-
-		lda frameCounter_12
-		and #$03					; A%3 = 0, 1, or 2
-		bne :+
-
-		dec someObjProperty_0300,X
-		lda someObjProperty_0300,X
-		bne :+
-
-		lda object_Attrib_1_0404,X
-		ora #OBJPROP_TODO
-		sta object_Attrib_1_0404,X
-	
-	; loads a frame of animation
-	; X indexes the object
-	; Y indexes the byte being loaded
-	:				
-		ldy #$00			  ; starts from first tile
-		lda (addressPtr_32),Y ; reads object WIDTH in pixels
-		bpl :+				  ; if positive, continue
-
-		jmp WriteOAMEntry  ; if negative, do something else
-	
-	:
-		sta objectWidth_0600,X		; stores WIDTH in pixels
-		DIV8 A						; divide by 8 (get size in tiles)		
-		clc		
-		adc #$01					; add 1
-		sta var_44  				; store W+1 in temp variable
-		iny							; next value
-		lda (addressPtr_32),Y		; reads	object HEIGHT in pixels
-		sta objectHeight_0601,X		; store HEIGHT in pixels
-		DIV8 A						; divide by 8 (get size in tiles)
-		clc
-		adc #$01					; add 1
-		sta counter_H_45			; store H+1 in temp variable
-		iny							; next value
-		ldx oamAddressPtr_3E		; loads next OAM free address
-	
-	ReplaceMeLabel_11:
-		lda var_44
-		sta counter_W_3C			; counts tiles in X
-		lda tempTile_X_Lo_40					; X position LO
-		sta tile_X_Lo_46
-		lda tempTile_X_Hi_41		; X position HI
-		sta tile_X_Hi_47
-	
-	
-	loopLoadFrameTiles:			; load frame tiles
-		lda (addressPtr_32),Y		; load tile index
-		beq :+						; if tile $00 (blank), skip
-
-		lda tile_X_Hi_47			; check X HI
-		bne :++						; break if X HI not zero
-
-		lda tile_Y_Hi_43			; check Y HI
-		bne :++						; break if Y HI not zero
-
-		lda (addressPtr_32),Y 		; load tile index
-		sta OAM_0200+OAM_TILE,X		; store tile index in OAM
-		lda tile_Y_Lo_42			; load tile Y position from RAM
-		sta OAM_0200+OAM_Y,X		; store tile Y position in OAM 
-		iny							; next value
-		lda (addressPtr_32),Y		; load tile attributes
-		sta OAM_0200+OAM_ATT,X		; store tile attributes in OAM
-		lda tile_X_Lo_46			; load tile X position from RAM
-		sta OAM_0200+OAM_X,X		; store tile X position in OAM
-		txa
-		clc
-		adc #OAM_STRIDE				; 4-byte stride in OAM
-		beq FinishingSpriteUpdates	; break if overflow
-		tax	
-	
-	; also arive here if found a blank tile
-	:
-		iny						; next value
-		dec counter_W_3C		; decrement W counter
-		beq :++					; break if end-of-line
-
-		lda tile_X_Lo_46		
-		adc #$08
-		sta tile_X_Lo_46		; step 8 pixels in X
-		bcc loopLoadFrameTiles	; loop if less than $FF
-		inc tile_X_Hi_47		; add carry to X_HI
-		jmp loopLoadFrameTiles  ; loop
-	
-	:
-		iny
-		jmp :--
-	
-	: ; end-of-line
-		dec counter_H_45		; decrement H counter
-		beq :+					; break if end-of-file
-
-		lda tile_Y_Lo_42		
-		clc
-		adc #$08
-		sta tile_Y_Lo_42		; step 8 pixels in Y
-		bcc ReplaceMeLabel_11	; if not overflow, loop to next frame
-		inc tile_Y_Hi_43		; if overflow, add to Y HI
-		jmp ReplaceMeLabel_11	; loop to next frame
-	
-	:
-		stx oamAddressPtr_3E	; stores next OAM free address
-	
-	NextObjectIndex:
-
-		lda objectIndex_5F		; get current object index
-		clc
-		adc objIndexStep_59		; add step (+6 or -6)
-		cmp #ENEMY_OBJECT_END	; check if 240 (40 objects)
-		bcc ContinueUpdating	; if less than 240, skip ahead	
-		beq ResetIndex			; if equal to 240, continue
-	
-		lda #ENEMY_OBJECT_END - OBJECT_BYTE_SIZE; $EA Replace last object				
-		bne ContinueUpdating
-		
-		ResetIndex:
+		:
 			lda #$00
+			sta someObjProperty_0302,X
+			sta someObjProperty_0303,X
 		
-		ContinueUpdating:
+		:
+			cmp #$05					; Boss Shooting
+			bne :+ 
+			jsr Copy_5BytesPage05_FromEnd_ToBeginning
+			jmp :++
+		
+		:
+			lda #$10
+			sta objAttributes_1_0404,X
+		
+		:
+			jmp NextObjectIndex
+			
+			; UpdateAnimationFrame
+			; $16 is a offset and need to be doubled (word)
+			; X = $2C
+			; sta objCurrentFrameOffset_0701,X (X = object index)
+			; objCurrentFrameOffset_0701,X stores the offset $2C
+			; X = A ($2C)
+			; 
 
-			sta objectIndex_5F
-			cmp beingUpdated_3D
-			beq ClearRemainingOAM
+		UpdateAnimationFrame:					; A holds index for object's animation frame to be loaded
+			asl A								; transform index in WORD offset.
+			sta objCurrentFrameOffset_0701,X 			; stores animation frame index.
+			tax									; start using index as X offset
+			COPY_WORD_X AnimationAtlas_A895, addressPtr_32
+			; Now addressPtr_32 points to the animation frame
+			
+			iny									; advance to next index from projectile/animation
+			ldx objIndex_5F						; Load current object index
+			lda objAttributes_2_0405,X			
+			bpl :+								; Branch if !BIT7 of objAttributes_2_0405
+				
+				lda (objectPtr_36),Y			; Load next byte from ANIMATION TABLE
+				clc								
+				adc objDeltaX_0C				; Add it to delta X
+				jmp :++
+		
+				:								; It BIT7 of objAttributes_2_0405 is ONE
+				lda (objectPtr_36),Y			; Load next byte from ANIMATION TABLE
+		
+			:
+			sta tile_X_Lo_46
+			AddByte2Word_A_X tile_X_Lo_46, object_X_Lo_0400, object_X_Hi_0401, tPositionXLo_40, tPositionXHi_41, temp_47
 
-			jmp loopOverObjects		
+			iny									; next index in ANIMATION TABLE
+			lda objAttributes_2_0405,X
+			bpl :+
+				lda (objectPtr_36),Y
+				clc
+				adc objDeltaY_0D
+				jmp :++
 
-			WriteOAMEntry:
+			:
+				lda (objectPtr_36),Y
+			
+			:
+			sta delta_Y_Lo_48
+			AddByte2Word_A_X delta_Y_Lo_48, object_Y_Lo_0402, object_Y_Hi_0403, tPositionYLo_42, tPositionYHi_43, temp_49
+			
+			iny							; advance to next index in ANIMATION TABLE
+			tya							; stores index in Y
+			sta animationTable_Index_0503,X	; stores index in object's animation frame index
+		
+		ReplaceMeLabel_6:
+			lda objAttributes_1_0404,X
+			and #OBJPROP_SHOT
+			bne :+
+
+			jmp NextObjectIndex
+		
+		:
+			lda objAttributes_2_0405,X
+			and #(OBJPROP_UNUSED+OBJPROP_IS_NOT_BOSS)
+			beq :+
+
+			lda frameCounter_12
+			and #$03					; A%3 = 0, 1, or 2
+			bne :+
+
+			dec someObjProperty_0300,X
+			lda someObjProperty_0300,X
+			bne :+
+
+			lda objAttributes_1_0404,X
+			ora #OBJPROP_TODO
+			sta objAttributes_1_0404,X
+		
+		; loads a frame of animation
+		; X indexes the object
+		; Y indexes the byte being loaded
+		:				
+			ldy #$00			  	; starts from first tile
+			lda (addressPtr_32),Y 	; reads object WIDTH in pixels
+			bpl :+				  	; if positive, continue
+				jmp WriteOAMEntry  	; if negative, do something else
+		
+		:
+			sta objWidthPixels_0600,X	; stores WIDTH in pixels
+			DIV8 A						; divide by 8 (get size in tiles)		
+			clc		
+			adc #$01					; add 1
+			sta tilesWidth_44  			; store W+1 in future counter
+			iny							; next value
+			lda (addressPtr_32),Y		; reads	object HEIGHT in pixels
+			sta objHeightPixels_0601,X	; store HEIGHT in pixels
+			DIV8 A						; divide by 8 (get size in tiles)
+			clc
+			adc #$01					; add 1
+			sta counter_H_45			; store H+1 in counter
+			iny							; next value
+			ldx oamAddressPtr_3E		; loads next OAM free address
+		
+		loopLoadFrames:
+			
+			lda tilesWidth_44
+			sta counter_W_3C			; counts tiles in X
+			
+			lda tPositionXLo_40			; X position LO
+			sta tile_X_Lo_46
+			
+			lda tPositionXHi_41			; X position HI
+			sta temp_47
+		
+		
+			loopLoadFrameTiles:			; load frame tiles
+				lda (addressPtr_32),Y		; load tile index
+				beq :+						; if tile $00 (blank), skip
+
+				lda temp_47					; check X HI
+				bne :++						; break if X HI not zero
+
+				lda tPositionYHi_43			; check Y HI
+				bne :++						; break if Y HI not zero
+
+				lda (addressPtr_32),Y 		; load tile index
+				sta OAM_0200+OAM_TILE,X		; store tile index in OAM
+				lda tPositionYLo_42			; load tile Y position from RAM
+				sta OAM_0200+OAM_Y,X		; store tile Y position in OAM 
+				iny							; next value
+				lda (addressPtr_32),Y		; load tile attributes
+				sta OAM_0200+OAM_ATT,X		; store tile attributes in OAM
+				lda tile_X_Lo_46			; load tile X position from RAM
+				sta OAM_0200+OAM_X,X		; store tile X position in OAM
+				txa
+				clc
+				adc #OAM_STRIDE				; 4-byte stride in OAM
+				beq FinishingSpriteUpdates	; break if overflow
+				tax	
+			
+			; also arive here if found a blank tile
+			:
+				iny						; next value
+				dec counter_W_3C		; decrement W counter
+				beq :++					; break if end-of-line
+
+				lda tile_X_Lo_46		
+				adc #$08
+				sta tile_X_Lo_46		; step 8 pixels in X
+				bcc loopLoadFrameTiles	; loop if less than $FF
+				inc temp_47				; add carry to X_HI
+				jmp loopLoadFrameTiles  ; loop
+			
+			:
+				iny
+				jmp :--
+			
+			: ; end-of-line
+				dec counter_H_45		; decrement H counter
+				beq :+					; break if end-of-file
+
+				lda tPositionYLo_42		
+				clc
+				adc #$08
+				sta tPositionYLo_42		; step 8 pixels in Y
+				bcc loopLoadFrames		; if not overflow, loop to next frame
+				
+				inc tPositionYHi_43		; if overflow, add to Y HI
+				jmp loopLoadFrames		; loop to next frame
+			
+			:
+				stx oamAddressPtr_3E	; stores next OAM free address
+		
+		NextObjectIndex:
+
+			lda objIndex_5F		; get current object index
+			clc
+			adc objIndexStep_59		; add step (+6 or -6)
+			cmp #ENEMY_OBJECT_END	; check if 240 (40 objects)
+			bcc ContinueUpdating	; if less than 240, skip ahead	
+			beq ResetIndex			; if equal to 240, continue
+		
+			lda #ENEMY_OBJECT_END - OBJECT_BYTE_SIZE; $EA Replace last object				
+			bne ContinueUpdating
+			
+			ResetIndex:
+				lda #$00
+			
+			ContinueUpdating:
+
+				sta objIndex_5F
+				cmp beingUpdated_3D
+				beq ClearRemainingOAM
+
+				jmp loopOverObjects		
+
+			WriteOAMEntry:				; Not really, but since $0200 will be
+										; DMAed to OAM, then yes.
 		
 				ldx oamAddressPtr_3E
 				
-				lda tempTile_X_Hi_41	; get high byte of sprite's X position
+				lda tPositionXHi_41		; get high byte of sprite's X position
 				bne NextObjectIndex		; if not zero, skip sprite.
 										; this ensures that the sprite is on screen.
 
-				lda tile_Y_Hi_43		; get high byte of sprite's Y position
+				lda tPositionYHi_43		; get high byte of sprite's Y position
 				bne NextObjectIndex		; if not zero, skip sprite.
 										; this ensures that the sprite is on screen.
 				
 				; writing 4 byte per sprite 		
-				lda tile_Y_Lo_42		; Y position
+				lda tPositionYLo_42		; Y position
 				sta OAM_0200+OAM_Y,X		
 				iny
 
@@ -3913,7 +3871,7 @@ Data_at97F5:
 				lda (addressPtr_32),Y	; tile attribute
 				sta OAM_0200+OAM_ATT,X
 
-				lda tempTile_X_Lo_40	; X position
+				lda tPositionXLo_40		; X position
 				sta OAM_0200+OAM_X,X
 				
 				txa						; move to next sprite
@@ -3936,13 +3894,13 @@ Data_at97F5:
 				bne :-
 		
 		FinishingSpriteUpdates:
-			lda objectIndex_5F
+			lda objIndex_5F
 			cmp beingUpdated_3D
 			bne :+
 
 		; reverse the indexing
 			lda #ZERO				
-			sta objectIndex_5F		; reset object index
+			sta objIndex_5F		; reset object index
 			sec
 			sbc objIndexStep_59		; convert +6 into -6
 			sta objIndexStep_59
@@ -4004,7 +3962,7 @@ Data_at97F5:
 	cmp #$02
 	bcc handlePlayerActions
 	lda #(OBJPROP_IS_NOT_BOSS+OBJPROP_CAN_COLLIDE)
-	sta object_Attrib_2_0405
+	sta objAttributes_2_0405
 	bne handlePlayerActions
 	
 	doGameIsPaused:
@@ -4072,7 +4030,7 @@ Data_at97F5:
 		jsr CheckPlayerCanShoot_A_rA
 		sta flagPlayerHasShot_62
 		
-		lda healthPoints_0603
+		lda objHealthPoints_0603
 		cmp #CONFIG_PLAYER_FLASHING_HEALTH	; if the player is with over health
 		bcc :+
 		
@@ -4110,7 +4068,7 @@ Data_atA80A:
 .proc CheckPlayerCanShoot_A_rA
 
 	pha
-	lda object_Attrib_1_0404
+	lda objAttributes_1_0404
 	bit BIT_OBJPROP_SHOT
 	beq :+
 	

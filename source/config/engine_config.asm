@@ -109,7 +109,7 @@
 ; shots type ==========================
 .define SHOOT_NOTHING			$00
 .define SHOOT_SINGLE_BUBBLE		$01
-.define SHOOT_RING_BUBBLES		$03
+.define SHOOT_EIGHT_BUBBLES		$03
 .define SHOOT_5_BUBBLES			$05
 .define SHOOT_3_COMETS			$06
 .define SHOOT_3_COMETS_2_AMBERS	$07
