@@ -55,8 +55,8 @@ frameScrollAt_27:		.res 1	; $27 ; 2
 frameScrollCtr_28:		.res 1	; $28 ; 3
 screenScrollX_29:		.res 1	; $29 ; 7
 var_2A:					.res 1	; $2A	; 3
-enemySet0Size_2B:		.res 1	; $2B	; 4
-enemySet1Size_2C:		.res 1	; $2C	; 4
+enemySet1Size_2B:		.res 1	; $2B	; 4
+enemySet2Size_2C:		.res 1	; $2C	; 4
 var_2D:					.res 1	; $2D	; 4
 flagGenDrop_2E:			.res 1	; $2E	; 4
 .res 1 ; $2F
@@ -245,9 +245,9 @@ paletteRAM_E0:			.res 32	; $E0 ; 4
 ;.define someObjProperty_0203 	$0203 ; X
 
 ; page 03
-.define someObjProperty_0300 $0300 ; #10 of 10-byte file (also $0700)
-.define someObjProperty_0301 $0301 ; #7 of 10-byte file (What kind of ATTACK?)
-.define someObjProperty_0302 $0302 ; #6 of 10-byte file
+.define someObjProperty_0300 $0300 ; #10 byte of enemy profile (also $0700)
+.define someObjProperty_0301 $0301 ; #7 byte of enemy profile (What kind of ATTACK?)
+.define someObjProperty_0302 $0302 ; #6 byte of enemy profile (???)
 .define someObjProperty_0303 $0303
 
 ; page 04
@@ -266,34 +266,22 @@ paletteRAM_E0:			.res 32	; $E0 ; 4
 ;						 ||+-------- 5: Player can shoot
 ;						 |+--------- 6:
 ;						 +---------- 7: Object needs to be updated
-.define OBJPROP_TODO	FLAG_3
-.define OBJPROP_SHOT	FLAG_5
-.define OBJPROP_VALID	FLAG_7
+.define OBJPROP_TODO		FLAG_3
+.define OBJPROP_SHOT		FLAG_5
+.define OBJPROP_VALID		FLAG_7
 .define BIT_OBJPROP_SHOT	BIT_5
 
-.define objAttributes_2_0405 $0405 ; #2 of 10-byte file (flags) 
+.define objAttributes_2_0405 $0405 ; #2 byte of enemy profile (flags) 
 ; objAttributes_2_0405   7654 3210
-; 						 |||| |||+-- 0: Enemy is part of SET 0
-;						 |||| ||+--- 1: Enemy is part of SET 1
+; 						 |||| |||+-- 0: Enemy is part of SET 1
+;						 |||| ||+--- 1: Enemy is part of SET 2
 ;						 |||| |+---- 2:
 ;						 |||| +----- 3:
 ;						 |||+------- 4: Obj is enemy or pickup (not boss)
 ;						 ||+-------- 5:
 ;						 |+--------- 6: Obj can collide
 ;						 +---------- 7: Obj is fixed (doesn't move)
-.define OBJPROP_PARTOF_SET0 FLAG_0
-.define OBJPROP_PARTOF_SET1 FLAG_1
-.define OBJPROP_UNUSED 		FLAG_3
-.define OBJPROP_IS_NOT_BOSS	FLAG_4
-.define OBJPROP_CAN_COLLIDE	FLAG_6
-.define OBJPROP_IS_FIXED	FLAG_7		; ??? TEST MORE
 
-.define BIT_OBJPROP_PARTOF_SET0 BIT_0
-.define BIT_OBJPROP_PARTOF_SET1 BIT_1
-.define BIT_OBJPROP_UNUSED 		BIT_3
-.define BIT_OBJPROP_IS_NOT_BOSS	BIT_4
-.define BIT_OBJPROP_CAN_COLLIDE	BIT_6
-.define BIT_OBJPROP_IS_FIXED	BIT_7	; ??? TEST MORE
 
 ; page 05
 ;.define someObjProperty_0500 		$0500
@@ -307,15 +295,15 @@ paletteRAM_E0:			.res 32	; $E0 ; 4
 .define page_5_Gap		 	RAMPage_6-(animationLoopCounter_0505+ENEMY_OBJECT_START+1)
 
 ; page 06
-.define objWidthPixels_0600 		$0600 ; #3 of 10-byte file
-.define objHeightPixels_0601 		$0601 ; #4 of 10-byte file
-.define objAttackPoints_0602 		$0602 ; #1 of 10-byte file
-.define objHealthPoints_0603 	 	$0603 ; #5 of 10-byte file
-.define objShooterPosX_0604 		$0604 ; #8 of 10-byte file 
-.define objShooterPoxY_0605 		$0605 ; #9 of 10-byte file
+.define objWidthPixels_0600 		$0600 ; #3 byte of enemy profile
+.define objHeightPixels_0601 		$0601 ; #4 byte of enemy profile
+.define objAttackPoints_0602 		$0602 ; #1 byte of enemy profile
+.define objHealthPoints_0603 	 	$0603 ; #5 byte of enemy profile
+.define objShooterPosX_0604 		$0604 ; #8 byte of enemy profile :: shooter vertex X offset
+.define objShooterPoxY_0605 		$0605 ; #9 byte of enemy profile :: shooter vertex Y offset
 
 ; page 07
-.define someObjProperty_0700 		$0700 	; #10 of 10-byte file (also $0300)
+.define someObjProperty_0700 		$0700 	; #10 byte of enemy profile (also $0300)
 .define objCurrentFrameOffset_0701 	$0701	; current animation frame offset in AnimationAtlas
 .define objHitBox_Left_X_0702 		$0702	; vertices of hit box
 .define objHitBox_Right_X_0703 		$0703	; vertices of hit box
@@ -705,8 +693,8 @@ StartingNewStage:
 		sta var_2D				; object status flags?
 		iny
 		lda (objectPtr_3A),Y	; read next byte after $F1
-		sta enemySet0Size_2B	; store it
-		inc enemySet0Size_2B	; increment it (is it a counter?)
+		sta enemySet1Size_2B	; store it
+		inc enemySet1Size_2B	; increment it (is it a counter?)
 		iny			
 		lda (objectPtr_3A),Y	; read next byte
 		
@@ -718,28 +706,28 @@ StartingNewStage:
 		sta var_2D				; object status flags?
 		iny
 		lda (objectPtr_3A),Y	; read next byte after $F2
-		sta enemySet1Size_2C	; enemy is part of a set
-		inc enemySet1Size_2C	; size of set (stores n+1)
+		sta enemySet2Size_2C	; enemy is part of a set
+		inc enemySet2Size_2C	; size of set (stores n+1)
 		iny
 		lda (objectPtr_3A),Y	; read next byte
 		
 		; no control character found. 
 		; loading enemy
 		: 
-		sta objectType_58			; #1 byte of object file
+		sta objectType_58			; #1 byte of enemy profile
 		iny
 		lda (objectPtr_3A),Y
-		sta new_X_Lo_54				; X position, #2 byte of object file
+		sta new_X_Lo_54				; X position, #2 byte of enemy profile
 		iny
 		lda (objectPtr_3A),Y
-		sta new_X_Hi_55				; #3 byte of object file
+		sta new_X_Hi_55				; #3 byte of enemy profile
 		iny
 		lda (objectPtr_3A),Y
-		sta new_Y_Lo_56				; Y position, #4 byte of object file
+		sta new_Y_Lo_56				; Y position, #4 byte of enemy profile
 		iny
 		lda (objectPtr_3A),Y
-		sta new_Y_Hi_57				; #5 byte of object file
-		jsr SpawnEnemy_X				; Use's objectType_58 to load the specific enemy type
+		sta new_Y_Hi_57				; #5 byte of enemy profile
+		jsr SpawnEnemy_X			; Use's objectType_58 to load the specific enemy type
 		iny
 		jmp loopYLoadObject
 
@@ -793,23 +781,23 @@ doneLoadingEnemyBatch:
 	iny
 
 	lda (objectPtr_38),Y		; loads #1 byte of 10
-	sta objAttackPoints_0602,X		; stores #1 byte of 10
+	sta objAttackPoints_0602,X	; stores #1 byte of 10
 	iny
 	lda (objectPtr_38),Y		; loads #2 byte of 10
-	ora #(FLAG_5+FLAG_6)		; turn ON flags 5 and 6
+	ora #(OBJPROP_UNKNOWN2+OBJPROP_CAN_COLLIDE)		; turn ON flags 5 and 6
 	ora var_2D					; turn ON other flags from var_2D (see previous routine)
 	sta objAttributes_2_0405,X	; store #2 byte of 10
 	iny
 
 	lda (objectPtr_38),Y		; loads #3 byte of 10
-	sta objWidthPixels_0600,X			; stores #3 byte of 10
+	sta objWidthPixels_0600,X	; stores #3 byte of 10
 	iny
 	lda (objectPtr_38),Y		; loads #4 byte of 10
-	sta objHeightPixels_0601,X		; stores #4 byte of 10
+	sta objHeightPixels_0601,X	; stores #4 byte of 10
 	iny
 
 	lda (objectPtr_38),Y		; loads #5 byte of 10 
-	sta objHealthPoints_0603,X		; stores #5 byte of 10
+	sta objHealthPoints_0603,X	; stores #5 byte of 10
 	iny
 	lda (objectPtr_38),Y		; loads #6 byte of 10
 	sta someObjProperty_0302,X	; stores #6 byte of 10
@@ -835,21 +823,21 @@ doneLoadingEnemyBatch:
 	sta someObjProperty_0300,X	; stores #10 byte of 10
 	
 	lda new_X_Lo_54
-	sta object_X_Lo_0400,X 	; X position, #2 byte of object file
+	sta object_X_Lo_0400,X 	; X position, #2 byte of enemy profile
 	lda new_X_Hi_55
-	sta object_X_Hi_0401,X	; #3 byte of object file
+	sta object_X_Hi_0401,X	; #3 byte of enemy profile
 	lda new_Y_Lo_56
-	sta object_Y_Lo_0402,X	; Y position, #4 byte of object file
+	sta object_Y_Lo_0402,X	; Y position, #4 byte of enemy profile
 	lda new_Y_Hi_57
-	sta object_Y_Hi_0403,X	; #5 byte of object file
+	sta object_Y_Hi_0403,X	; #5 byte of enemy profile
 	
 	lda #ZERO
 	sta animationTable_Index_0503,X	; zero out 
-	sta animationDelay_0504,X	; zero out 
+	sta animationDelay_0504,X		; zero out 
 	sta animationLoopCounter_0505,X	; zero out 
-	sta someObjProperty_0303,X	; zero out 
+	sta someObjProperty_0303,X		; zero out 
 
-	lda #FLAG_7
+	lda #OBJPROP_VALID
 	sta objAttributes_1_0404,X ; Set as VALID OBJECT
 
 	pla
@@ -1238,14 +1226,14 @@ doneLoadingEnemyBatch:
 	
 	; There can be 2 sets of enemies on the screen
 	:  
-	bit BIT_OBJPROP_PARTOF_SET0 ; check for Set 0
+	bit BIT_OBJPROP_PARTOF_SET1 ; check for Set 1
 	beq :+						
 
-		lda enemySet0Size_2B
+		lda enemySet1Size_2B
 		beq doHandleObjCollision
 		sec
 		sbc #$01
-		sta enemySet0Size_2B
+		sta enemySet1Size_2B
 		cmp #$01
 		bne doALSOHandleObjCollision
 		
@@ -1254,14 +1242,14 @@ doneLoadingEnemyBatch:
 		jmp doHandleObjCollision
 	
 	:  
-	bit BIT_OBJPROP_PARTOF_SET1	; check for Set 1
+	bit BIT_OBJPROP_PARTOF_SET2	; check for Set 2
 	beq :+						
 
-		lda enemySet1Size_2C
+		lda enemySet2Size_2C
 		beq doHandleObjCollision
 		sec
 		sbc #$01
-		sta enemySet1Size_2C
+		sta enemySet2Size_2C
 		cmp #$01
 		bne doALSOHandleObjCollision
 		
@@ -3444,6 +3432,7 @@ Data_at97F5:
 .endproc
 ;
 ; $A458
+; ===================================
 .proc UnusedFunction1
 	
 	:
@@ -3461,9 +3450,9 @@ Data_at97F5:
 
 	ldx #$00
 	:
-	inx
-	cpx #$0F
-	bne :-
+		inx
+		cpx #$0F
+		bne :-
 	
 	pla
 	tax
@@ -3472,6 +3461,7 @@ Data_at97F5:
 	rts
 
 .endproc
+; ===================================
 ;
 ; $A46F
 .proc HandleSpriteUpdates
@@ -3659,11 +3649,11 @@ Data_at97F5:
 			; sta objCurrentFrameOffset_0701,X (X = object index)
 			; objCurrentFrameOffset_0701,X stores the offset $2C
 			; X = A ($2C)
-			; 
+			
 
 		UpdateAnimationFrame:					; A holds index for object's animation frame to be loaded
 			asl A								; transform index in WORD offset.
-			sta objCurrentFrameOffset_0701,X 			; stores animation frame index.
+			sta objCurrentFrameOffset_0701,X 	; stores animation frame index.
 			tax									; start using index as X offset
 			COPY_WORD_X AnimationAtlas_A895, addressPtr_32
 			; Now addressPtr_32 points to the animation frame
@@ -3700,8 +3690,8 @@ Data_at97F5:
 			sta delta_Y_Lo_48
 			AddByte2Word_A_X delta_Y_Lo_48, object_Y_Lo_0402, object_Y_Hi_0403, tPositionYLo_42, tPositionYHi_43, temp_49
 			
-			iny							; advance to next index in ANIMATION TABLE
-			tya							; stores index in Y
+			iny								; advance to next index in ANIMATION TABLE
+			tya								; stores index in Y
 			sta animationTable_Index_0503,X	; stores index in object's animation frame index
 		
 		ReplaceMeLabel_6:
@@ -3713,7 +3703,7 @@ Data_at97F5:
 		
 		:
 			lda objAttributes_2_0405,X
-			and #(OBJPROP_UNUSED+OBJPROP_IS_NOT_BOSS)
+			and #(OBJPROP_UNKNOWN+OBJPROP_IS_NOT_BOSS)
 			beq :+
 
 			lda frameCounter_12
@@ -3766,6 +3756,7 @@ Data_at97F5:
 		
 		
 			loopLoadFrameTiles:			; load frame tiles
+				
 				lda (addressPtr_32),Y		; load tile index
 				beq :+						; if tile $00 (blank), skip
 
@@ -3825,7 +3816,7 @@ Data_at97F5:
 		
 		NextObjectIndex:
 
-			lda objIndex_5F		; get current object index
+			lda objIndex_5F			; get current object index
 			clc
 			adc objIndexStep_59		; add step (+6 or -6)
 			cmp #ENEMY_OBJECT_END	; check if 240 (40 objects)

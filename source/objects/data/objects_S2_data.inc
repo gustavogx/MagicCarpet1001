@@ -1,5 +1,5 @@
-; The offset used to read from this list, 
-; stored in objectType_58, is the first byte in each file. 
+; The offset used to read from this list,
+; stored in objectType_58, is the first byte in each file.
 
 ; The address itself is stored in objectPtr_38
 
@@ -38,132 +38,164 @@
 .word Data_atBD11	;	index $1F
 
 Data_atBB9D:
-.word Data_atBD1D ;$bd1d 
-.incbin "objects/data/data2/data-block-atBB9F.bin"
+.word Data_atBD1D ;$bd1d
+.include "objects/profiles/enemy_profile_20.inc"
+;.incbin "objects/data/data2/data-block-atBB9F.bin"
 
 Data_atBBA9:
-.word Data_atBD31 ;$bd31 
-.incbin "objects/data/data2/data-block-atBBAB.bin"
+.word Data_atBD31 ;$bd31
+.include "objects/profiles/enemy_profile_20.inc"
+;.incbin "objects/data/data2/data-block-atBBAB.bin"
 
 Data_atBBB5:
 .word Data_atBD45 ;$bd45
-.incbin "objects/data/data2/data-block-atBBB7.bin"
+.include "objects/profiles/enemy_profile_21.inc"
+;.incbin "objects/data/data2/data-block-atBBB7.bin"
 
 Data_atBBC1:
 .word Data_atBD6D ;$bd6d
-.incbin "objects/data/data2/data-block-atBBC3.bin"
+.include "objects/profiles/enemy_profile_21.inc"
+;.incbin "objects/data/data2/data-block-atBBC3.bin"
 
 Data_atBBCD:
 .word Data_atBD95 ;$bd95
-.incbin "objects/data/data2/data-block-atBBCF.bin"
+.include "objects/profiles/enemy_profile_22.inc"
+;.incbin "objects/data/data2/data-block-atBBCF.bin"
 
 Data_atBBD9:
 .word Data_atBE17 ;$be17
-.incbin "objects/data/data2/data-block-atBBDB.bin"
+.include "objects/profiles/enemy_profile_23.inc"
+;.incbin "objects/data/data2/data-block-atBBDB.bin"
 
 Data_atBBE5:
 .word Data_atBE41 ;$be41
-.incbin "objects/data/data2/data-block-atBBE7.bin"
+.include "objects/profiles/enemy_profile_24.inc"
+;.incbin "objects/data/data2/data-block-atBBE7.bin"
 
 Data_atBBF1:
 .word Data_atBE6E ;$be6e
-.incbin "objects/data/data2/data-block-atBBF3.bin"
+.include "objects/profiles/enemy_profile_25.inc"
+;.incbin "objects/data/data2/data-block-atBBF3.bin"
 
 Data_atBBFD:
 .word Data_atBE9E ;$be9e
-.incbin "objects/data/data2/data-block-atBBFF.bin"
+.include "objects/profiles/enemy_profile_26.inc"
+;.incbin "objects/data/data2/data-block-atBBFF.bin"
 
 Data_atBC09:
 .word Data_atBEEC ;$beec
-.incbin "objects/data/data2/data-block-atBC0B.bin"
+.include "objects/profiles/enemy_profile_0D.inc"
+;.incbin "objects/data/data2/data-block-atBC0B.bin"
 
 Data_atBC15:
 .word Data_atBF3A ;$bf3a
-.incbin "objects/data/data2/data-block-atBC17.bin"
+.include "objects/profiles/enemy_profile_0D.inc"
+;.incbin "objects/data/data2/data-block-atBC17.bin"
 
 Data_atBC21:
 .word Data_atBF88 ;$bf88
-.incbin "objects/data/data2/data-block-atBC23.bin"
+.include "objects/profiles/enemy_profile_27.inc"
+;.incbin "objects/data/data2/data-block-atBC23.bin"
 
 Data_atBC2D:
-.word Data_atBFD4 ;$bfd4 
-.incbin "objects/data/data2/data-block-atBC2F.bin"
+.word Data_atBFD4 ;$bfd4
+.include "objects/profiles/enemy_profile_28.inc"
+;.incbin "objects/data/data2/data-block-atBC2F.bin"
 
 Data_atBC39:
-.word Data_atC020 ;$c020 
-.incbin "objects/data/data2/data-block-atBC3B.bin"
+.word Data_atC020 ;$c020
+.include "objects/profiles/enemy_profile_29.inc"
+;.incbin "objects/data/data2/data-block-atBC3B.bin"
 
 Data_atBC45:
-.word Data_atC07C ;$c07c 
-.incbin "objects/data/data2/data-block-atBC47.bin"
+.word Data_atC07C ;$c07c
+.include "objects/profiles/enemy_profile_0C.inc"
+;.incbin "objects/data/data2/data-block-atBC47.bin"
 
 Data_atBC51:
 .word Data_atC0D8 ;$c0d8
-.incbin "objects/data/data2/data-block-atBC53.bin"
+.include "objects/profiles/enemy_profile_2A.inc"
+;.incbin "objects/data/data2/data-block-atBC53.bin"
 
 Data_atBC5D:
 .word Data_atC153 ;$c153
-.incbin "objects/data/data2/data-block-atBC5F.bin"
+.include "objects/profiles/enemy_profile_00.inc"
+;.incbin "objects/data/data2/data-block-atBC5F.bin"
 
 Data_atBC69:
 .word Data_atC1B5 ;$c1b5
-.incbin "objects/data/data2/data-block-atBC6B.bin"
+.include "objects/profiles/enemy_profile_2B.inc"
+;.incbin "objects/data/data2/data-block-atBC6B.bin"
 
 Data_atBC75:
 .word Data_atC1CC ;$c1cc
-.incbin "objects/data/data2/data-block-atBC77.bin"
+.include "objects/profiles/enemy_profile_00.inc"
+;.incbin "objects/data/data2/data-block-atBC77.bin"
 
 Data_atBC81:
-.word Data_atC22E ;$c22e 
-.incbin "objects/data/data2/data-block-atBC83.bin"
+.word Data_atC22E ;$c22e
+.include "objects/profiles/enemy_profile_2A.inc"
+;.incbin "objects/data/data2/data-block-atBC83.bin"
 
 Data_atBC8D:
 .word Data_atC2A9 ;$c2a9
-.incbin "objects/data/data2/data-block-atBC8F.bin"
+.include "objects/profiles/enemy_profile_2C.inc"
+;.incbin "objects/data/data2/data-block-atBC8F.bin"
 
 Data_atBC99:
 .word Data_atC2CB ;$c2cb
-.incbin "objects/data/data2/data-block-atBC9B.bin"
+.include "objects/profiles/enemy_profile_2D.inc"
+;.incbin "objects/data/data2/data-block-atBC9B.bin"
 
 Data_atBCA5:
 .word Data_atC2DF ;$c2df
-.incbin "objects/data/data2/data-block-atBCA7.bin"
+.include "objects/profiles/enemy_profile_2E.inc"
+;.incbin "objects/data/data2/data-block-atBCA7.bin"
 
 Data_atBCB1:
 .word Data_atC2FF ;$c2ff
-.incbin "objects/data/data2/data-block-atBCB3.bin"
+.include "objects/profiles/enemy_profile_2F.inc"
+;.incbin "objects/data/data2/data-block-atBCB3.bin"
 
 Data_atBCBD:
 .word Data_atC325 ;$c325
-.incbin "objects/data/data2/data-block-atBCBF.bin"
+.include "objects/profiles/enemy_profile_30.inc"
+;.incbin "objects/data/data2/data-block-atBCBF.bin"
 
 Data_atBCC9:
 .word Data_atC339 ;$c339
-.incbin "objects/data/data2/data-block-atBCCB.bin"
+.include "objects/profiles/enemy_profile_30.inc"
+;.incbin "objects/data/data2/data-block-atBCCB.bin"
 
 Data_atBCD5:
 .word Data_atC34D ;$c34d
-.incbin "objects/data/data2/data-block-atBCD7.bin"
+.include "objects/profiles/enemy_profile_31.inc"
+;.incbin "objects/data/data2/data-block-atBCD7.bin"
 
 Data_atBCE1:
 .word Data_atC3CA ;$c3ca
-.incbin "objects/data/data2/data-block-atBCE3.bin"
+.include "objects/profiles/enemy_profile_32.inc"
+;.incbin "objects/data/data2/data-block-atBCE3.bin"
 
 Data_atBCED:
 .word Data_atC447 ;$c447
-.incbin "objects/data/data2/data-block-atBCEF.bin"
+.include "objects/profiles/enemy_profile_33.inc"
+;.incbin "objects/data/data2/data-block-atBCEF.bin"
 
 Data_atBCF9:
 .word Data_atC44F ;$c44f
-.incbin "objects/data/data2/data-block-atBCFB.bin"
+.include "objects/profiles/enemy_profile_34.inc"
+;.incbin "objects/data/data2/data-block-atBCFB.bin"
 
 Data_atBD05:
 .word Data_atC485 ;$c485
-.incbin "objects/data/data2/data-block-atBD87.bin"
+.include "objects/profiles/enemy_profile_35.inc"
+;.incbin "objects/data/data2/data-block-atBD87.bin"
 
 Data_atBD11:
 .word Data_atC4BB ;$c4bb
-.incbin "objects/data/data2/data-block-atBD13.bin"
+.include "objects/profiles/enemy_profile_36.inc"
+;.incbin "objects/data/data2/data-block-atBD13.bin"
 
 ; ===; Each one of the above has one below (enemy AI?)
 

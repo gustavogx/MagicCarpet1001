@@ -24,6 +24,63 @@
 .define GAMEMODE_STARTSCREEN	$01
 .define GAMEMODE_BOSSFIGHT		$02
 
+; Animation
+.define acTIMER 				%10000000 ; $80
+.define acLOOPN					%11000000 ; $C0
+.define acLOOPBACK   			$FE
+.define acEND					$FF
+
+.define wvControl0 				$F0
+.define wvSET1ENEMIES  			$F1
+.define wvSET2ENEMIES  			$F2
+.define wvControl3  			$F3
+.define wvEND  					$FF
+
+.define afBUBBLE    			$16	; Bubble enemy projectile 1 frame
+.define afAMBER    				$17	; Amber enemy projectile 2 frames: $17, $18
+.define afBEDOUIN 				$19	; Bedouin 2 frames: $19, $1A
+.define afJINN					$1B ; Jinn 2 frames: $1B, $1C
+.define afBEE					$1D ; Bee 2 frames: $1D, $1E
+.define afDUCK					$1F ; Duck 3 frames: $1F, $20, $21
+.define afBAT					$2D ; Bat 3 frames: $2D, $2E, $2F
+.define afBALL					$33 ; Ball 2 frames: $33, $34
+.define afMINE					$35 ; Mine 2 frames: $35, $36
+.define afBLOCK					$31 ; Block 2 frames: $31, $32
+.define afBLOCKBREAK			$3A ; Block breaking 2 frames: $3A, $3B
+.define afSPARKLE   			$3C ; Sparkle enemy projectile 2 frames: $3C, $3D
+.define afMETEOR 				$42 ; Meteor 1 frame
+.define afBLANK 				$43 ; Blank 1 frame
+
+.define afWITCH 				$28 ; Stage 1 Boss
+.define afCROC 					$2A ; Stage 2 Boss
+.define afSKULL					$22 ; Stage 3 Boss
+.define afMOUTH 				$37 ; Stage 4 Boss
+
+; objAttributes_2_0405   7654 3210
+; 						 |||| |||+-- 0: Enemy is part of SET 1
+;						 |||| ||+--- 1: Enemy is part of SET 2
+;						 |||| |+---- 2:
+;						 |||| +----- 3:
+;						 |||+------- 4: Obj is enemy or pickup (not boss)
+;						 ||+-------- 5:
+;						 |+--------- 6: Obj can collide
+;						 +---------- 7: Obj is fixed (doesn't move)
+.define OBJPROP_PARTOF_SET1 FLAG_0
+.define OBJPROP_PARTOF_SET2 FLAG_1
+.define OBJPROP_UNUSED1		FLAG_2
+.define OBJPROP_UNKNOWN 	FLAG_3
+.define OBJPROP_IS_NOT_BOSS	FLAG_4
+.define OBJPROP_UNKNOWN2	FLAG_5
+.define OBJPROP_CAN_COLLIDE	FLAG_6
+.define OBJPROP_IS_FIXED	FLAG_7		; ??? TEST MORE
+
+.define BIT_OBJPROP_PARTOF_SET1 BIT_0
+.define BIT_OBJPROP_PARTOF_SET2 BIT_1
+.define BIT_OBJPROP_UNUSED 		BIT_3
+.define BIT_OBJPROP_IS_NOT_BOSS	BIT_4
+.define BIT_OBJPROP_CAN_COLLIDE	BIT_6
+.define BIT_OBJPROP_IS_FIXED	BIT_7	; ??? TEST MORE
+
 ; Heart is object zero (never shuffled)
 .define HEART_HUD_Y		$D8
 .define HEART_OFFSCREEN $F8
@@ -107,6 +164,18 @@
 .define SFX_MAGIC_LAMP 	$0C; 0C Magic Lamp SFX
 
 ; shots type ==========================
+;
+;	Shot types:
+;	00 nothing
+;	01 single directional bubble
+;	02 nothing
+;	03 ring of bubble
+;	04 nothing
+;	05 wall of 4 bubbles + 1 wavy spark
+; 	06 three comets
+;	07 wall with three comets and 2 ambers
+;	08 3 commets wall with 5 ambers, 1 wavy
+;
 .define SHOOT_NOTHING			$00
 .define SHOOT_SINGLE_BUBBLE		$01
 .define SHOOT_EIGHT_BUBBLES		$03

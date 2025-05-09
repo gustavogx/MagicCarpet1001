@@ -51,9 +51,9 @@
 .define FULL	$FF
 .define ALL1	$FF
 
-.define TRUE	$01
-.define FALSE	$00
-.define LOWER	%00001111
-.define UPPER	%11110000
+.define TRUE	$01  ; Boolean true value
+.define FALSE	$00  ; Boolean false value
+.define LOWER	%00001111  ; Lower 4 bits mask
+.define UPPER	%11110000  ; Upper 4 bits mask
 
 .define EOL	$FF

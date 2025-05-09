@@ -9,7 +9,16 @@
 .word $ffff ; termination value for loading enemy waves
 
 WAVE_S1_01: ; $acb8
-.incbin "objects/data/waves1/enemy-wave-atACB8.bin" 
+;.incbin "objects/data/waves1/enemy-wave-atACB8.bin" 
+.byte $00, $3C, $01, $BE, $00 ; Enemy Stage index, XLo, XHi, YLo, YHi
+.byte $01, $0A, $01, $64, $00
+.byte $02, $00, $01, $46, $00
+.byte $0A, $64, $01, $78, $00
+.byte $0B, $5A, $01, $96, $00
+.byte $03, $6E, $01, $78, $00
+.byte $03, $60, $01, $64, $00
+.byte $03, $78, $01, $5A, $00
+.byte wvEND
 
 WAVE_S1_02: ; $ace1
 .incbin "objects/data/waves1/enemy-wave-atACE1.bin"
@@ -39,7 +48,14 @@ WAVE_S1_10: ; $ae63
 .incbin "objects/data/waves1/enemy-wave-atAE63.bin"
 
 WAVE_S1_11: ; $ae85
-.incbin "objects/data/waves1/enemy-wave-atAE85.bin"
+;.incbin "objects/data/waves1/enemy-wave-atAE85.bin"
+.byte wvSET2ENEMIES, 5			; enemy set (drops), set size
+.byte $04, $5A, $01, $4B, $01   ; enemy stage index,   XLo,    XHi,    YLo,    YHi
+.byte $04, $3C, $01, $2D, $01
+.byte $04, $1E, $01, $0F, $01
+.byte $04, $FF, $00, $F0, $00
+.byte $04, $E1, $00, $D2, $00
+.byte wvControl0, wvEND
 
 WAVE_S1_12: ; $aea2
 .incbin "objects/data/waves1/enemy-wave-atAEA2.bin"

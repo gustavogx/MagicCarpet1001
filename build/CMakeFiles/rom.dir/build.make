@@ -77,6 +77,27 @@ CMakeFiles/rom: /home/gvaldivi/Games/MagicCarpet1001/rom/MagicCarpet.nes
 	@$(CMAKE_COMMAND) -E touch_nocreate /home/gvaldivi/Games/MagicCarpet1001/rom/MagicCarpet.dbg
 
 main.o: /home/gvaldivi/Games/MagicCarpet1001/source/main.asm
+main.o: /home/gvaldivi/Games/MagicCarpet1001/source/config/defines.asm
+main.o: /home/gvaldivi/Games/MagicCarpet1001/source/config/engine_config.asm
+main.o: /home/gvaldivi/Games/MagicCarpet1001/source/config/inesheader.inc
+main.o: /home/gvaldivi/Games/MagicCarpet1001/source/macros.asm
+main.o: /home/gvaldivi/Games/MagicCarpet1001/source/main.asm
+main.o: /home/gvaldivi/Games/MagicCarpet1001/source/objects/data/hud_lives.inc
+main.o: /home/gvaldivi/Games/MagicCarpet1001/source/objects/data/objects_S1_data.inc
+main.o: /home/gvaldivi/Games/MagicCarpet1001/source/objects/data/objects_S1_waves.inc
+main.o: /home/gvaldivi/Games/MagicCarpet1001/source/objects/data/objects_S2_data.inc
+main.o: /home/gvaldivi/Games/MagicCarpet1001/source/objects/data/objects_S2_waves.inc
+main.o: /home/gvaldivi/Games/MagicCarpet1001/source/objects/data/objects_S3_S4_data.inc
+main.o: /home/gvaldivi/Games/MagicCarpet1001/source/objects/data/objects_S3_waves.inc
+main.o: /home/gvaldivi/Games/MagicCarpet1001/source/objects/data/objects_S4_waves.inc
+main.o: /home/gvaldivi/Games/MagicCarpet1001/source/objects/despawn/despawn_objects.inc
+main.o: /home/gvaldivi/Games/MagicCarpet1001/source/objects/misc/boss_animation_frames.inc
+main.o: /home/gvaldivi/Games/MagicCarpet1001/source/objects/misc/projectiles.inc
+main.o: /home/gvaldivi/Games/MagicCarpet1001/source/objects/objects.asm
+main.o: /home/gvaldivi/Games/MagicCarpet1001/source/sounds/data/sound_data.inc
+main.o: /home/gvaldivi/Games/MagicCarpet1001/source/sounds/sound_engine.asm
+main.o: /home/gvaldivi/Games/MagicCarpet1001/source/sounds/sounds.asm
+main.o: /home/gvaldivi/Games/MagicCarpet1001/source/stages/backgrounds.asm
 	@$(CMAKE_COMMAND) -E cmake_echo_color "--switch=$(COLOR)" --blue --bold --progress-dir=/home/gvaldivi/Games/MagicCarpet1001/build/CMakeFiles --progress-num=$(CMAKE_PROGRESS_2) "Assembling main.asm"
 	/usr/bin/ca65 /home/gvaldivi/Games/MagicCarpet1001/source/main.asm -o /home/gvaldivi/Games/MagicCarpet1001/build/main.o --debug-info -I/home/gvaldivi/Games/MagicCarpet1001/include
 

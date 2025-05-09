@@ -14,6 +14,7 @@
 
 .macro GAMEENGINE_INITIALIZE_MAPPER
 	; Initialize the mapper
+	; This macro sets the initial bank for the game
 	lda BankSwitching_FFF0	; Loads #$00 from ROM filling (dangerous!)
 	sta BankSwitching_FFF0  ; Set mapper to Bank0
 .endmacro
@@ -21,14 +22,14 @@
 .macro GAMEENGINE_PPU_WARMUP
 	; PPU Warm up
 	ldx #$10 ; Wait 16 cycles for PPU to reach its stable state
-	:	
+	:
 		lda PpuStatus_2002
 		dex
 		bne :-
 .endmacro
 
 .macro GAMEENGINE_DMA page
-	lda #$00			
+	lda #$00
 	sta OamAddr_2003		; reset DMA pointer to begining of OAM
 	lda page				; setup page number of OAM mirror in RAM
 	sta SpriteDma_4014		; trigger sprite DMA from RAM to OAM
@@ -48,7 +49,7 @@
 
 ; macro Flip
 ; Flips a single big flag
-.macro Flip flag 
+.macro Flip flag
 	eor #flag
 .endmacro
 
@@ -60,7 +61,7 @@
 .endmacro
 
 ; macro PushAXY
-; Pushes the registers A, X and Y, in this order, 
+; Pushes the registers A, X and Y, in this order,
 ; on the top of the stack
 .macro PushAXY
 	pha
@@ -71,7 +72,7 @@
 .endmacro
 
 ; macro PullAXY
-; Pulls the registers A, X and Y, in reverse order, 
+; Pulls the registers A, X and Y, in reverse order,
 ; from the top of the stack
 .macro PullAXY
 	pla
@@ -82,7 +83,7 @@
 .endmacro
 
 ; macro PushXY
-; Pushes the registers X and Y, in this order, 
+; Pushes the registers X and Y, in this order,
 ; on the top of the stack
 .macro PushXY
 	txa
@@ -92,7 +93,7 @@
 .endmacro
 
 ; macro PushYX
-; Pushes the registers Y and X, in this order, 
+; Pushes the registers Y and X, in this order,
 ; on the top of the stack
 .macro PushYX
 	tya
@@ -102,7 +103,7 @@
 .endmacro
 
 ; macro PullXY
-; Pulls the registers X and Y, in reverse order, 
+; Pulls the registers X and Y, in reverse order,
 ; from the top of the stack
 .macro PullXY
 	pla
@@ -112,7 +113,7 @@
 .endmacro
 
 ; macro PullYX
-; Pulls the registers Y and X, in reverse order, 
+; Pulls the registers Y and X, in reverse order,
 ; from the top of the stack
 .macro PullYX
 	pla
@@ -129,10 +130,10 @@
 
 		lda #$FF
 		bne :++
-	
+
 	:
 		lda #$00
-	
+
 	:
 		sta work
 		lda byte
@@ -222,7 +223,7 @@
 	nop
 .else
 	lda index
-	sta soundIndex_8D	
+	sta soundIndex_8D
 	jsr PlaySoundForever
 .endif
 .endmacro

@@ -22,11 +22,25 @@ set(OUTPUT_ROM "${ROM_DIR}/MagicCarpet.nes")
 set(OUTPUT_DBG "${ROM_DIR}/MagicCarpet.dbg")
 set(CONFIG_FILE "${SOURCE_DIR}/config/mapper003.cfg")
 
+# Find all source files that should trigger recompilation
+file(GLOB_RECURSE ASM_SOURCE_FILES
+    "${SOURCE_DIR}/*.asm"
+    "${SOURCE_DIR}/*.inc"
+    "${SOURCE_DIR}/config/*.asm"
+    "${SOURCE_DIR}/config/*.inc"
+    "${SOURCE_DIR}/objects/*.asm"
+    "${SOURCE_DIR}/objects/*.inc"
+    "${SOURCE_DIR}/sounds/*.asm"
+    "${SOURCE_DIR}/sounds/*.inc"
+    "${SOURCE_DIR}/stages/*.asm"
+    "${SOURCE_DIR}/stages/*.inc"
+)
+
 # Custom command to assemble main.asm
 add_custom_command(
     OUTPUT ${MAIN_OBJ}
     COMMAND ${CA65} ${MAIN_ASM} -o ${MAIN_OBJ} --debug-info -I${INCLUDE_DIR}
-    DEPENDS ${MAIN_ASM}
+    DEPENDS ${MAIN_ASM} ${ASM_SOURCE_FILES}
     COMMENT "Assembling main.asm"
 )
 

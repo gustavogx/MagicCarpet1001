@@ -94,6 +94,7 @@ int main(int argc, char** argv) {
                 std::streamsize address = pos;
                 if (nesOffset) {
                     address += 0x8000;
+                    address -= 0x10;
                 }
 
                 // Print the difference

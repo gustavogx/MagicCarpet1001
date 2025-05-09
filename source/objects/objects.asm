@@ -20,7 +20,6 @@ AnimationAtlas_A895:
 .word DATA_ADDR_0A                              ; "Game Over" text
 
 ; Player
-.define ANIM_PLAYER_FLYING ANFR_1_PLAYER_FLYING_0B
 .word ANFR_1_PLAYER_FLYING_0B, ANFR_2_PLAYER_FLYING_0C, ANFR_3_PLAYER_FLYING_0D  ; Player Flying (3 frames)
 .word DATA_ADDR_0E                              ; Player Shooting
 .word DATA_ADDR_0F, DATA_ADDR_10                ; Player Death (2 frames)
@@ -31,33 +30,32 @@ AnimationAtlas_A895:
 .word DATA_ADDR_15                              ; P power up
 .word ANFR_BUBBLE_16                            ; Bubble enemy projectile
 
-.define ANIM_AMBER ANFR_1_AMBER_17
 .word ANFR_1_AMBER_17                           ; Amber 1
 .word ANFR_2_AMBER_18                           ; Amber 2
 
 .word DATA_ADDR_19, DATA_ADDR_1A                ; Enemy rocket-bedouins
-.word DATA_ADDR_1B, DATA_ADDR_1C                ; Enemy heads
+.word DATA_ADDR_1B, DATA_ADDR_1C                ; Enemy jinn
 .word DATA_ADDR_1D, DATA_ADDR_1E                ; Enemy bees
 .word DATA_ADDR_1F, DATA_ADDR_20, DATA_ADDR_21  ; Enemy ducks
 .word ANFR_SKULL_IDLE_22, ANFR_SKULL_FLASHING_23; Skull Boss (Idle and flashing)
 .word DATA_ADDR_24, DATA_ADDR_25                ; Player diagonal projectiles (up and down)
 .word DATA_ADDR_26                              ; Heart power up
 .word DATA_ADDR_27                              ; Speed Power up
-.word ANFR_WITCH_IDLE_29, ANFR_WITCH_FLASHING_29	; Witch Boss (Idle and flashing)
+.word ANFR_WITCH_IDLE_28, ANFR_WITCH_FLASHING_29	; Witch Boss (Idle and flashing)
 .word ANFR_CROCK_IDLE_2A, ANFR_CROCK_SHOOTING_2B	; Crock Boss (Idle and shooting)
 .word ANFR_COMET_HORIZONTAL_2C                  ; Straight comet projectile
-.word DATA_ADDR_2D, DATA_ADDR_2E, DATA_ADDR_2F  ; Enemy Bats
+.word ANFR_BAT_1_2D, ANFR_BAT_1_2E, ANFR_BAT_1_2F  ; Enemy Bats
 .word DATA_ADDR_30                              ; Single Falling Sparkle
-.word DATA_ADDR_31, DATA_ADDR_32, DATA_ADDR_33
+.word ANFR_BLOCK_IDLE_31, ANFR_BLOCK_FLASHING_32, DATA_ADDR_33
 .word DATA_ADDR_34, DATA_ADDR_35, DATA_ADDR_36
 .word ANFR_MOUTH_OPENING_1_37
-.word DATA_ADDR_38, DATA_ADDR_39, DATA_ADDR_3A, DATA_ADDR_3B
+.word ANFR_MOUTH_OPENING_2_38, ANFR_MOUTH_OPENING_3_39, ANFR_BLOCK_BREAKING_1_3A, ANFR_BLOCK_BREAKING_2_3B
 
 ;.define afSPARKLE ANIM_SPARKLE_1_3C
 .word ANIM_SPARKLE_1_3C, ANIM_SPARKLE_2_3D
 
 .word ANFR_COMET_30UP_3E, ANFR_COMET_30DOWN_3F
-.word DATA_ADDR_40, DATA_ADDR_41, DATA_ADDR_42, DATA_ADDR_43
+.word DATA_ADDR_40, DATA_ADDR_41, ANFR_METEOR_42, ANFR_BLANK_43
 
 ; ==========================================
 
@@ -207,7 +205,7 @@ DATA_ADDR_26: ; $aad8 - offset $04
 DATA_ADDR_27: ; $aadc - offset $04
 .byte $07, $07, $82, $01		; 	Speed Power up
 
-ANFR_WITCH_IDLE_29: ; $aae0 - offset $04
+ANFR_WITCH_IDLE_28: ; $aae0 - offset $04
 .incbin "objects/animation/data-object-atAAE0.bin" ; Witch boss Idle
 
 ANFR_WITCH_FLASHING_29: ; $ab08 - offset $28
@@ -222,22 +220,22 @@ ANFR_CROCK_SHOOTING_2B: ; $ab65 - offset $35
 ANFR_COMET_HORIZONTAL_2C: ; $ab9a - offset $35
 .incbin "objects/animation/data-object-atAB9A.bin" ; Straight comet shot
 
-DATA_ADDR_2D: ; $aba2 - offset $08
+ANFR_BAT_1_2D: ; $aba2 - offset $08
 .incbin "objects/animation/data-object-atABA2.bin" ; Enemy Bat Frame 1/3
 
-DATA_ADDR_2E: ; $abb0 - offset $0e
+ANFR_BAT_1_2E: ; $abb0 - offset $0e
 .incbin "objects/animation/data-object-atABB0.bin" ; Enemy Bat Frame 2/3
 
-DATA_ADDR_2F: ; $abbc - offset $0c
+ANFR_BAT_1_2F: ; $abbc - offset $0c
 .incbin "objects/animation/data-object-atABBC.bin" ; Enemy Bat Frame 3/3
 
 DATA_ADDR_30: ; $abca - offset $0e
 .byte $05, $07, $c1, $03 ; Single Falling Sparkle
 
-DATA_ADDR_31: ; $abce - offset $04
+ANFR_BLOCK_IDLE_31: ; $abce - offset $04
 .incbin "objects/animation/data-object-atABCE.bin" ; Enemy 4-pieces block Idle
 
-DATA_ADDR_32: ; $abd8 - offset $0a
+ANFR_BLOCK_FLASHING_32: ; $abd8 - offset $0a
 .incbin "objects/animation/data-object-atABD8.bin" ; Enemy 4-pieces block Flashing
 
 DATA_ADDR_33: ; $abe2 - offset $0a
@@ -255,16 +253,16 @@ DATA_ADDR_36: ; $ac00 - offset $0a
 ANFR_MOUTH_OPENING_1_37: ; $ac0a - offset $0a
 .incbin "objects/animation/data-object-atAC0A.bin" ; Mouth Boss Frame 1/3 (open animation)
 
-DATA_ADDR_38: ; $ac1c - offset $12
+ANFR_MOUTH_OPENING_2_38: ; $ac1c - offset $12
 .incbin "objects/animation/data-object-atAC1C.bin" ; Mouth Boss Frame 2/3 (open animation)
 
-DATA_ADDR_39: ; $ac2e - offset $12
+ANFR_MOUTH_OPENING_3_39: ; $ac2e - offset $12
 .incbin "objects/animation/data-object-atAC2E.bin" ; Mouth Boss Frame 3/3 (open animation)
 
-DATA_ADDR_3A: ; $ac48 - offset $1a
+ANFR_BLOCK_BREAKING_1_3A: ; $ac48 - offset $1a
 .incbin "objects/animation/data-object-atAC48.bin" ; Enemy 4-pieces block (breaking up) Frame 1/2
 
-DATA_ADDR_3B: ; $ac57 - offset $0f
+ANFR_BLOCK_BREAKING_2_3B: ; $ac57 - offset $0f
 .incbin "objects/animation/data-object-atAC57.bin" ; Enemy 4-pieces block (breaking up) Frame 2/2
 
 ANIM_SPARKLE_1_3C: ; $ac66 - offset $0f
@@ -285,10 +283,10 @@ DATA_ADDR_40: ; $ac7e - offset $08
 DATA_ADDR_41: ; $ac84 - offset $06
 .incbin "objects/animation/data-object-atAC84.bin" ; Enemy Bottom half ball
 
-DATA_ADDR_42: ; $ac8a - offset $06
+ANFR_METEOR_42: ; $ac8a - offset $06
 .incbin "objects/animation/data-object-atAC8A.bin" ; Enemy Falling Meteor
 
-DATA_ADDR_43: ; $ac94 - offset $0a
+ANFR_BLANK_43: ; $ac94 - offset $0a
 .byte $01, $01, $00, $00 ; Blank
 
 
