@@ -25,7 +25,7 @@ AnimationAtlas_A895:
 .word DATA_ADDR_0F, DATA_ADDR_10                ; Player Death (2 frames)
 .word DATA_ADDR_11                              ; Player projectiles horizontal
 
-.word DATA_ADDR_12, DATA_ADDR_13                ; Enemy hit puff
+.word ANFR_PUFF_12, ANFR_PUFF_13                ; Enemy hit puff
 .word DATA_ADDR_14                              ; 1up icon
 .word DATA_ADDR_15                              ; P power up
 .word ANFR_BUBBLE_16                            ; Bubble enemy projectile
@@ -46,8 +46,8 @@ AnimationAtlas_A895:
 .word ANFR_COMET_HORIZONTAL_2C                  ; Straight comet projectile
 .word ANFR_BAT_1_2D, ANFR_BAT_1_2E, ANFR_BAT_1_2F  ; Enemy Bats
 .word DATA_ADDR_30                              ; Single Falling Sparkle
-.word ANFR_BLOCK_IDLE_31, ANFR_BLOCK_FLASHING_32, DATA_ADDR_33
-.word DATA_ADDR_34, DATA_ADDR_35, DATA_ADDR_36
+.word ANFR_BLOCK_IDLE_31, ANFR_BLOCK_FLASHING_32, ANFR_BALL_1_33
+.word ANFR_BALL_2_34, ANFR_MINE_1_35, ANFR_MINE_2_36
 .word ANFR_MOUTH_OPENING_1_37
 .word ANFR_MOUTH_OPENING_2_38, ANFR_MOUTH_OPENING_3_39, ANFR_BLOCK_BREAKING_1_3A, ANFR_BLOCK_BREAKING_2_3B
 
@@ -55,7 +55,7 @@ AnimationAtlas_A895:
 .word ANIM_SPARKLE_1_3C, ANIM_SPARKLE_2_3D
 
 .word ANFR_COMET_30UP_3E, ANFR_COMET_30DOWN_3F
-.word DATA_ADDR_40, DATA_ADDR_41, ANFR_METEOR_42, ANFR_BLANK_43
+.word ANFR_TOPBALL_40, ANFR_BOTTOMBALL_41, ANFR_METEOR_42, ANFR_BLANK_43
 
 ; ==========================================
 
@@ -139,10 +139,10 @@ DATA_ADDR_10: ; $a9e1 - offset $13
 DATA_ADDR_11: ; $a9f5 - offset $14
 .byte $06, $05, $3f, $03 			;	Player shot horizontal
 
-DATA_ADDR_12: ; $a9f9 - offset $04
+ANFR_PUFF_12: ; $a9f9 - offset $04
 .incbin "objects/animation/data-object-atA9F9.bin" ;	Enemy hit puff Frame 1/2
 
-DATA_ADDR_13: ; $aa03 - offset $0a
+ANFR_PUFF_13: ; $aa03 - offset $0a
 .incbin "objects/animation/data-object-atAA03.bin" ; 	Enemy hit puff Frame 2/2
 
 DATA_ADDR_14: ; $aa0d - offset $0a
@@ -238,16 +238,16 @@ ANFR_BLOCK_IDLE_31: ; $abce - offset $04
 ANFR_BLOCK_FLASHING_32: ; $abd8 - offset $0a
 .incbin "objects/animation/data-object-atABD8.bin" ; Enemy 4-pieces block Flashing
 
-DATA_ADDR_33: ; $abe2 - offset $0a
+ANFR_BALL_1_33: ; $abe2 - offset $0a
 .incbin "objects/animation/data-object-atABE2.bin" ; Enemy ball Frame 1/2
 
-DATA_ADDR_34: ; $abec - offset $0a
+ANFR_BALL_2_34: ; $abec - offset $0a
 .incbin "objects/animation/data-object-atABEC.bin" ; Enemy ball Frame 2/2
 
-DATA_ADDR_35: ; $abf6 - offset $0a
+ANFR_MINE_1_35: ; $abf6 - offset $0a
 .incbin "objects/animation/data-object-atABF6.bin" ; Enemy Mine Frame 1/2
 
-DATA_ADDR_36: ; $ac00 - offset $0a
+ANFR_MINE_2_36: ; $ac00 - offset $0a
 .incbin "objects/animation/data-object-atAC00.bin" ; Enemy Mine Frame 2/2
 
 ANFR_MOUTH_OPENING_1_37: ; $ac0a - offset $0a
@@ -277,10 +277,10 @@ ANFR_COMET_30UP_3E: ; $ac6e - offset $04
 ANFR_COMET_30DOWN_3F: ; $ac76 - offset $08
 .incbin "objects/animation/data-object-atAC76.bin" ; Downwards comet shot
 
-DATA_ADDR_40: ; $ac7e - offset $08
+ANFR_TOPBALL_40: ; $ac7e - offset $08
 .incbin "objects/animation/data-object-atAC7E.bin" ; Enemy Top half ball
 
-DATA_ADDR_41: ; $ac84 - offset $06
+ANFR_BOTTOMBALL_41: ; $ac84 - offset $06
 .incbin "objects/animation/data-object-atAC84.bin" ; Enemy Bottom half ball
 
 ANFR_METEOR_42: ; $ac8a - offset $06

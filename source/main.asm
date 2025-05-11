@@ -304,7 +304,7 @@ paletteRAM_E0:			.res 32	; $E0 ; 4
 
 ; page 07
 .define someObjProperty_0700 		$0700 	; #10 byte of enemy profile (also $0300)
-.define objCurrentFrameOffset_0701 	$0701	; current animation frame offset in AnimationAtlas
+.define objCurrentFrameOffset_0701 	$0701	; current animation frame (see AnimationAtlas)
 .define objHitBox_Left_X_0702 		$0702	; vertices of hit box
 .define objHitBox_Right_X_0703 		$0703	; vertices of hit box
 .define objHitBox_Top_Y_0704 		$0704	; vertices of hit box

@@ -431,272 +431,2080 @@ Data_atCC81:
 ; ===; Each one of the above has one below (enemy AI?)
 
 Data_atCC8D:
-.incbin "objects/data/data3/data-block-atCC8D.bin"
+;.incbin "objects/data/data3/data-block-atCC8D.bin"
+; Bat movement pattern - circular motion
+.byte afBAT+0, -1, -2, acTIMER+1
+.byte afBAT+0, -1, -2, acTIMER+1
+.byte afBAT+1, -2, -3
+.byte afBAT+1, -2, -3, acTIMER+1
+.byte afBAT+2, -2, -4, acTIMER+1
+.byte afBAT+2, -2, -4
+.byte afBAT+0, -2, -5, acTIMER+1
+.byte afBAT+0, -2, -5, acTIMER+1
+.byte afBAT+1, -2, -6
+.byte afBAT+1, -2, -6, acTIMER+1
+.byte afBAT+2, -3, -4, acTIMER+1
+.byte afBAT+2, -3, -4
+.byte afBAT+0, -3, -3, acTIMER+1
+.byte afBAT+0, -3, -3, acTIMER+1
+.byte afBAT+1, -3, -2
+.byte afBAT+1, -3, -1, acTIMER+1
+.byte afBAT+2, -3, 0, acTIMER+1
+.byte afBAT+2, -3, 0
+.byte afBAT+0, -3, 0, acTIMER+1
+.byte afBAT+0, -3, 1, acTIMER+1
+.byte afBAT+1, -3, 2
+.byte afBAT+1, -3, 3, acTIMER+1
+.byte afBAT+2, -3, 4
+.byte afBAT+2, -3, 3, acTIMER+1
+.byte afBAT+0, -3, 2, acTIMER+2
+.byte afBAT+1, -3, 1, acTIMER+1
+.byte afBAT+2, -3, 1, acTIMER+2
+.byte acLOOPN+3, $58
+.byte acLOOPBACK, 0
 
 Data_atCCF5:
-.incbin "objects/data/data3/data-block-atCCF5.bin"
+;.incbin "objects/data/data3/data-block-atCCF5.bin"
+.byte afBAT+0, -1, 2, acTIMER+1
+.byte afBAT+0, -1, 2, acTIMER+1
+.byte afBAT+1, -2, 3
+.byte afBAT+1, -2, 3, acTIMER+1
+.byte afBAT+2, -2, 4, acTIMER+1
+.byte afBAT+2, -2, 4
+.byte afBAT+0, -2, 5, acTIMER+1
+.byte afBAT+0, -2, 5, acTIMER+1
+.byte afBAT+1, -2, 6
+.byte afBAT+1, -2, 6, acTIMER+1
+.byte afBAT+2, -3, 4, acTIMER+1
+.byte afBAT+2, -3, 4
+.byte afBAT+0, -3, 3, acTIMER+1
+.byte afBAT+0, -3, 3, acTIMER+1
+.byte afBAT+1, -3, 2
+.byte afBAT+1, -3, 1, acTIMER+1
+.byte afBAT+2, -3, 0, acTIMER+1
+.byte afBAT+2, -3, 0
+.byte afBAT+0, -3, 0, acTIMER+1
+.byte afBAT+0, -3, -1, acTIMER+1
+.byte afBAT+1, -3, -2
+.byte afBAT+1, -3, -3, acTIMER+1
+.byte afBAT+2, -3, -4
+.byte afBAT+2, -3, -3, acTIMER+1
+.byte afBAT+0, -3, -2, acTIMER+2
+.byte afBAT+1, -3, -1, acTIMER+1
+.byte afBAT+2, -3, -1, acTIMER+1
+.byte acLOOPN+3, $58
+.byte acLOOPBACK, 0
 
 Data_atCD5D:
-.incbin "objects/data/data3/data-block-atCD5D.bin"
+;.incbin "objects/data/data3/data-block-atCD5D.bin"
+.byte afBAT+0, -1, 6, acTIMER+1
+.byte afBAT+0, -1, 6
+.byte afBAT+1, -2, 5
+.byte afBAT+1, -2, 5, acTIMER+1
+.byte afBAT+2, -2, 4
+.byte afBAT+2, -2, 4
+.byte afBAT+0, -2, 3, acTIMER+1
+.byte afBAT+0, -2, 3
+.byte afBAT+1, -2, 2
+.byte afBAT+1, -2, 2, acTIMER+1
+.byte afBAT+2, -3, 2
+.byte afBAT+2, -3, 2
+.byte afBAT+0, -3, 0, acTIMER+1
+.byte afBAT+0, -3, 0
+.byte afBAT+1, -3, -1
+.byte afBAT+1, -3, -1, acTIMER+1
+.byte afBAT+2, -2, -2
+.byte afBAT+2, -2, -2
+.byte afBAT+0, -2, -3, acTIMER+1
+.byte afBAT+0, -2, -3
+.byte afBAT+1, -2, -4
+.byte afBAT+1, -2, -4, acTIMER+1
+.byte afBAT+2, -2, -5
+.byte afBAT+2, -2, -4
+.byte afBAT+0, -1, -5, acTIMER+1
+.byte afBAT+0, -1, -4
+.byte afBAT+1, -1, -5
+.byte afBAT+1, -1, -4, acTIMER+1
+.byte afBAT+2, -1, -5
+.byte afBAT+2, -1, -4
+.byte acLOOPN+2, $50
+.byte afBAT+0, -1, -6, acTIMER+1
+.byte afBAT+0, -1, -6
+.byte afBAT+1, -2, -5
+.byte afBAT+1, -2, -5, acTIMER+1
+.byte afBAT+2, -2, -4
+.byte afBAT+2, -2, -4
+.byte afBAT+0, -2, -3, acTIMER+1
+.byte afBAT+0, -2, -3
+.byte afBAT+1, -2, -2
+.byte afBAT+1, -2, -2, acTIMER+1
+.byte afBAT+2, -3, -2
+.byte afBAT+2, -3, -2
+.byte afBAT+0, -3, 0, acTIMER+1
+.byte afBAT+0, -3, 0
+.byte afBAT+1, -3, 1
+.byte afBAT+1, -3, 1, acTIMER+1
+.byte afBAT+2, -2, 2
+.byte afBAT+2, -2, 2
+.byte afBAT+0, -2, 3, acTIMER+1
+.byte afBAT+0, -2, 3
+.byte afBAT+1, -2, 4
+.byte afBAT+1, -2, 4, acTIMER+1
+.byte afBAT+2, -2, 5
+.byte afBAT+2, -2, 5
+.byte afBAT+0, -1, 5, acTIMER+1
+.byte afBAT+0, -1, 4
+.byte afBAT+1, -1, 5
+.byte afBAT+1, -1, 4, acTIMER+1
+.byte afBAT+2, -1, 5
+.byte afBAT+2, -1, 4
+.byte acLOOPN+2, $B6
+.byte acLOOPBACK, 0
 
 Data_atCE2B:
-.incbin "objects/data/data3/data-block-atCE2B.bin"
+;.incbin "objects/data/data3/data-block-atCE2B.bin"
+.byte afBAT+0, -1, 3, acTIMER+1
+.byte afBAT+0, -1, 4
+.byte afBAT+1, -2, 3
+.byte afBAT+1, -2, 3, acTIMER+1
+.byte afBAT+2, -1, 3
+.byte afBAT+2, -1, 4
+.byte acLOOPBACK, 0
 
 Data_atCE41:
-.incbin "objects/data/data3/data-block-atCE41.bin"
+;.incbin "objects/data/data3/data-block-atCE41.bin"
+.byte afBAT+0, -1, -3, acTIMER+1
+.byte afBAT+0, -1, -4
+.byte afBAT+1, -2, -3
+.byte afBAT+1, -2, -3, acTIMER+1
+.byte afBAT+2, -1, -3
+.byte afBAT+2, -1, -4
+.byte acLOOPBACK, 0
 
 Data_atCE57:
-.incbin "objects/data/data3/data-block-atCE57.bin"
+;.incbin "objects/data/data3/data-block-atCE57.bin"
+.byte afBAT+0, 1, -4, acTIMER+1
+.byte afBAT+0, 1, -4
+.byte afBAT+1, 2, -5
+.byte afBAT+1, 2, -5, acTIMER+1
+.byte afBAT+2, 1, -4
+.byte afBAT+2, 1, -4
+.byte acLOOPN+5, 0
+.byte afBAT+0, -2, 6
+.byte afBAT+0, -2, 6
+.byte afBAT+1, -2, 5, acTIMER+1
+.byte afBAT+1, -2, 5
+.byte afBAT+2, -2, 4
+.byte afBAT+2, -2, 4, acTIMER+1
+.byte afBAT+0, -2, 3
+.byte afBAT+0, -2, 3
+.byte afBAT+1, -2, 2, acTIMER+1
+.byte afBAT+1, -2, 2
+.byte afBAT+2, -2, 1
+.byte afBAT+2, -2, 1, acTIMER+1
+.byte afBAT+0, -3, -2
+.byte afBAT+0, -3, 3, acTIMER+1
+.byte afBAT+1, -3, -2
+.byte afBAT+1, -3, 4, acTIMER+1
+.byte afBAT+2, -3, -2
+.byte afBAT+2, -3, 5, acTIMER+1
+.byte acLOOPBACK, $3E
 
 Data_atCEAC:
-.incbin "objects/data/data3/data-block-atCEAC.bin"
+;.incbin "objects/data/data3/data-block-atCEAC.bin"
+.byte afBAT+0, 1, 4
+.byte afBAT+0, 1, 4
+.byte afBAT+1, 2, 5, acTIMER+1
+.byte afBAT+1, 2, 5
+.byte afBAT+2, 1, 4
+.byte afBAT+2, 1, 4, acTIMER+1
+.byte acLOOPN+5, 0
+.byte afBAT+0, -2, -6
+.byte afBAT+0, -2, -6
+.byte afBAT+1, -2, -5, acTIMER+1
+.byte afBAT+1, -2, -5
+.byte afBAT+2, -2, -4
+.byte afBAT+2, -2, -4, acTIMER+1
+.byte afBAT+0, -2, -3
+.byte afBAT+0, -2, -3
+.byte afBAT+1, -2, -2, acTIMER+1
+.byte afBAT+1, -2, -2
+.byte afBAT+2, -2, -1
+.byte afBAT+2, -2, -1, acTIMER+1
+.byte afBAT+0, -3, 2
+.byte afBAT+0, -3, -3, acTIMER+1
+.byte afBAT+1, -3, 2
+.byte afBAT+1, -3, -4, acTIMER+1
+.byte afBAT+2, -3, 2
+.byte afBAT+2, -3, -5, acTIMER+1
+.byte acLOOPBACK, $3E
 
 Data_atCF01:
-.incbin "objects/data/data3/data-block-atCF01.bin"
+;.incbin "objects/data/data3/data-block-atCF01.bin"
+.byte afDUCK+0, -2, 5, acTIMER+1
+.byte afDUCK+0, -2, 5, acTIMER+1
+.byte afDUCK+1, -2, 3
+.byte afDUCK+1, -3, 3, acTIMER+1
+.byte afDUCK+2, -3, 3, acTIMER+1
+.byte afDUCK+2, -3, 1
+.byte afDUCK+1, -4, 1, acTIMER+1
+.byte afDUCK+1, -4, 1, acTIMER+1
+.byte afDUCK+0, -4, 0
+.byte afDUCK+0, -4, -1, acTIMER+1
+.byte afDUCK+1, -4, -1, acTIMER+1
+.byte afDUCK+1, -3, -1
+.byte afDUCK+2, -3, -3, acTIMER+1
+.byte afDUCK+2, -3, -3, acTIMER+1
+.byte afDUCK+1, -2, -3
+.byte afDUCK+1, -2, -5, acTIMER+1
+.byte afDUCK+0, -2, -5, acTIMER+1
+.byte afDUCK+0, -2, -5
+.byte afDUCK+1, -2, -5, acTIMER+1
+.byte afDUCK+1, -2, -3, acTIMER+1
+.byte afDUCK+2, -3, -3
+.byte afDUCK+2, -3, -3, acTIMER+1
+.byte afDUCK+1, -3, -1, acTIMER+1
+.byte afDUCK+1, -4, -1
+.byte afDUCK+0, -4, -1, acTIMER+1
+.byte afDUCK+0, -4, 0, acTIMER+1
+.byte afDUCK+1, -4, 1
+.byte afDUCK+1, -4, 1, acTIMER+1
+.byte afDUCK+2, -3, 1, acTIMER+1
+.byte afDUCK+2, -3, 3
+.byte afDUCK+1, -3, 3, acTIMER+1
+.byte afDUCK+1, -2, 3, acTIMER+1
+.byte afDUCK+0, -2, 5
+.byte afDUCK+0, -2, 5, acTIMER+1
+.byte acLOOPBACK, 0
 
 Data_atCF80:
-.incbin "objects/data/data3/data-block-atCF80.bin"
+;.incbin "objects/data/data3/data-block-atCF80.bin"
+.byte afDUCK+0, 0, 0
+.byte afDUCK+1, 0, 0
+.byte afDUCK+2, 0, 0
+.byte afDUCK+1, 0, 0
+.byte acLOOPN+3, 0
+.byte afDUCK+0, -2, 5, acTIMER+1
+.byte afDUCK+0, -2, 5, acTIMER+1
+.byte afDUCK+1, -2, 3
+.byte afDUCK+1, -3, 3, acTIMER+1
+.byte afDUCK+2, -3, 3, acTIMER+1
+.byte afDUCK+2, -3, 1
+.byte afDUCK+1, -4, 1, acTIMER+1
+.byte afDUCK+1, -4, 1, acTIMER+1
+.byte afDUCK+0, -4, 0
+.byte afDUCK+0, -4, -1, acTIMER+1
+.byte afDUCK+1, -4, -1, acTIMER+1
+.byte afDUCK+1, -3, -1
+.byte afDUCK+2, -3, -3, acTIMER+1
+.byte afDUCK+2, -3, -3, acTIMER+1
+.byte afDUCK+1, -2, -3
+.byte afDUCK+1, -2, -5, acTIMER+1
+.byte afDUCK+0, -2, -5, acTIMER+1
+.byte afDUCK+0, -2, -5
+.byte afDUCK+1, -2, -5, acTIMER+1
+.byte afDUCK+1, -2, -3, acTIMER+1
+.byte afDUCK+2, -3, -3
+.byte afDUCK+2, -3, -3, acTIMER+1
+.byte afDUCK+1, -3, -1, acTIMER+1
+.byte afDUCK+1, -4, -1
+.byte afDUCK+0, -4, -1, acTIMER+1
+.byte afDUCK+0, -4, 0, acTIMER+1
+.byte afDUCK+1, -4, 1
+.byte afDUCK+1, -4, 1, acTIMER+1
+.byte afDUCK+2, -3, 1, acTIMER+1
+.byte afDUCK+2, -3, 3
+.byte afDUCK+1, -3, 3, acTIMER+1
+.byte afDUCK+1, -2, 3, acTIMER+1
+.byte afDUCK+0, -2, 5
+.byte afDUCK+0, -2, 5, acTIMER+1
+.byte acLOOPBACK, $0E
 
 Data_atD00D:
-.incbin "objects/data/data3/data-block-atD00D.bin"
+;.incbin "objects/data/data3/data-block-atD00D.bin"
+.byte afDUCK+0, 0, 0
+.byte afDUCK+1, 0, 0
+.byte afDUCK+2, 0, 0
+.byte afDUCK+1, 0, 0
+.byte acLOOPN+6, 0
+.byte afDUCK+0, -2, 5, acTIMER+1
+.byte afDUCK+0, -2, 5, acTIMER+1
+.byte afDUCK+1, -2, 3
+.byte afDUCK+1, -3, 3, acTIMER+1
+.byte afDUCK+2, -3, 3, acTIMER+1
+.byte afDUCK+2, -3, 1
+.byte afDUCK+1, -4, 1, acTIMER+1
+.byte afDUCK+1, -4, 1, acTIMER+1
+.byte afDUCK+0, -4, 0
+.byte afDUCK+0, -4, -1, acTIMER+1
+.byte afDUCK+1, -4, -1, acTIMER+1
+.byte afDUCK+1, -3, -1
+.byte afDUCK+2, -3, -3, acTIMER+1
+.byte afDUCK+2, -3, -3, acTIMER+1
+.byte afDUCK+1, -2, -3
+.byte afDUCK+1, -2, -5, acTIMER+1
+.byte afDUCK+0, -2, -5, acTIMER+1
+.byte afDUCK+0, -2, -5
+.byte afDUCK+1, -2, -5, acTIMER+1
+.byte afDUCK+1, -2, -3, acTIMER+1
+.byte afDUCK+2, -3, -3
+.byte afDUCK+2, -3, -3, acTIMER+1
+.byte afDUCK+1, -3, -1, acTIMER+1
+.byte afDUCK+1, -4, -1
+.byte afDUCK+0, -4, -1, acTIMER+1
+.byte afDUCK+0, -4, 0, acTIMER+1
+.byte afDUCK+1, -4, 1
+.byte afDUCK+1, -4, 1, acTIMER+1
+.byte afDUCK+2, -3, 1, acTIMER+1
+.byte afDUCK+2, -3, 3
+.byte afDUCK+1, -3, 3, acTIMER+1
+.byte afDUCK+1, -2, 3, acTIMER+1
+.byte afDUCK+0, -2, 5
+.byte afDUCK+0, -2, 5, acTIMER+1
+.byte acLOOPBACK, $0E
 
 Data_atD09A:
-.incbin "objects/data/data3/data-block-atD09A.bin"
+;.incbin "objects/data/data3/data-block-atD09A.bin"
+.byte afDUCK+0, 0, 0
+.byte afDUCK+1, 0, 0
+.byte afDUCK+2, 0, 0
+.byte afDUCK+1, 0, 0
+.byte acLOOPN+9, 0
+.byte afDUCK+0, -2, 5, acTIMER+1
+.byte afDUCK+0, -2, 5, acTIMER+1
+.byte afDUCK+1, -2, 3
+.byte afDUCK+1, -3, 3, acTIMER+1
+.byte afDUCK+2, -3, 3, acTIMER+1
+.byte afDUCK+2, -3, 1
+.byte afDUCK+1, -4, 1, acTIMER+1
+.byte afDUCK+1, -4, 1, acTIMER+1
+.byte afDUCK+0, -4, 0
+.byte afDUCK+0, -4, -1, acTIMER+1
+.byte afDUCK+1, -4, -1, acTIMER+1
+.byte afDUCK+1, -3, -1
+.byte afDUCK+2, -3, -3, acTIMER+1
+.byte afDUCK+2, -3, -3, acTIMER+1
+.byte afDUCK+1, -2, -3
+.byte afDUCK+1, -2, -5, acTIMER+1
+.byte afDUCK+0, -2, -5, acTIMER+1
+.byte afDUCK+0, -2, -5
+.byte afDUCK+1, -2, -5, acTIMER+1
+.byte afDUCK+1, -2, -3, acTIMER+1
+.byte afDUCK+2, -3, -3
+.byte afDUCK+2, -3, -3, acTIMER+1
+.byte afDUCK+1, -3, -1, acTIMER+1
+.byte afDUCK+1, -4, -1
+.byte afDUCK+0, -4, -1, acTIMER+1
+.byte afDUCK+0, -4, 0, acTIMER+1
+.byte afDUCK+1, -4, 1
+.byte afDUCK+1, -4, 1, acTIMER+1
+.byte afDUCK+2, -3, 1, acTIMER+1
+.byte afDUCK+2, -3, 3
+.byte afDUCK+1, -3, 3, acTIMER+1
+.byte afDUCK+1, -2, 3, acTIMER+1
+.byte afDUCK+0, -2, 5
+.byte afDUCK+0, -2, 5, acTIMER+1
+.byte acLOOPBACK, $0E
 
 Data_atD127:
-.incbin "objects/data/data3/data-block-atD127.bin"
+;.incbin "objects/data/data3/data-block-atD127.bin"
+.byte afDUCK+0, 0, 0
+.byte afDUCK+1, 0, 0
+.byte afDUCK+2, 0, 0
+.byte afDUCK+1, 0, 0
+.byte acLOOPN+12, 0
+.byte afDUCK+0, -2, 5, acTIMER+1
+.byte afDUCK+0, -2, 5, acTIMER+1
+.byte afDUCK+1, -2, 3
+.byte afDUCK+1, -3, 3, acTIMER+1
+.byte afDUCK+2, -3, 3, acTIMER+1
+.byte afDUCK+2, -3, 1
+.byte afDUCK+1, -4, 1, acTIMER+1
+.byte afDUCK+1, -4, 1, acTIMER+1
+.byte afDUCK+0, -4, 0
+.byte afDUCK+0, -4, -1, acTIMER+1
+.byte afDUCK+1, -4, -1, acTIMER+1
+.byte afDUCK+1, -3, -1
+.byte afDUCK+2, -3, -3, acTIMER+1
+.byte afDUCK+2, -3, -3, acTIMER+1
+.byte afDUCK+1, -2, -3
+.byte afDUCK+1, -2, -5, acTIMER+1
+.byte afDUCK+0, -2, -5, acTIMER+1
+.byte afDUCK+0, -2, -5
+.byte afDUCK+1, -2, -5, acTIMER+1
+.byte afDUCK+1, -2, -3, acTIMER+1
+.byte afDUCK+2, -3, -3
+.byte afDUCK+2, -3, -3, acTIMER+1
+.byte afDUCK+1, -3, -1, acTIMER+1
+.byte afDUCK+1, -4, -1
+.byte afDUCK+0, -4, -1, acTIMER+1
+.byte afDUCK+0, -4, 0, acTIMER+1
+.byte afDUCK+1, -4, 1
+.byte afDUCK+1, -4, 1, acTIMER+1
+.byte afDUCK+2, -3, 1, acTIMER+1
+.byte afDUCK+2, -3, 3
+.byte afDUCK+1, -3, 3, acTIMER+1
+.byte afDUCK+1, -2, 3, acTIMER+1
+.byte afDUCK+0, -2, 5
+.byte afDUCK+0, -2, 5, acTIMER+1
+.byte acLOOPBACK, $0E
 
 Data_atD1B4:
-.incbin "objects/data/data3/data-block-atD1B4.bin"
+;.incbin "objects/data/data3/data-block-atD1B4.bin"
+.byte afDUCK+0, 0, 0
+.byte afDUCK+1, 0, 0
+.byte afDUCK+2, 0, 0
+.byte afDUCK+1, 0, 0
+.byte acLOOPN+15, 0
+.byte afDUCK+0, -2, 5, acTIMER+1
+.byte afDUCK+0, -2, 5, acTIMER+1
+.byte afDUCK+1, -2, 3
+.byte afDUCK+1, -3, 3, acTIMER+1
+.byte afDUCK+2, -3, 3, acTIMER+1
+.byte afDUCK+2, -3, 1
+.byte afDUCK+1, -4, 1, acTIMER+1
+.byte afDUCK+1, -4, 1, acTIMER+1
+.byte afDUCK+0, -4, 0
+.byte afDUCK+0, -4, -1, acTIMER+1
+.byte afDUCK+1, -4, -1, acTIMER+1
+.byte afDUCK+1, -3, -1
+.byte afDUCK+2, -3, -3, acTIMER+1
+.byte afDUCK+2, -3, -3, acTIMER+1
+.byte afDUCK+1, -2, -3
+.byte afDUCK+1, -2, -5, acTIMER+1
+.byte afDUCK+0, -2, -5, acTIMER+1
+.byte afDUCK+0, -2, -5
+.byte afDUCK+1, -2, -5, acTIMER+1
+.byte afDUCK+1, -2, -3, acTIMER+1
+.byte afDUCK+2, -3, -3
+.byte afDUCK+2, -3, -3, acTIMER+1
+.byte afDUCK+1, -3, -1, acTIMER+1
+.byte afDUCK+1, -4, -1
+.byte afDUCK+0, -4, -1, acTIMER+1
+.byte afDUCK+0, -4, 0, acTIMER+1
+.byte afDUCK+1, -4, 1
+.byte afDUCK+1, -4, 1, acTIMER+1
+.byte afDUCK+2, -3, 1, acTIMER+1
+.byte afDUCK+2, -3, 3
+.byte afDUCK+1, -3, 3, acTIMER+1
+.byte afDUCK+1, -2, 3, acTIMER+1
+.byte afDUCK+0, -2, 5
+.byte afDUCK+0, -2, 5, acTIMER+1
+.byte acLOOPBACK, $0E
 
 Data_atD241:
-.incbin "objects/data/data3/data-block-atD241.bin"
+;.incbin "objects/data/data3/data-block-atD241.bin"
+.byte afDUCK+0, -3, 1, acTIMER+1
+.byte afDUCK+0, -3, 1, acTIMER+1
+.byte afDUCK+1, -3, 1, acTIMER+1
+.byte afDUCK+1, -3, 1, acTIMER+1
+.byte afDUCK+2, -3, 1, acTIMER+1
+.byte afDUCK+2, -3, 1, acTIMER+1
+.byte afDUCK+1, -3, 1, acTIMER+1
+.byte afDUCK+1, -3, 1, acTIMER+1
+.byte acLOOPN+3, 0
+.byte afDUCK+0, 0, 2
+.byte afDUCK+0, 0, 2
+.byte afDUCK+1, 0, 2
+.byte afDUCK+1, 0, 2
+.byte afDUCK+2, 0, 2
+.byte afDUCK+2, 0, 2
+.byte afDUCK+1, 0, 2
+.byte afDUCK+1, 0, 2
+.byte acLOOPN+3, $22
+.byte afDUCK+0, -4, 0, acTIMER+1
+.byte afDUCK+1, -4, 0, acTIMER+1
+.byte afDUCK+2, -4, 0, acTIMER+1
+.byte afDUCK+1, -4, 0, acTIMER+1
+.byte acLOOPN+5, $3C
+.byte acLOOPBACK, 0
 
 Data_atD291:
-.incbin "objects/data/data3/data-block-atD291.bin"
+;.incbin "objects/data/data3/data-block-atD291.bin"
+.byte afDUCK+0, -3, 1, acTIMER+1
+.byte afDUCK+0, -3, 1, acTIMER+1
+.byte afDUCK+1, -3, 1, acTIMER+1
+.byte afDUCK+1, -3, 1, acTIMER+1
+.byte afDUCK+2, -3, 1, acTIMER+1
+.byte afDUCK+2, -3, 1, acTIMER+1
+.byte afDUCK+1, -3, 1, acTIMER+1
+.byte afDUCK+1, -3, 1, acTIMER+1
+.byte acLOOPN+3, 0
+.byte afDUCK+0, 0, -2
+.byte afDUCK+0, 0, -2
+.byte afDUCK+1, 0, -2
+.byte afDUCK+1, 0, -2
+.byte afDUCK+2, 0, -2
+.byte afDUCK+2, 0, -2
+.byte afDUCK+1, 0, -2
+.byte afDUCK+1, 0, -2
+.byte acLOOPN+3, $22
+.byte afDUCK+0, -4, 0, acTIMER+1
+.byte afDUCK+1, -4, 0, acTIMER+1
+.byte afDUCK+2, -4, 0, acTIMER+1
+.byte afDUCK+1, -4, 0, acTIMER+1
+.byte acLOOPN+5, $3C
+.byte acLOOPBACK, 0
 
 Data_atD2E1:
-.incbin "objects/data/data3/data-block-atD2E1.bin"
+;.incbin "objects/data/data3/data-block-atD2E1.bin"
+.byte afDUCK+0, -3, -1, acTIMER+1
+.byte afDUCK+0, -3, -1, acTIMER+1
+.byte afDUCK+1, -3, -1, acTIMER+1
+.byte afDUCK+1, -3, -1, acTIMER+1
+.byte afDUCK+2, -3, -1, acTIMER+1
+.byte afDUCK+2, -3, -1, acTIMER+1
+.byte afDUCK+1, -3, -1, acTIMER+1
+.byte afDUCK+1, -3, -1, acTIMER+1
+.byte acLOOPN+3, 0
+.byte afDUCK+0, 0, -2
+.byte afDUCK+0, 0, -2
+.byte afDUCK+1, 0, -2
+.byte afDUCK+1, 0, -2
+.byte afDUCK+2, 0, -2
+.byte afDUCK+2, 0, -2
+.byte afDUCK+1, 0, -2
+.byte afDUCK+1, 0, -2
+.byte acLOOPN+3, $22
+.byte afDUCK+0, -4, 0, acTIMER+1
+.byte afDUCK+1, -4, 0, acTIMER+1
+.byte afDUCK+2, -4, 0, acTIMER+1
+.byte afDUCK+1, -4, 0, acTIMER+1
+.byte acLOOPN+5, $3C
+.byte acLOOPBACK, 0
 
 Data_atD331:
-.incbin "objects/data/data3/data-block-atD331.bin"
+;.incbin "objects/data/data3/data-block-atD331.bin"
+.byte afDUCK+0, -3, -1, acTIMER+1
+.byte afDUCK+0, -3, -1, acTIMER+1
+.byte afDUCK+1, -3, -1, acTIMER+1
+.byte afDUCK+1, -3, -1, acTIMER+1
+.byte afDUCK+2, -3, -1, acTIMER+1
+.byte afDUCK+2, -3, -1, acTIMER+1
+.byte afDUCK+1, -3, -1, acTIMER+1
+.byte afDUCK+1, -3, -1, acTIMER+1
+.byte acLOOPN+3, 0
+.byte afDUCK+0, 0, 2
+.byte afDUCK+0, 0, 2
+.byte afDUCK+1, 0, 2
+.byte afDUCK+1, 0, 2
+.byte afDUCK+2, 0, 2
+.byte afDUCK+2, 0, 2
+.byte afDUCK+1, 0, 2
+.byte afDUCK+1, 0, 2
+.byte acLOOPN+3, $22
+.byte afDUCK+0, -4, 0, acTIMER+1
+.byte afDUCK+1, -4, 0, acTIMER+1
+.byte afDUCK+2, -4, 0, acTIMER+1
+.byte afDUCK+1, -4, 0, acTIMER+1
+.byte acLOOPN+5, $3C
+.byte acLOOPBACK, 0
 
 Data_atD381:
-.incbin "objects/data/data3/data-block-atD381.bin"
+;.incbin "objects/data/data3/data-block-atD381.bin"
+.byte afDUCK+0, -3, 1, acTIMER+1
+.byte afDUCK+0, -3, 1, acTIMER+1
+.byte afDUCK+1, -3, 1, acTIMER+1
+.byte afDUCK+1, -3, 1, acTIMER+1
+.byte afDUCK+2, -3, 1, acTIMER+1
+.byte afDUCK+2, -3, 1, acTIMER+1
+.byte afDUCK+1, -3, 1, acTIMER+1
+.byte afDUCK+1, -3, 1, acTIMER+1
+.byte acLOOPN+3, 0
+.byte afDUCK+0, -4, -1
+.byte afDUCK+0, -4, -1, acTIMER+1
+.byte afDUCK+1, -3, -2
+.byte afDUCK+1, -3, -2, acTIMER+1
+.byte afDUCK+2, -3, -3
+.byte afDUCK+2, -2, -3, acTIMER+1
+.byte afDUCK+1, -2, -4
+.byte afDUCK+1, -2, -4, acTIMER+1
+.byte acLOOPBACK, 0
 
 Data_atD3C1:
-.incbin "objects/data/data3/data-block-atD3C1.bin"
+;.incbin "objects/data/data3/data-block-atD3C1.bin"
+.byte afDUCK+0, -3, -1, acTIMER+1
+.byte afDUCK+0, -3, -1, acTIMER+1
+.byte afDUCK+1, -3, -1, acTIMER+1
+.byte afDUCK+1, -3, -1, acTIMER+1
+.byte afDUCK+2, -3, -1, acTIMER+1
+.byte afDUCK+2, -3, -1, acTIMER+1
+.byte afDUCK+1, -3, -1, acTIMER+1
+.byte afDUCK+1, -3, -1, acTIMER+1
+.byte acLOOPN+3, 0
+.byte afDUCK+0, -4, 1
+.byte afDUCK+0, -4, 1, acTIMER+1
+.byte afDUCK+1, -3, 2
+.byte afDUCK+1, -3, 2, acTIMER+1
+.byte afDUCK+2, -3, 3
+.byte afDUCK+2, -2, 3, acTIMER+1
+.byte afDUCK+1, -2, 4
+.byte afDUCK+1, -2, 4, acTIMER+1
+.byte acLOOPBACK, 0
 
 Data_atD401:
-.incbin "objects/data/data3/data-block-atD401.bin"
+;.incbin "objects/data/data3/data-block-atD401.bin"
+.byte afDUCK+0, -2, 0, acTIMER+1
+.byte afDUCK+0, -3, 0, acTIMER+1
+.byte afDUCK+1, -2, 1, acTIMER+1
+.byte afDUCK+1, -3, 0, acTIMER+1
+.byte afDUCK+2, -2, 0, acTIMER+1
+.byte afDUCK+2, -3, 0, acTIMER+1
+.byte afDUCK+1, -2, -1, acTIMER+1
+.byte afDUCK+1, -3, 0, acTIMER+1
+.byte acLOOPBACK, 0, 0, 0, 0
 
 Data_atD426:
-.incbin "objects/data/data3/data-block-atD426.bin"
+;.incbin "objects/data/data3/data-block-atD426.bin"
+.byte afDUCK+1, -2, 0, acTIMER+1
+.byte afDUCK+1, -3, 0, acTIMER+1
+.byte afDUCK+2, -2, 1, acTIMER+1
+.byte afDUCK+2, -3, 0, acTIMER+1
+.byte afDUCK+1, -2, 0, acTIMER+1
+.byte afDUCK+1, -3, 0, acTIMER+1
+.byte afDUCK+0, -2, -1, acTIMER+1
+.byte afDUCK+0, -3, 0, acTIMER+1
+.byte acLOOPBACK, 0
 
 Data_atD448:
-.incbin "objects/data/data3/data-block-atD448.bin"
+;.incbin "objects/data/data3/data-block-atD448.bin"
 ;.res 186 ; ba
+.byte afMINE+0, -1, 6
+.byte afMINE+0, -1, 6
+.byte afMINE+1, -2, 5
+.byte afMINE+1, -2, 5
+.byte afMINE+0, -2, 4
+.byte afMINE+0, -2, 4
+.byte afMINE+1, -2, 3
+.byte afMINE+1, -2, 3
+.byte afMINE+0, -2, 2
+.byte afMINE+0, -2, 2
+.byte afMINE+1, -3, 2
+.byte afMINE+1, -3, 2
+.byte afMINE+0, -3, 0
+.byte afMINE+0, -3, 0
+.byte afMINE+1, -3, -1
+.byte afMINE+1, -3, -1
+.byte afMINE+0, -2, -2
+.byte afMINE+0, -2, -2
+.byte afMINE+1, -2, -3
+.byte afMINE+1, -2, -3
+.byte afMINE+0, -2, -4
+.byte afMINE+0, -2, -4
+.byte afMINE+1, -2, -5
+.byte afMINE+1, -2, -4
+.byte afMINE+0, -1, -3
+.byte afMINE+0, -1, -3
+.byte afMINE+0, -1, -3
+.byte afMINE+1, -1, -3
+.byte afMINE+1, -1, -3
+.byte afMINE+1, -1, -3
+.byte acLOOPN+2, $48
+.byte afMINE+0, -1, -6
+.byte afMINE+0, -1, -6
+.byte afMINE+1, -2, -5
+.byte afMINE+1, -2, -5
+.byte afMINE+0, -2, -4
+.byte afMINE+0, -2, -4
+.byte afMINE+1, -2, -3
+.byte afMINE+1, -2, -3
+.byte afMINE+0, -2, -2
+.byte afMINE+0, -2, -2
+.byte afMINE+1, -3, -2
+.byte afMINE+1, -3, -2
+.byte afMINE+0, -3, 0
+.byte afMINE+0, -3, 0
+.byte afMINE+1, -3, 1
+.byte afMINE+1, -3, 1
+.byte afMINE+0, -2, 2
+.byte afMINE+0, -2, 2
+.byte afMINE+1, -2, 3
+.byte afMINE+1, -2, 3
+.byte afMINE+0, -2, 4
+.byte afMINE+0, -2, 4
+.byte afMINE+1, -2, 5
+.byte afMINE+1, -2, 4
+.byte afMINE+0, -1, 3
+.byte afMINE+0, -1, 3
+.byte afMINE+0, -1, 3
+.byte afMINE+1, -1, 3
+.byte afMINE+1, -1, 3
+.byte afMINE+1, -1, 3
+.byte acLOOPN+2, $A4
+.byte acLOOPBACK, 0
 
 Data_atD502:
-.incbin "objects/data/data3/data-block-atD502.bin"
+;.incbin "objects/data/data3/data-block-atD502.bin"
 ;.res 44 ; 2c
+.byte afMINE+1, -2, -1
+.byte afMINE+1, -2, -1
+.byte afMINE+0, -2, -1
+.byte afMINE+0, -2, -1
+.byte acLOOPN+10, 0
+.byte afMINE+1, 0, 3
+.byte afMINE+1, 0, 3
+.byte afMINE+0, 0, 3
+.byte afMINE+0, 0, 3
+.byte acLOOPN+8, $0E
+.byte afMINE+1, -2, -2
+.byte afMINE+1, -2, -2
+.byte afMINE+0, -2, -2
+.byte afMINE+0, -2, -2
+.byte acLOOPN+17, $1C
+.byte acLOOPBACK, $0E
 
 Data_atD52E:
-.incbin "objects/data/data3/data-block-atD52E.bin"
+;.incbin "objects/data/data3/data-block-atD52E.bin"
 ;.res 124 ; 7c
+.byte afMINE+0, -2, 5
+.byte afMINE+1, -2, 5, acTIMER+1
+.byte afMINE+0, -2, 3, acTIMER+1
+.byte afMINE+1, -3, 3
+.byte afMINE+0, -3, 3
+.byte afMINE+1, -3, 2, acTIMER+1
+.byte afMINE+0, -4, 2, acTIMER+1
+.byte afMINE+1, -4, 2, acTIMER+1
+.byte afMINE+0, -4, 0
+.byte afMINE+1, -4, -2, acTIMER+1
+.byte afMINE+0, -4, -2, acTIMER+1
+.byte afMINE+1, -3, -2, acTIMER+1
+.byte afMINE+0, -3, -3
+.byte afMINE+1, -3, -3
+.byte afMINE+0, -2, -3, acTIMER+1
+.byte afMINE+1, -2, -5, acTIMER+1
+.byte afMINE+0, -2, -5
+.byte afMINE+1, -2, -5
+.byte afMINE+0, -2, -5, acTIMER+1
+.byte afMINE+1, -2, -3, acTIMER+1
+.byte afMINE+0, -3, -3
+.byte afMINE+1, -3, -3
+.byte afMINE+0, -3, -2, acTIMER+1
+.byte afMINE+1, -4, -2, acTIMER+1
+.byte afMINE+0, -4, -2, acTIMER+1
+.byte afMINE+1, -4, 0
+.byte afMINE+0, -4, 2, acTIMER+1
+.byte afMINE+1, -4, 2, acTIMER+1
+.byte afMINE+0, -3, 2, acTIMER+1
+.byte afMINE+1, -3, 3
+.byte afMINE+0, -3, 3
+.byte afMINE+1, -2, 3, acTIMER+1
+.byte afMINE+0, -2, 5, acTIMER+1
+.byte afMINE+1, -2, 5
+.byte acLOOPBACK, 0
 
 Data_atD5AA:
 ; Next 5 files are almost the same,
 ; except for byte $08, here $C3.
-.incbin "objects/data/data3/data-block-atD5AA.bin"
+;.incbin "objects/data/data3/data-block-atD5AA.bin"
 ;.res 134 ; 86
+.byte afMINE+0, 0, 0, acTIMER+1
+.byte afMINE+1, 0, 0, acTIMER+1
+.byte acLOOPN+3, 0
+.byte afMINE+0, -2, 5
+.byte afMINE+1, -2, 5, acTIMER+1
+.byte afMINE+0, -2, 3, acTIMER+1
+.byte afMINE+1, -3, 3
+.byte afMINE+0, -3, 3
+.byte afMINE+1, -3, 2, acTIMER+1
+.byte afMINE+0, -4, 2, acTIMER+1
+.byte afMINE+1, -4, 2, acTIMER+1
+.byte afMINE+0, -4, 0
+.byte afMINE+1, -4, -2, acTIMER+1
+.byte afMINE+0, -4, -2, acTIMER+1
+.byte afMINE+1, -3, -2, acTIMER+1
+.byte afMINE+0, -3, -3
+.byte afMINE+1, -3, -3
+.byte afMINE+0, -2, -3, acTIMER+1
+.byte afMINE+1, -2, -5, acTIMER+1
+.byte afMINE+0, -2, -5
+.byte afMINE+1, -2, -5
+.byte afMINE+0, -2, -5, acTIMER+1
+.byte afMINE+1, -2, -3, acTIMER+1
+.byte afMINE+0, -3, -3
+.byte afMINE+1, -3, -3
+.byte afMINE+0, -3, -2, acTIMER+1
+.byte afMINE+1, -4, -2, acTIMER+1
+.byte afMINE+0, -4, -2, acTIMER+1
+.byte afMINE+1, -4, 0
+.byte afMINE+0, -4, 2, acTIMER+1
+.byte afMINE+1, -4, 2, acTIMER+1
+.byte afMINE+0, -3, 2, acTIMER+1
+.byte afMINE+1, -3, 3
+.byte afMINE+0, -3, 3
+.byte afMINE+1, -2, 3, acTIMER+1
+.byte afMINE+0, -2, 5, acTIMER+1
+.byte afMINE+1, -2, 5
+.byte acLOOPBACK, $0A
 
 Data_atD630:
 ; Almost the same as the previous one,
 ; except for byte $08, here $C6.
-.incbin "objects/data/data3/data-block-atD630.bin"
+;.incbin "objects/data/data3/data-block-atD630.bin"
 ;.res 134 ; 86
+.byte afMINE+0, 0, 0, acTIMER+1
+.byte afMINE+1, 0, 0, acTIMER+1
+.byte acLOOPN+6, 0
+.byte afMINE+0, -2, 5
+.byte afMINE+1, -2, 5, acTIMER+1
+.byte afMINE+0, -2, 3, acTIMER+1
+.byte afMINE+1, -3, 3
+.byte afMINE+0, -3, 3
+.byte afMINE+1, -3, 2, acTIMER+1
+.byte afMINE+0, -4, 2, acTIMER+1
+.byte afMINE+1, -4, 2, acTIMER+1
+.byte afMINE+0, -4, 0
+.byte afMINE+1, -4, -2, acTIMER+1
+.byte afMINE+0, -4, -2, acTIMER+1
+.byte afMINE+1, -3, -2, acTIMER+1
+.byte afMINE+0, -3, -3
+.byte afMINE+1, -3, -3
+.byte afMINE+0, -2, -3, acTIMER+1
+.byte afMINE+1, -2, -5, acTIMER+1
+.byte afMINE+0, -2, -5
+.byte afMINE+1, -2, -5
+.byte afMINE+0, -2, -5, acTIMER+1
+.byte afMINE+1, -2, -3, acTIMER+1
+.byte afMINE+0, -3, -3
+.byte afMINE+1, -3, -3
+.byte afMINE+0, -3, -2, acTIMER+1
+.byte afMINE+1, -4, -2, acTIMER+1
+.byte afMINE+0, -4, -2, acTIMER+1
+.byte afMINE+1, -4, 0
+.byte afMINE+0, -4, 2, acTIMER+1
+.byte afMINE+1, -4, 2, acTIMER+1
+.byte afMINE+0, -3, 2, acTIMER+1
+.byte afMINE+1, -3, 3
+.byte afMINE+0, -3, 3
+.byte afMINE+1, -2, 3, acTIMER+1
+.byte afMINE+0, -2, 5, acTIMER+1
+.byte afMINE+1, -2, 5
+.byte acLOOPBACK, $0A
 
 Data_atD6B6:
 ; Almost the same as the previous one,
 ; except for byte $08, here $C9
-.incbin "objects/data/data3/data-block-atD6B6.bin"
+;.incbin "objects/data/data3/data-block-atD6B6.bin"
 ;.res 134 ; 86
+.byte afMINE+0, 0, 0, acTIMER+1
+.byte afMINE+1, 0, 0, acTIMER+1
+.byte acLOOPN+9, 0
+.byte afMINE+0, -2, 5
+.byte afMINE+1, -2, 5, acTIMER+1
+.byte afMINE+0, -2, 3, acTIMER+1
+.byte afMINE+1, -3, 3
+.byte afMINE+0, -3, 3
+.byte afMINE+1, -3, 2, acTIMER+1
+.byte afMINE+0, -4, 2, acTIMER+1
+.byte afMINE+1, -4, 2, acTIMER+1
+.byte afMINE+0, -4, 0
+.byte afMINE+1, -4, -2, acTIMER+1
+.byte afMINE+0, -4, -2, acTIMER+1
+.byte afMINE+1, -3, -2, acTIMER+1
+.byte afMINE+0, -3, -3
+.byte afMINE+1, -3, -3
+.byte afMINE+0, -2, -3, acTIMER+1
+.byte afMINE+1, -2, -5, acTIMER+1
+.byte afMINE+0, -2, -5
+.byte afMINE+1, -2, -5
+.byte afMINE+0, -2, -5, acTIMER+1
+.byte afMINE+1, -2, -3, acTIMER+1
+.byte afMINE+0, -3, -3
+.byte afMINE+1, -3, -3
+.byte afMINE+0, -3, -2, acTIMER+1
+.byte afMINE+1, -4, -2, acTIMER+1
+.byte afMINE+0, -4, -2, acTIMER+1
+.byte afMINE+1, -4, 0
+.byte afMINE+0, -4, 2, acTIMER+1
+.byte afMINE+1, -4, 2, acTIMER+1
+.byte afMINE+0, -3, 2, acTIMER+1
+.byte afMINE+1, -3, 3
+.byte afMINE+0, -3, 3
+.byte afMINE+1, -2, 3, acTIMER+1
+.byte afMINE+0, -2, 5, acTIMER+1
+.byte afMINE+1, -2, 5
+.byte acLOOPBACK, $0A
 
 Data_atD73C:
 ; Almost the same as the previous one,
 ; except for byte $08, here $CC
-.incbin "objects/data/data3/data-block-atD73C.bin"
+;.incbin "objects/data/data3/data-block-atD73C.bin"
 ;.res 134 ; 86
+.byte afMINE+0, 0, 0, acTIMER+1
+.byte afMINE+1, 0, 0, acTIMER+1
+.byte acLOOPN+12, 0
+.byte afMINE+0, -2, 5
+.byte afMINE+1, -2, 5, acTIMER+1
+.byte afMINE+0, -2, 3, acTIMER+1
+.byte afMINE+1, -3, 3
+.byte afMINE+0, -3, 3
+.byte afMINE+1, -3, 2, acTIMER+1
+.byte afMINE+0, -4, 2, acTIMER+1
+.byte afMINE+1, -4, 2, acTIMER+1
+.byte afMINE+0, -4, 0
+.byte afMINE+1, -4, -2, acTIMER+1
+.byte afMINE+0, -4, -2, acTIMER+1
+.byte afMINE+1, -3, -2, acTIMER+1
+.byte afMINE+0, -3, -3
+.byte afMINE+1, -3, -3
+.byte afMINE+0, -2, -3, acTIMER+1
+.byte afMINE+1, -2, -5, acTIMER+1
+.byte afMINE+0, -2, -5
+.byte afMINE+1, -2, -5
+.byte afMINE+0, -2, -5, acTIMER+1
+.byte afMINE+1, -2, -3, acTIMER+1
+.byte afMINE+0, -3, -3
+.byte afMINE+1, -3, -3
+.byte afMINE+0, -3, -2, acTIMER+1
+.byte afMINE+1, -4, -2, acTIMER+1
+.byte afMINE+0, -4, -2, acTIMER+1
+.byte afMINE+1, -4, 0
+.byte afMINE+0, -4, 2, acTIMER+1
+.byte afMINE+1, -4, 2, acTIMER+1
+.byte afMINE+0, -3, 2, acTIMER+1
+.byte afMINE+1, -3, 3
+.byte afMINE+0, -3, 3
+.byte afMINE+1, -2, 3, acTIMER+1
+.byte afMINE+0, -2, 5, acTIMER+1
+.byte afMINE+1, -2, 5
+.byte acLOOPBACK, $0A
 
 Data_atD7C2:
 ; Almost the same as the previous one,
 ; except for byte $08, here $CF.
-.incbin "objects/data/data3/data-block-atD7C2.bin"
+;.incbin "objects/data/data3/data-block-atD7C2.bin"
 ;.res 134 ; 86
+.byte afMINE+0, 0, 0, acTIMER+1
+.byte afMINE+1, 0, 0, acTIMER+1
+.byte acLOOPN+15, 0
+.byte afMINE+0, -2, 5
+.byte afMINE+1, -2, 5, acTIMER+1
+.byte afMINE+0, -2, 3, acTIMER+1
+.byte afMINE+1, -3, 3
+.byte afMINE+0, -3, 3
+.byte afMINE+1, -3, 2, acTIMER+1
+.byte afMINE+0, -4, 2, acTIMER+1
+.byte afMINE+1, -4, 2, acTIMER+1
+.byte afMINE+0, -4, 0
+.byte afMINE+1, -4, -2, acTIMER+1
+.byte afMINE+0, -4, -2, acTIMER+1
+.byte afMINE+1, -3, -2, acTIMER+1
+.byte afMINE+0, -3, -3
+.byte afMINE+1, -3, -3
+.byte afMINE+0, -2, -3, acTIMER+1
+.byte afMINE+1, -2, -5, acTIMER+1
+.byte afMINE+0, -2, -5
+.byte afMINE+1, -2, -5
+.byte afMINE+0, -2, -5, acTIMER+1
+.byte afMINE+1, -2, -3, acTIMER+1
+.byte afMINE+0, -3, -3
+.byte afMINE+1, -3, -3
+.byte afMINE+0, -3, -2, acTIMER+1
+.byte afMINE+1, -4, -2, acTIMER+1
+.byte afMINE+0, -4, -2, acTIMER+1
+.byte afMINE+1, -4, 0
+.byte afMINE+0, -4, 2, acTIMER+1
+.byte afMINE+1, -4, 2, acTIMER+1
+.byte afMINE+0, -3, 2, acTIMER+1
+.byte afMINE+1, -3, 3
+.byte afMINE+0, -3, 3
+.byte afMINE+1, -2, 3, acTIMER+1
+.byte afMINE+0, -2, 5, acTIMER+1
+.byte afMINE+1, -2, 5
+.byte acLOOPBACK, $0A
 
 Data_atD848:
-.incbin "objects/data/data3/data-block-atD848.bin"
+;.incbin "objects/data/data3/data-block-atD848.bin"
 ;.res 24 ; 18
+.byte afTOPBALL, -3, 0, acTIMER+1
+.byte acLOOPN+8, 0
+.byte afTOPBALL, 0, -5, acTIMER+1
+.byte acLOOPN+9, 6
+.byte afTOPBALL, 0, 0, acTIMER+4
+.byte afTOPBALL, -4, 2, acTIMER+1
+.byte acLOOPN+24, $10
+.byte acLOOPBACK, 0
 
 Data_atD860:
-.incbin "objects/data/data3/data-block-atD860.bin"
+;.incbin "objects/data/data3/data-block-atD860.bin"
 ;.res 24 ; 18
+.byte afBOTTOMBALL, -3, 0, acTIMER+1
+.byte acLOOPN+8, 0
+.byte afBOTTOMBALL, 0, 5, acTIMER+1
+.byte acLOOPN+9, 6
+.byte afBOTTOMBALL, 0, 0, acTIMER+4
+.byte afBOTTOMBALL, -4, -2, acTIMER+1
+.byte acLOOPN+24, $10
+.byte acLOOPBACK, 0
 
 Data_atD878:
-.incbin "objects/data/data3/data-block-atD878.bin"
+;.incbin "objects/data/data3/data-block-atD878.bin"
 ;.res 21 ; 15
+.byte afTOPBALL, -3, -4, acTIMER+1
+.byte acLOOPN+20, 0
+.byte afTOPBALL, 0, 5, acTIMER+1
+.byte acLOOPN+15, 6
+.byte afTOPBALL, -4, 0
+.byte afTOPBALL, -3, 0, acTIMER+1
+.byte acLOOPBACK, $0C
 
 Data_atD88D:
-.incbin "objects/data/data3/data-block-atD88D.bin"
+;.incbin "objects/data/data3/data-block-atD88D.bin"
 ;.res 21 ; 15
+.byte afBOTTOMBALL, -3, 4, acTIMER+1
+.byte acLOOPN+20, 0
+.byte afBOTTOMBALL, 0, -5, acTIMER+1
+.byte acLOOPN+15, 6
+.byte afBOTTOMBALL, -4, 0
+.byte afBOTTOMBALL, -3, 0, acTIMER+1
+.byte acLOOPBACK, $0C
 
 Data_atD8A2:
-.incbin "objects/data/data3/data-block-atD8A2.bin"
+;.incbin "objects/data/data3/data-block-atD8A2.bin"
 ;.res 15 ; f
+.byte afTOPBALL, -3, 0, acTIMER+1
+.byte acLOOPN+30, 0
+.byte afTOPBALL, 0, 0, acTIMER+4
+.byte afTOPBALL, -4, -2
+.byte acLOOPBACK, $0A
 
 Data_atD8B1:
-.incbin "objects/data/data3/data-block-atD8B1.bin"
+;.incbin "objects/data/data3/data-block-atD8B1.bin"
 ;.res 15 ; f
+.byte afBOTTOMBALL, -3, 0, acTIMER+1
+.byte acLOOPN+30, 0
+.byte afBOTTOMBALL, 0, 0, acTIMER+4
+.byte afBOTTOMBALL, -4, 2
+.byte acLOOPBACK, $0A
 
 Data_atD8C0:
-.incbin "objects/data/data3/data-block-atD8C0.bin"
+;.incbin "objects/data/data3/data-block-atD8C0.bin"
 ;.res 69 ; 45
+.byte afBALL+1, -3, 0
+.byte afBALL+1, -3, 0
+.byte afBALL+1, -3, 0
+.byte afBALL+1, -3, 0
+.byte afBALL+1, -3, 0
+.byte afBALL+1, -3, 0
+.byte afBALL+1, -3, 0
+.byte afBALL+1, -3, 0
+.byte afBALL+1, -3, 0
+.byte afBALL+0, -3, 0
+.byte afBALL+0, -3, 0
+.byte afBALL+0, -3, 0
+.byte acLOOPN+7, 0
+.byte afBALL+1, 4, 0
+.byte afBALL+1, 4, 0
+.byte afBALL+1, 4, 0
+.byte afBALL+1, 4, 0
+.byte afBALL+1, 4, 0
+.byte afBALL+1, 4, 0
+.byte afBALL+1, 4, 0
+.byte afBALL+1, 4, 0
+.byte afBALL+1, 4, 0
+.byte acLOOPN+7, $26
+.byte acLOOPBACK, 0
 
 Data_atD905:
-.incbin "objects/data/data3/data-block-atD905.bin"
+;.incbin "objects/data/data3/data-block-atD905.bin"
 ;.res 119 ; 77
+.byte afBALL+0, -3, 4, acTIMER+2
+.byte acLOOPN+20, 0
+.byte afBALL+1, 0, 0, acTIMER+1
+.byte afBALL+1, 0, 0, acTIMER+1
+.byte afBALL+1, -2, -8, acTIMER+1
+.byte afBALL+1, -2, -7, acTIMER+1
+.byte afBALL+1, -2, -6
+.byte afBALL+1, 2, -5
+.byte afBALL+0, -2, -4
+.byte afBALL+0, -2, -4
+.byte afBALL+0, -2, -3
+.byte afBALL+0, -2, -3
+.byte afBALL+0, -2, -2, acTIMER+1
+.byte afBALL+0, -2, -2, acTIMER+1
+.byte afBALL+0, -2, -1, acTIMER+1
+.byte afBALL+0, -2, -1, acTIMER+1
+.byte afBALL+0, -3, -1, acTIMER+1
+.byte afBALL+0, -3, -1, acTIMER+1
+.byte afBALL+0, -3, 0, acTIMER+1
+.byte afBALL+0, -3, 0, acTIMER+1
+.byte afBALL+0, -3, 1, acTIMER+1
+.byte afBALL+0, -3, 1, acTIMER+1
+.byte afBALL+0, -2, 1
+.byte afBALL+0, -2, 1
+.byte afBALL+0, -2, 2
+.byte afBALL+0, -2, 2
+.byte afBALL+0, -2, 3
+.byte afBALL+0, -2, 3
+.byte afBALL+0, -2, 4
+.byte afBALL+0, -2, 4
+.byte afBALL+1, -2, 5
+.byte afBALL+1, -2, 6
+.byte afBALL+1, -2, 7, acTIMER+1
+.byte afBALL+1, -2, 8
+.byte acLOOPBACK, 6
 
 Data_atD97C:
 ; Next 3 files are almost the same,
 ; except for byte $04, here $C4.
-.incbin "objects/data/data3/data-block-atD97C.bin"
+;.incbin "objects/data/data3/data-block-atD97C.bin"
 ;.res 125 ; 7d
+.byte afBALL+0, 0, 0, acTIMER+2
+.byte acLOOPN+4, 0
+.byte afBALL+0, -3, 4, acTIMER+2
+.byte acLOOPN+20, 6
+.byte afBALL+1, 0, 0, acTIMER+1
+.byte afBALL+1, 0, 0, acTIMER+1
+.byte afBALL+1, -2, -8, acTIMER+1
+.byte afBALL+1, -2, -7, acTIMER+1
+.byte afBALL+1, -2, -6
+.byte afBALL+1, -2, -5
+.byte afBALL+0, -2, -4
+.byte afBALL+0, -2, -4
+.byte afBALL+0, -2, -3
+.byte afBALL+0, -2, -3
+.byte afBALL+0, -2, -2, acTIMER+1
+.byte afBALL+0, -2, -2, acTIMER+1
+.byte afBALL+0, -2, -1, acTIMER+1
+.byte afBALL+0, -2, -1, acTIMER+1
+.byte afBALL+0, -3, -1, acTIMER+1
+.byte afBALL+0, -3, -1, acTIMER+1
+.byte afBALL+0, -3, 0, acTIMER+1
+.byte afBALL+0, -3, 0, acTIMER+1
+.byte afBALL+0, -3, 1, acTIMER+1
+.byte afBALL+0, -3, 1, acTIMER+1
+.byte afBALL+0, -2, 1
+.byte afBALL+0, -2, 1
+.byte afBALL+0, -2, 2
+.byte afBALL+0, -2, 2
+.byte afBALL+0, -2, 3
+.byte afBALL+0, -2, 3
+.byte afBALL+0, -2, 4
+.byte afBALL+0, -2, 4
+.byte afBALL+1, -2, 5
+.byte afBALL+1, -2, 6
+.byte afBALL+1, -2, 7, acTIMER+1
+.byte afBALL+1, -2, 8
+.byte acLOOPBACK, $0C
 
 Data_atD9F9:
 ; Almost the same as the previous one,
 ; except for byte $04, here $C9.
-.incbin "objects/data/data3/data-block-atD9F9.bin"
+;.incbin "objects/data/data3/data-block-atD9F9.bin"
 ;.res 125 ; 7d
+.byte afBALL+0, 0, 0, acTIMER+2
+.byte acLOOPN+9, 0
+.byte afBALL+0, -3, 4, acTIMER+2
+.byte acLOOPN+20, 6
+.byte afBALL+1, 0, 0, acTIMER+1
+.byte afBALL+1, 0, 0, acTIMER+1
+.byte afBALL+1, -2, -8, acTIMER+1
+.byte afBALL+1, -2, -7, acTIMER+1
+.byte afBALL+1, -2, -6
+.byte afBALL+1, -2, -5
+.byte afBALL+0, -2, -4
+.byte afBALL+0, -2, -4
+.byte afBALL+0, -2, -3
+.byte afBALL+0, -2, -3
+.byte afBALL+0, -2, -2, acTIMER+1
+.byte afBALL+0, -2, -2, acTIMER+1
+.byte afBALL+0, -2, -1, acTIMER+1
+.byte afBALL+0, -2, -1, acTIMER+1
+.byte afBALL+0, -3, -1, acTIMER+1
+.byte afBALL+0, -3, -1, acTIMER+1
+.byte afBALL+0, -3, 0, acTIMER+1
+.byte afBALL+0, -3, 0, acTIMER+1
+.byte afBALL+0, -3, 1, acTIMER+1
+.byte afBALL+0, -3, 1, acTIMER+1
+.byte afBALL+0, -2, 1
+.byte afBALL+0, -2, 1
+.byte afBALL+0, -2, 2
+.byte afBALL+0, -2, 2
+.byte afBALL+0, -2, 3
+.byte afBALL+0, -2, 3
+.byte afBALL+0, -2, 4
+.byte afBALL+0, -2, 4
+.byte afBALL+1, -2, 5
+.byte afBALL+1, -2, 6
+.byte afBALL+1, -2, 7, acTIMER+1
+.byte afBALL+1, -2, 8
+.byte acLOOPBACK, $0C
 
 Data_atDA76:
 ; Almost the same as the previous one,
 ; except for byte $04, here $CE.
-.incbin "objects/data/data3/data-block-atDA76.bin"
+;.incbin "objects/data/data3/data-block-atDA76.bin"
 ;.res 125 ; 7d
+.byte afBALL+0, 0, 0, acTIMER+2
+.byte acLOOPN+14, 0
+.byte afBALL+0, -3, 4, acTIMER+2
+.byte acLOOPN+20, 6
+.byte afBALL+1, 0, 0, acTIMER+1
+.byte afBALL+1, 0, 0, acTIMER+1
+.byte afBALL+1, -2, -8, acTIMER+1
+.byte afBALL+1, -2, -7, acTIMER+1
+.byte afBALL+1, -2, -6
+.byte afBALL+1, -2, -5
+.byte afBALL+0, -2, -4
+.byte afBALL+0, -2, -4
+.byte afBALL+0, -2, -3
+.byte afBALL+0, -2, -3
+.byte afBALL+0, -2, -2, acTIMER+1
+.byte afBALL+0, -2, -2, acTIMER+1
+.byte afBALL+0, -2, -1, acTIMER+1
+.byte afBALL+0, -2, -1, acTIMER+1
+.byte afBALL+0, -3, -1, acTIMER+1
+.byte afBALL+0, -3, -1, acTIMER+1
+.byte afBALL+0, -3, 0, acTIMER+1
+.byte afBALL+0, -3, 0, acTIMER+1
+.byte afBALL+0, -3, 1, acTIMER+1
+.byte afBALL+0, -3, 1, acTIMER+1
+.byte afBALL+0, -2, 1
+.byte afBALL+0, -2, 1
+.byte afBALL+0, -2, 2
+.byte afBALL+0, -2, 2
+.byte afBALL+0, -2, 3
+.byte afBALL+0, -2, 3
+.byte afBALL+0, -2, 4
+.byte afBALL+0, -2, 4
+.byte afBALL+1, -2, 5
+.byte afBALL+1, -2, 6
+.byte afBALL+1, -2, 7, acTIMER+1
+.byte afBALL+1, -2, 8
+.byte acLOOPBACK, $0C
 
 Data_atDAF3:
-.incbin "objects/data/data3/data-block-atDAF3.bin"
+;.incbin "objects/data/data3/data-block-atDAF3.bin"
 ;.res 119 ; 77
+.byte afBALL+0, -3, 4, acTIMER+2
+.byte acLOOPN+20, 0
+.byte afBALL+1, 0, 0, acTIMER+1
+.byte afBALL+1, 0, 0, acTIMER+1
+.byte afBALL+1, -2, -8, acTIMER+1
+.byte afBALL+1, -2, -8, acTIMER+1
+.byte afBALL+1, -2, -7
+.byte afBALL+1, -2, -7
+.byte afBALL+0, -2, -6
+.byte afBALL+0, -2, -6
+.byte afBALL+0, -2, -5
+.byte afBALL+0, -2, -4
+.byte afBALL+0, -2, -3, acTIMER+1
+.byte afBALL+0, -2, -2, acTIMER+1
+.byte afBALL+0, -2, -1, acTIMER+1
+.byte afBALL+0, -2, -1, acTIMER+1
+.byte afBALL+0, -3, -1, acTIMER+1
+.byte afBALL+0, -3, -1, acTIMER+1
+.byte afBALL+1, -3, 0, acTIMER+1
+.byte afBALL+1, -3, 0, acTIMER+1
+.byte afBALL+0, -3, 1, acTIMER+1
+.byte afBALL+0, -3, 1, acTIMER+1
+.byte afBALL+0, -2, 1
+.byte afBALL+0, -2, 1
+.byte afBALL+0, -2, 2
+.byte afBALL+0, -2, 3
+.byte afBALL+0, -2, 4
+.byte afBALL+0, -2, 5
+.byte afBALL+0, -2, 6
+.byte afBALL+0, -2, 6
+.byte afBALL+1, -2, 7
+.byte afBALL+1, -2, 7
+.byte afBALL+1, -2, 8, acTIMER+1
+.byte afBALL+1, -2, 8
+.byte acLOOPBACK, 6
 
 Data_atDB6A:
-.incbin "objects/data/data3/data-block-atDB6A.bin"
+;.incbin "objects/data/data3/data-block-atDB6A.bin"
 ;.res 125 ; 7d
+.byte afBALL+0, 0, 0, acTIMER+1
+.byte acLOOPN+9, 0
+.byte afBALL+0, -3, 4, acTIMER+2
+.byte acLOOPN+20, 6
+.byte afBALL+1, 0, 0, acTIMER+1
+.byte afBALL+1, 0, 0, acTIMER+1
+.byte afBALL+1, -2, -8, acTIMER+1
+.byte afBALL+1, -2, -8, acTIMER+1
+.byte afBALL+1, -2, -7
+.byte afBALL+1, -2, -7
+.byte afBALL+0, -2, -6
+.byte afBALL+0, -2, -6
+.byte afBALL+0, -2, -5
+.byte afBALL+0, -2, -4
+.byte afBALL+0, -2, -3, acTIMER+1
+.byte afBALL+0, -2, -2, acTIMER+1
+.byte afBALL+0, -2, -1, acTIMER+1
+.byte afBALL+0, -2, -1, acTIMER+1
+.byte afBALL+0, -3, -1, acTIMER+1
+.byte afBALL+0, -3, -1, acTIMER+1
+.byte afBALL+1, -3, 0, acTIMER+1
+.byte afBALL+1, -3, 0, acTIMER+1
+.byte afBALL+0, -3, 1, acTIMER+1
+.byte afBALL+0, -3, 1, acTIMER+1
+.byte afBALL+0, -2, 1
+.byte afBALL+0, -2, 1
+.byte afBALL+0, -2, 2
+.byte afBALL+0, -2, 3
+.byte afBALL+0, -2, 4
+.byte afBALL+0, -2, 5
+.byte afBALL+0, -2, 6
+.byte afBALL+0, -2, 6
+.byte afBALL+1, -2, 7
+.byte afBALL+1, -2, 7
+.byte afBALL+1, -2, 8, acTIMER+1
+.byte afBALL+1, -2, 8
+.byte acLOOPBACK, $0C
 
 Data_atDBE7:
-.incbin "objects/data/data3/data-block-atDBE7.bin"
+;.incbin "objects/data/data3/data-block-atDBE7.bin"
 ;.res 125 ; 7d
+.byte afBALL+0, 0, 0, acTIMER+1
+.byte acLOOPN+19, 0
+.byte afBALL+0, -3, 4, acTIMER+2
+.byte acLOOPN+20, 6
+.byte afBALL+1, 0, 0, acTIMER+1
+.byte afBALL+1, 0, 0, acTIMER+1
+.byte afBALL+1, -2, -8, acTIMER+1
+.byte afBALL+1, -2, -8, acTIMER+1
+.byte afBALL+1, -2, -7
+.byte afBALL+1, -2, -7
+.byte afBALL+0, -2, -6
+.byte afBALL+0, -2, -6
+.byte afBALL+0, -2, -5
+.byte afBALL+0, -2, -4
+.byte afBALL+0, -2, -3, acTIMER+1
+.byte afBALL+0, -2, -2, acTIMER+1
+.byte afBALL+0, -2, -1, acTIMER+1
+.byte afBALL+0, -2, -1, acTIMER+1
+.byte afBALL+0, -3, -1, acTIMER+1
+.byte afBALL+0, -3, -1, acTIMER+1
+.byte afBALL+1, -3, 0, acTIMER+1
+.byte afBALL+1, -3, 0, acTIMER+1
+.byte afBALL+0, -3, 1, acTIMER+1
+.byte afBALL+0, -3, 1, acTIMER+1
+.byte afBALL+0, -2, 1
+.byte afBALL+0, -2, 1
+.byte afBALL+0, -2, 2
+.byte afBALL+0, -2, 3
+.byte afBALL+0, -2, 4
+.byte afBALL+0, -2, 5
+.byte afBALL+0, -2, 6
+.byte afBALL+0, -2, 6
+.byte afBALL+1, -2, 7
+.byte afBALL+1, -2, 7
+.byte afBALL+1, -2, 8, acTIMER+1
+.byte afBALL+1, -2, 8
+.byte acLOOPBACK, $0C
 
 Data_atDC64:
-.incbin "objects/data/data3/data-block-atDC64.bin"
+;.incbin "objects/data/data3/data-block-atDC64.bin"
 ;.res 125 ; 7d
+.byte afBALL+0, 0, 0, acTIMER+1
+.byte acLOOPN+29, 0
+.byte afBALL+0, -3, 4, acTIMER+2
+.byte acLOOPN+20, 6
+.byte afBALL+1, 0, 0, acTIMER+1
+.byte afBALL+1, 0, 0, acTIMER+1
+.byte afBALL+1, -2, -8, acTIMER+1
+.byte afBALL+1, -2, -8, acTIMER+1
+.byte afBALL+1, -2, -7
+.byte afBALL+1, -2, -7
+.byte afBALL+0, -2, -6
+.byte afBALL+0, -2, -6
+.byte afBALL+0, -2, -5
+.byte afBALL+0, -2, -4
+.byte afBALL+0, -2, -3, acTIMER+1
+.byte afBALL+0, -2, -2, acTIMER+1
+.byte afBALL+0, -2, -1, acTIMER+1
+.byte afBALL+0, -2, -1, acTIMER+1
+.byte afBALL+0, -3, -1, acTIMER+1
+.byte afBALL+0, -3, -1, acTIMER+1
+.byte afBALL+1, -3, 0, acTIMER+1
+.byte afBALL+1, -3, 0, acTIMER+1
+.byte afBALL+0, -3, 1, acTIMER+1
+.byte afBALL+0, -3, 1, acTIMER+1
+.byte afBALL+0, -2, 1
+.byte afBALL+0, -2, 1
+.byte afBALL+0, -2, 2
+.byte afBALL+0, -2, 3
+.byte afBALL+0, -2, 4
+.byte afBALL+0, -2, 5
+.byte afBALL+0, -2, 6
+.byte afBALL+0, -2, 6
+.byte afBALL+1, -2, 7
+.byte afBALL+1, -2, 7
+.byte afBALL+1, -2, 8, acTIMER+1
+.byte afBALL+1, -2, 8
+.byte acLOOPBACK, $0C
 
 Data_atDCE1:
-.incbin "objects/data/data3/data-block-atDCE1.bin"
+;.incbin "objects/data/data3/data-block-atDCE1.bin"
 ;.res 186 ; ba
+.byte afMINE+0, -1, -6
+.byte afMINE+0, -1, -6
+.byte afMINE+1, -2, -5
+.byte afMINE+1, -2, -5
+.byte afMINE+0, -2, -4
+.byte afMINE+0, -2, -4
+.byte afMINE+1, -2, -3
+.byte afMINE+1, -2, -3
+.byte afMINE+0, -2, -2
+.byte afMINE+0, -2, -2
+.byte afMINE+1, -3, -2
+.byte afMINE+1, -3, -2
+.byte afMINE+0, -3, 0
+.byte afMINE+0, -3, 0
+.byte afMINE+1, -3, 1
+.byte afMINE+1, -3, 1
+.byte afMINE+0, -2, 2
+.byte afMINE+0, -2, 2
+.byte afMINE+1, -2, 3
+.byte afMINE+1, -2, 3
+.byte afMINE+0, -2, 4
+.byte afMINE+0, -2, 4
+.byte afMINE+1, -2, 5
+.byte afMINE+1, -2, 4
+.byte afMINE+0, -1, 3
+.byte afMINE+0, -1, 3
+.byte afMINE+0, -1, 3
+.byte afMINE+1, -1, 3
+.byte afMINE+1, -1, 3
+.byte afMINE+1, -1, 3
+.byte acLOOPN+2, $48
+.byte afMINE+0, -1, 6
+.byte afMINE+0, -1, 6
+.byte afMINE+1, -2, 5
+.byte afMINE+1, -2, 5
+.byte afMINE+0, -2, 4
+.byte afMINE+0, -2, 4
+.byte afMINE+1, -2, 3
+.byte afMINE+1, -2, 3
+.byte afMINE+0, -2, 2
+.byte afMINE+0, -2, 2
+.byte afMINE+1, -3, 2
+.byte afMINE+1, -3, 2
+.byte afMINE+0, -3, 0
+.byte afMINE+0, -3, 0
+.byte afMINE+1, -3, -1
+.byte afMINE+1, -3, -1
+.byte afMINE+0, -2, -2
+.byte afMINE+0, -2, -2
+.byte afMINE+1, -2, -3
+.byte afMINE+1, -2, -3
+.byte afMINE+0, -2, -4
+.byte afMINE+0, -2, -4
+.byte afMINE+1, -2, -5
+.byte afMINE+1, -2, -4
+.byte afMINE+0, -1, -3
+.byte afMINE+0, -1, -3
+.byte afMINE+0, -1, -3
+.byte afMINE+1, -1, -3
+.byte afMINE+1, -1, -3
+.byte afMINE+1, -1, -3
+.byte acLOOPN+2, $A4
+.byte acLOOPBACK, 0
 
 Data_atDD9B:
-.incbin "objects/data/data3/data-block-atDD9B.bin"
+;.incbin "objects/data/data3/data-block-atDD9B.bin"
 ;.res 5 ; 5
+.byte afMETEOR, -4, 4
+.byte acLOOPBACK, 0
 
 Data_atDDA0:
-.incbin "objects/data/data3/data-block-atDDA0.bin"
+;.incbin "objects/data/data3/data-block-atDDA0.bin"
 ;.res 5 ; 5
+.byte afMETEOR, -3, 3
+.byte acLOOPBACK, 0
 
 Data_atDDA5:
-.incbin "objects/data/data3/data-block-atDDA5.bin"
+;.incbin "objects/data/data3/data-block-atDDA5.bin"
 ;.res 5 ; 5
+.byte afMETEOR, -2, 2
+.byte acLOOPBACK, 0
 
 Data_atDDAA:
-.incbin "objects/data/data3/data-block-atDDAA.bin"
+;.incbin "objects/data/data3/data-block-atDDAA.bin"
 ;.res 101 ; 65
+.byte afAMBER+0, 0, -6
+.byte afAMBER+1, 0, -6
+.byte acLOOPN+7, 0
+.byte afAMBER+0, -1, -6
+.byte afAMBER+0, -1, -6
+.byte afAMBER+1, -2, -5
+.byte afAMBER+1, -2, -5
+.byte afAMBER+0, -2, -4
+.byte afAMBER+0, -2, -4
+.byte afAMBER+1, -2, -3
+.byte afAMBER+1, -2, -3
+.byte afAMBER+0, -2, -2
+.byte afAMBER+0, -2, -2
+.byte afAMBER+1, -3, -2
+.byte afAMBER+1, -3, -2
+.byte afAMBER+0, -3, 0
+.byte afAMBER+0, -3, 0
+.byte afAMBER+1, -3, 1
+.byte afAMBER+1, -3, 1
+.byte afAMBER+0, -2, 2
+.byte afAMBER+0, -2, 2
+.byte afAMBER+1, -2, 3
+.byte afAMBER+1, -2, 3
+.byte afAMBER+0, -2, 4
+.byte afAMBER+0, -2, 4
+.byte afAMBER+1, -2, 5
+.byte afAMBER+1, -2, 5
+.byte afAMBER+0, -1, 6
+.byte afAMBER+0, -1, 6
+.byte afAMBER+0, -1, 6
+.byte afAMBER+1, -1, 6
+.byte afAMBER+1, -1, 6
+.byte afAMBER+1, -1, 6
+.byte acLOOPN+3, $53
+.byte acEND
 
 Data_atDE0F:
-.incbin "objects/data/data3/data-block-atDE0F.bin"
+;.incbin "objects/data/data3/data-block-atDE0F.bin"
 ;.res 105 ; 69
+.byte afAMBER+0, 0, 0, acTIMER+29
+.byte afAMBER+0, 0, -6
+.byte afAMBER+1, 0, -6
+.byte acLOOPN+5, 4
+.byte afAMBER+0, -1, -6
+.byte afAMBER+0, -1, -6
+.byte afAMBER+1, -2, -5
+.byte afAMBER+1, -2, -5
+.byte afAMBER+0, -2, -4
+.byte afAMBER+0, -2, -4
+.byte afAMBER+1, -2, -3
+.byte afAMBER+1, -2, -3
+.byte afAMBER+0, -2, -2
+.byte afAMBER+0, -2, -2
+.byte afAMBER+1, -3, -2
+.byte afAMBER+1, -3, -2
+.byte afAMBER+0, -3, 0
+.byte afAMBER+0, -3, 0
+.byte afAMBER+1, -3, 1
+.byte afAMBER+1, -3, 1
+.byte afAMBER+0, -2, 2
+.byte afAMBER+0, -2, 2
+.byte afAMBER+1, -2, 3
+.byte afAMBER+1, -2, 3
+.byte afAMBER+0, -2, 4
+.byte afAMBER+0, -2, 4
+.byte afAMBER+1, -2, 5
+.byte afAMBER+1, -2, 4
+.byte afAMBER+0, -1, 3
+.byte afAMBER+0, -1, 3
+.byte afAMBER+0, -1, 3
+.byte afAMBER+1, -1, 3
+.byte afAMBER+1, -1, 3
+.byte afAMBER+1, -1, 3
+.byte acLOOPN+3, $4B
+.byte acEND
 
 Data_atDE78:
-.incbin "objects/data/data3/data-block-atDE78.bin"
+;.incbin "objects/data/data3/data-block-atDE78.bin"
 ;.res 101 ; 65
+.byte afAMBER+0, 0, -6
+.byte afAMBER+1, 0, -6
+.byte acLOOPN+10, 0
+.byte afAMBER+0, -1, -6
+.byte afAMBER+0, -1, -6
+.byte afAMBER+1, -2, -5
+.byte afAMBER+1, -2, -5
+.byte afAMBER+0, -2, -4
+.byte afAMBER+0, -2, -4
+.byte afAMBER+1, -2, -3
+.byte afAMBER+1, -2, -3
+.byte afAMBER+0, -2, -2
+.byte afAMBER+0, -2, -2
+.byte afAMBER+1, -3, -2
+.byte afAMBER+1, -3, -2
+.byte afAMBER+0, -3, 0
+.byte afAMBER+0, -3, 0
+.byte afAMBER+1, -3, 1
+.byte afAMBER+1, -3, 1
+.byte afAMBER+0, -2, 2
+.byte afAMBER+0, -2, 2
+.byte afAMBER+1, -2, 3
+.byte afAMBER+1, -2, 3
+.byte afAMBER+0, -2, 4
+.byte afAMBER+0, -2, 4
+.byte afAMBER+1, -2, 5
+.byte afAMBER+1, -2, 5
+.byte afAMBER+0, -1, 6
+.byte afAMBER+0, -1, 6
+.byte afAMBER+0, -1, 6
+.byte afAMBER+1, -1, 6
+.byte afAMBER+1, -1, 6
+.byte afAMBER+1, -1, 6
+.byte acLOOPN+3, $50
+.byte acEND
 
 Data_atDEDD:
-.incbin "objects/data/data3/data-block-atDEDD.bin"
+;.incbin "objects/data/data3/data-block-atDEDD.bin"
 ;.res 104 ; 68
+.byte afAMBER+0, 0, 0, acTIMER+29
+.byte afAMBER+0, 0, -6
+.byte afAMBER+1, 0, -6
+.byte acLOOPN+10, 4
+.byte afAMBER+0, -1, -6
+.byte afAMBER+0, -1, -6
+.byte afAMBER+1, -2, -5
+.byte afAMBER+1, -2, -5
+.byte afAMBER+0, -2, -4
+.byte afAMBER+0, -2, -4
+.byte afAMBER+1, -2, -3
+.byte afAMBER+1, -2, -3
+.byte afAMBER+0, -2, -2
+.byte afAMBER+0, -2, -2
+.byte afAMBER+1, -3, -2
+.byte afAMBER+1, -3, -2
+.byte afAMBER+0, -3, 0
+.byte afAMBER+0, -3, 0
+.byte afAMBER+1, -3, 1
+.byte afAMBER+1, -3, 1
+.byte afAMBER+0, -2, 2
+.byte afAMBER+0, -2, 2
+.byte afAMBER+1, -2, 3
+.byte afAMBER+1, -2, 3
+.byte afAMBER+0, -2, 4
+.byte afAMBER+0, -2, 4
+.byte afAMBER+1, -2, 5
+.byte afAMBER+1, -2, 5
+.byte afAMBER+0, -1, 6
+.byte afAMBER+0, -1, 6
+.byte afAMBER+0, -1, 6
+.byte afAMBER+1, -1, 6
+.byte afAMBER+1, -1, 6
+.byte afAMBER+1, -1, 6
+.byte acLOOPN+3, $51
 
 Data_atDF45:
-.incbin "objects/data/data3/data-block-atDF45.bin"
+;.incbin "objects/data/data3/data-block-atDF45.bin"
 ;.res 101 ; 65
+.byte afAMBER+0, 0, 6
+.byte afAMBER+1, 0, 6
+.byte acLOOPN+6, 0
+.byte afAMBER+0, -1, 6
+.byte afAMBER+0, -1, 6
+.byte afAMBER+1, -2, 5
+.byte afAMBER+1, -2, 5
+.byte afAMBER+0, -2, 4
+.byte afAMBER+0, -2, 4
+.byte afAMBER+1, -2, 3
+.byte afAMBER+1, -2, 3
+.byte afAMBER+0, -2, 2
+.byte afAMBER+0, -2, 2
+.byte afAMBER+1, -3, 2
+.byte afAMBER+1, -3, 2
+.byte afAMBER+0, -3, 0
+.byte afAMBER+0, -3, 0
+.byte afAMBER+1, -3, -1
+.byte afAMBER+1, -3, -1
+.byte afAMBER+0, -2, -2
+.byte afAMBER+0, -2, -2
+.byte afAMBER+1, -2, -3
+.byte afAMBER+1, -2, -3
+.byte afAMBER+0, -2, -4
+.byte afAMBER+0, -2, -4
+.byte afAMBER+1, -2, -5
+.byte afAMBER+1, -2, -5
+.byte afAMBER+0, -1, -6
+.byte afAMBER+0, -1, -6
+.byte afAMBER+0, -1, -6
+.byte afAMBER+1, -1, -6
+.byte afAMBER+1, -1, -6
+.byte afAMBER+1, -1, -6
+.byte acLOOPN+2, $53
+.byte acEND
 
 Data_atDFAA:
-.incbin "objects/data/data3/data-block-atDFAA.bin"
+;.incbin "objects/data/data3/data-block-atDFAA.bin"
 ;.res 105 ; 69
+.byte afAMBER+0, 0, 0, acTIMER+30
+.byte afAMBER+0, 0, 6
+.byte afAMBER+1, 0, 6
+.byte acLOOPN+6, 4
+.byte afAMBER+0, -1, 6
+.byte afAMBER+0, -1, 6
+.byte afAMBER+1, -2, 5
+.byte afAMBER+1, -2, 5
+.byte afAMBER+0, -2, 4
+.byte afAMBER+0, -2, 4
+.byte afAMBER+1, -2, 3
+.byte afAMBER+1, -2, 3
+.byte afAMBER+0, -2, 2
+.byte afAMBER+0, -2, 2
+.byte afAMBER+1, -3, 2
+.byte afAMBER+1, -3, 2
+.byte afAMBER+0, -3, 0
+.byte afAMBER+0, -3, 0
+.byte afAMBER+1, -3, -1
+.byte afAMBER+1, -3, -1
+.byte afAMBER+0, -2, -2
+.byte afAMBER+0, -2, -2
+.byte afAMBER+1, -2, -3
+.byte afAMBER+1, -2, -3
+.byte afAMBER+0, -2, -4
+.byte afAMBER+0, -2, -4
+.byte afAMBER+1, -2, -5
+.byte afAMBER+1, -2, -5
+.byte afAMBER+0, -1, -6
+.byte afAMBER+0, -1, -6
+.byte afAMBER+0, -1, -6
+.byte afAMBER+1, -1, -6
+.byte afAMBER+1, -1, -6
+.byte afAMBER+1, -1, -6
+.byte acLOOPN+2, $54
+.byte acEND
 
 Data_atE013:
-.incbin "objects/data/data3/data-block-atE013.bin"
+;.incbin "objects/data/data3/data-block-atE013.bin"
 ;.res 101 ; 65
+.byte afAMBER+0, 0, 6
+.byte afAMBER+1, 0, 6
+.byte acLOOPN+10, 0
+.byte afAMBER+0, -1, 6
+.byte afAMBER+0, -1, 6
+.byte afAMBER+1, -2, 5
+.byte afAMBER+1, -2, 5
+.byte afAMBER+0, -2, 4
+.byte afAMBER+0, -2, 4
+.byte afAMBER+1, -2, 3
+.byte afAMBER+1, -2, 3
+.byte afAMBER+0, -2, 2
+.byte afAMBER+0, -2, 2
+.byte afAMBER+1, -3, 2
+.byte afAMBER+1, -3, 2
+.byte afAMBER+0, -3, 0
+.byte afAMBER+0, -3, 0
+.byte afAMBER+1, -3, -1
+.byte afAMBER+1, -3, -1
+.byte afAMBER+0, -2, -2
+.byte afAMBER+0, -2, -2
+.byte afAMBER+1, -2, -3
+.byte afAMBER+1, -2, -3
+.byte afAMBER+0, -2, -4
+.byte afAMBER+0, -2, -4
+.byte afAMBER+1, -2, -4
+.byte afAMBER+1, -2, -4
+.byte afAMBER+0, -1, -4
+.byte afAMBER+0, -1, -4
+.byte afAMBER+0, -1, -4
+.byte afAMBER+1, -1, -4
+.byte afAMBER+1, -1, -4
+.byte afAMBER+1, -1, -4
+.byte acLOOPN+5, $4A
+.byte acEND
 
 Data_atE078:
-.incbin "objects/data/data3/data-block-atE078.bin"
+;.incbin "objects/data/data3/data-block-atE078.bin"
 ;.res 105 ; 69
+.byte afAMBER+0, 0, 0, acTIMER+14
+.byte afAMBER+0, 0, 6
+.byte afAMBER+1, 0, 6
+.byte acLOOPN+10, 4
+.byte afAMBER+0, -1, 6
+.byte afAMBER+0, -1, 6
+.byte afAMBER+1, -2, 5
+.byte afAMBER+1, -2, 5
+.byte afAMBER+0, -2, 4
+.byte afAMBER+0, -2, 4
+.byte afAMBER+1, -2, 3
+.byte afAMBER+1, -2, 3
+.byte afAMBER+0, -2, 2
+.byte afAMBER+0, -2, 2
+.byte afAMBER+1, -3, 2
+.byte afAMBER+1, -3, 2
+.byte afAMBER+0, -3, 0
+.byte afAMBER+0, -3, 0
+.byte afAMBER+1, -3, -1
+.byte afAMBER+1, -3, -1
+.byte afAMBER+0, -2, -2
+.byte afAMBER+0, -2, -2
+.byte afAMBER+1, -2, -3
+.byte afAMBER+1, -2, -3
+.byte afAMBER+0, -2, -4
+.byte afAMBER+0, -2, -4
+.byte afAMBER+1, -2, -5
+.byte afAMBER+1, -2, -5
+.byte afAMBER+0, -1, -6
+.byte afAMBER+0, -1, -6
+.byte afAMBER+0, -1, -6
+.byte afAMBER+1, -1, -6
+.byte afAMBER+1, -1, -6
+.byte afAMBER+1, -1, -6
+.byte acLOOPN+4, $57
+.byte acEND
 
 Data_atE0E1:
-.incbin "objects/data/data3/data-block-atE0E1.bin"
+;.incbin "objects/data/data3/data-block-atE0E1.bin"
 ;.res 18 ; 12
+.byte afBLOCK+0, -3, 4
+.byte afBLOCK+0, -3, 0
+.byte acLOOPN+7, 3
+.byte afBLOCKBREAK+0, -7, -4
+.byte afBLOCKBREAK+0, -3, 0
+.byte acLOOPN+2, $0B
+.byte acLOOPBACK, 0
 
 Data_atE0F3:
-.incbin "objects/data/data3/data-block-atE0F3.bin"
+;.incbin "objects/data/data3/data-block-atE0F3.bin"
 ;.res 22 ; 16
+.byte afBLOCK+0, 0, 0, acTIMER+29
+.byte afBLOCK+0, -3, 4
+.byte afBLOCK+0, -3, 0
+.byte acLOOPN+7, 7
+.byte afBLOCKBREAK+0, -7, -4
+.byte afBLOCKBREAK+0, -3, 0
+.byte acLOOPN+2, $0F
+.byte acLOOPBACK, 4
 
 Data_atE109:
-.incbin "objects/data/data3/data-block-atE109.bin"
+;.incbin "objects/data/data3/data-block-atE109.bin"
 ;.res 57 ; 39
+.byte afBLOCK+0, 0, 0, acTIMER+29
+.byte afBLOCK+0, 0, 0
+.byte afBLOCK+0, 0, 0
+.byte afBLOCK+0, 0, 0
+.byte afBLOCK+1, 0, 0
+.byte acLOOPN+5, 4
+.byte afBLOCKBREAK+0, -4, -4, acTIMER+5
+.byte afBLOCKBREAK+1, 0, 0, acTIMER+1
+.byte afPUFF+0, 2, 3, acTIMER+2
+.byte afPUFF+1, 0, 0, acTIMER+2
+.byte acLOOPN+1, $1A
+.byte afPUFF+0, -3, -3, acTIMER+2
+.byte afPUFF+1, 0, 0, acTIMER+2
+.byte acLOOPN+1, $24
+.byte afPUFF+0, 2, 1, acTIMER+2
+.byte afPUFF+1, 0, 0, acTIMER+2
+.byte acLOOPN+1, $2E
+.byte acEND
 
 Data_atE142:
-.incbin "objects/data/data3/data-block-atE142.bin"
+;.incbin "objects/data/data3/data-block-atE142.bin"
 ;.res 31 ; 1F
+.byte afBLOCK+0, 0, 0, acTIMER+49
+.byte afBLOCK+0, 0, 0
+.byte afBLOCK+0, 0, 0
+.byte afBLOCK+0, 0, 0
+.byte afBLOCK+1, 0, 0
+.byte acLOOPN+5, 4
+.byte afBLOCKBREAK+0, -4, -4, acTIMER+5
+.byte afBLOCKBREAK+1, 0, 0, acTIMER+1
+.byte afBLOCK+0, 0, -5
+.byte acLOOPBACK, $1A
 
 Data_atE161:
-.incbin "objects/data/data3/data-block-atE161.bin"
+;.incbin "objects/data/data3/data-block-atE161.bin"
 ;.res 31 ; 1F
+.byte afBLOCK+0, 0, 0, acTIMER+29
+.byte afBLOCK+0, 0, 0
+.byte afBLOCK+0, 0, 0
+.byte afBLOCK+0, 0, 0
+.byte afBLOCK+1, 0, 0
+.byte acLOOPN+5, 4
+.byte afBLOCKBREAK+0, -4, -4, acTIMER+5
+.byte afBLOCKBREAK+1, 0, 0, acTIMER+1
+.byte afBLOCK+0, -3, -5
+.byte acLOOPBACK, $1A
 
 Data_atE180:
-.incbin "objects/data/data3/data-block-atE180.bin"
+;.incbin "objects/data/data3/data-block-atE180.bin"
 ;.res 31 ; 1F
+.byte afBLOCK+0, 0, 0, acTIMER+29
+.byte afBLOCK+0, 0, 0
+.byte afBLOCK+0, 0, 0
+.byte afBLOCK+0, 0, 0
+.byte afBLOCK+1, 0, 0
+.byte acLOOPN+5, 4
+.byte afBLOCKBREAK+0, -4, -4, acTIMER+5
+.byte afBLOCKBREAK+1, 0, 0, acTIMER+1
+.byte afBLOCK+0, 3, -5
+.byte acLOOPBACK, $1A
 
 Data_atE19F:
-.incbin "objects/data/data3/data-block-atE19F.bin"
+;.incbin "objects/data/data3/data-block-atE19F.bin"
 ;.res 31 ; 1F
+.byte afBLOCK+0, 0, 0, acTIMER+49
+.byte afBLOCK+0, 0, 0
+.byte afBLOCK+0, 0, 0
+.byte afBLOCK+0, 0, 0
+.byte afBLOCK+1, 0, 0
+.byte acLOOPN+5, 4
+.byte afBLOCKBREAK+0, -4, -4, acTIMER+5
+.byte afBLOCKBREAK+1, 0, 0, acTIMER+1
+.byte afBLOCK+0, 0, 5
+.byte acLOOPBACK, $1A
 
 Data_atE1BE:
-.incbin "objects/data/data3/data-block-atE1BE.bin"
+;.incbin "objects/data/data3/data-block-atE1BE.bin"
 ;.res 31 ; 1F
+.byte afBLOCK+0, 0, 0, acTIMER+29
+.byte afBLOCK+0, 0, 0
+.byte afBLOCK+0, 0, 0
+.byte afBLOCK+0, 0, 0
+.byte afBLOCK+1, 0, 0
+.byte acLOOPN+5, 4
+.byte afBLOCKBREAK+0, -4, -4, acTIMER+5
+.byte afBLOCKBREAK+1, 0, 0, acTIMER+1
+.byte afBLOCK+0, -3, 5
+.byte acLOOPBACK, $1A
 
 Data_atE1DD:
-.incbin "objects/data/data3/data-block-atE1DD.bin"
+;.incbin "objects/data/data3/data-block-atE1DD.bin"
 ;.res 31 ; 1F
+.byte afBLOCK+0, 0, 0, acTIMER+29
+.byte afBLOCK+0, 0, 0
+.byte afBLOCK+0, 0, 0
+.byte afBLOCK+0, 0, 0
+.byte afBLOCK+1, 0, 0
+.byte acLOOPN+5, 4
+.byte afBLOCKBREAK+0, -4, -4, acTIMER+5
+.byte afBLOCKBREAK+1, 0, 0, acTIMER+1
+.byte afBLOCK+0, 3, 5
+.byte acLOOPBACK, $1A
 
 Data_atE1FC:
-.incbin "objects/data/data3/data-block-atE1FC.bin"
+;.incbin "objects/data/data3/data-block-atE1FC.bin"
 ;.res 31 ; 1F
+.byte afBLOCK+0, 0, 0, acTIMER+49
+.byte afBLOCK+0, 0, 0
+.byte afBLOCK+0, 0, 0
+.byte afBLOCK+0, 0, 0
+.byte afBLOCK+1, 0, 0
+.byte acLOOPN+5, 4
+.byte afBLOCKBREAK+0, -4, -4, acTIMER+5
+.byte afBLOCKBREAK+1, 0, 0, acTIMER+1
+.byte afBLOCK+0, -5, 0
+.byte acLOOPBACK, $1A
 
 Data_atE21B:
-.incbin "objects/data/data3/data-block-atE21B.bin"
+;.incbin "objects/data/data3/data-block-atE21B.bin"
 ;.res 71 ; 47
+.byte afBLOCK+0, -6, -4
+.byte afBLOCK+0, -6, -2
+.byte afBLOCK+0, -6, -2
+.byte afBLOCK+0, -6, 0
+.byte afBLOCK+0, -6, 2
+.byte afBLOCK+0, -6, 2
+.byte afBLOCK+1, -6, 4
+.byte afBLOCK+0, -6, 2, acTIMER+1
+.byte afBLOCK+0, -4, 4, acTIMER+1
+.byte afBLOCK+0, -2, 6, acTIMER+1
+.byte afBLOCK+0, 2, 6, acTIMER+1
+.byte afBLOCK+0, 4, 4, acTIMER+1
+.byte afBLOCK+0, 6, 2, acTIMER+1
+.byte afBLOCK+0, 6, -2, acTIMER+1
+.byte afBLOCK+1, 4, -4, acTIMER+1
+.byte afBLOCK+0, 2, -6, acTIMER+1
+.byte afBLOCK+0, -2, -6, acTIMER+1
+.byte afBLOCK+0, -4, -4, acTIMER+1
+.byte afBLOCK+0, -6, -2, acTIMER+1
+.byte acLOOPBACK, 0
 
 Data_atE262:
-.incbin "objects/data/data3/data-block-atE262.bin"
+;.incbin "objects/data/data3/data-block-atE262.bin"
 ;.res 83 ; 53
+.byte afMINE+0, -3, 0
+.byte afMINE+0, -3, 0
+.byte afMINE+1, -3, 0
+.byte afMINE+1, -3, 0
+.byte acLOOPN+20, 0
+.byte afMINE+0, -4, 1
+.byte afMINE+0, -3, 1
+.byte afMINE+1, -3, 2
+.byte afMINE+1, -2, 1
+.byte afMINE+0, -2, 2
+.byte afMINE+0, -1, 2
+.byte afMINE+1, -2, 3
+.byte afMINE+1, -1, 4
+.byte afMINE+0, -1, 5
+.byte afMINE+0, 1, 5
+.byte afMINE+1, 1, 4
+.byte afMINE+1, 2, 3
+.byte afMINE+0, 1, 2
+.byte afMINE+0, 2, 2
+.byte afMINE+1, 2, 1
+.byte afMINE+1, 3, 2
+.byte afMINE+0, 3, 1
+.byte afMINE+0, 4, 1
+.byte afMINE+1, 3, 0
+.byte afMINE+1, 3, 0
+.byte afMINE+0, 3, 0
+.byte afMINE+0, 3, 0
+.byte acLOOPN+20, $44
+.byte acEND
 
 Data_atE2B5:
-.incbin "objects/data/data3/data-block-atE2B5.bin"
-;.res 241
+;.incbin "objects/data/data3/data-block-atE2B5.bin"
+;.res 241 ; F1
+.byte afSKULL, -3, 0
+.byte acLOOPN+22, 0
+.byte afSKULL, -4, 0, acTIMER+1
+.byte acLOOPN+3, 5
+.byte afSKULL, -4, 3, acTIMER+1
+.byte afSKULL, -2, 2, acTIMER+1
+.byte afSKULL, -1, 3, acTIMER+1
+.byte afSKULL, 0, 4, acTIMER+1
+.byte acLOOPN+3, $17
+.byte afSKULL, -5, 8, acTIMER+1
+.byte afSKULL, -5, 5, acTIMER+1
+.byte afSKULL, -5, 2, acTIMER+1
+.byte afSKULL, -5, -2, acTIMER+1
+.byte afSKULL, -5, -5, acTIMER+1
+.byte afSKULL, -5, -8, acTIMER+1
+.byte afSKULL, 5, -8, acTIMER+1
+.byte afSKULL, 5, -5, acTIMER+1
+.byte afSKULL, 5, -2, acTIMER+1
+.byte afSKULL, 5, 2, acTIMER+1
+.byte afSKULL, 5, 5, acTIMER+1
+.byte afSKULL, 5, 8, acTIMER+1
+.byte afSKULL, 0, 5, acTIMER+3
+.byte acLOOPN+8, $4D
+.byte afSKULL, 5, 4
+.byte afSKULL, 6, 4
+.byte afSKULL, -5, 4
+.byte afSKULL, -6, 4
+.byte afSKULL, 0, 5, acTIMER+3
+.byte acLOOPN+8, $5F
+.byte afSKULL, -5, 8, acTIMER+1
+.byte afSKULL, -5, 5, acTIMER+1
+.byte afSKULL, -5, 2, acTIMER+1
+.byte afSKULL, -5, -2, acTIMER+1
+.byte afSKULL, -5, -5, acTIMER+1
+.byte afSKULL, -5, -8, acTIMER+1
+.byte afSKULL, 5, -8, acTIMER+1
+.byte afSKULL, 5, -5, acTIMER+1
+.byte afSKULL, 5, -2, acTIMER+1
+.byte afSKULL, 5, 2, acTIMER+1
+.byte afSKULL, 5, 5, acTIMER+1
+.byte afSKULL, 5, 8, acTIMER+1
+.byte afSKULL, 0, 4, acTIMER+1
+.byte acLOOPN+3, $95
+.byte afSKULL, 1, 3, acTIMER+1
+.byte afSKULL, 2, 2, acTIMER+1
+.byte afSKULL, 4, 3, acTIMER+1
+.byte afSKULL, 2, 6
+.byte afSKULL, 3, 5
+.byte afSKULL, 4, 4
+.byte afSKULL, 5, 3
+.byte afSKULL, 6, 2
+.byte afSKULL, 6, -2
+.byte afSKULL, 5, -3
+.byte afSKULL, 4, -4
+.byte afSKULL, 3, -5
+.byte afSKULL, 2, -6
+.byte afSKULL, -4, -3, acTIMER+1
+.byte acLOOPN+9, $C5
+.byte afSKULL, 4, -3, acTIMER+2
+.byte acLOOPN+9, $CB
+.byte afSKULL, -4, -3, acTIMER+1
+.byte acLOOPN+9, $D1
+.byte afSKULL, 4, -3, acTIMER+2
+.byte acLOOPN+9, $D7
+.byte afSKULL, -2, -7
+.byte afSKULL, -3, -7
+.byte afSKULL, -4, -6
+.byte afSKULL, -5, -5
+.byte afSKULL, -5, -5
+.byte afSKULL, -5, -4
+.byte acLOOPBACK, 5

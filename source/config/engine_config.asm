@@ -36,6 +36,7 @@
 .define wvControl3  			$F3
 .define wvEND  					$FF
 
+.define afPUFF					$12	; Puff 2 frames: $12, $13
 .define afBUBBLE    			$16	; Bubble enemy projectile 1 frame
 .define afAMBER    				$17	; Amber enemy projectile 2 frames: $17, $18
 .define afBEDOUIN 				$19	; Bedouin 2 frames: $19, $1A
@@ -48,6 +49,8 @@
 .define afBLOCK					$31 ; Block 2 frames: $31, $32
 .define afBLOCKBREAK			$3A ; Block breaking 2 frames: $3A, $3B
 .define afSPARKLE   			$3C ; Sparkle enemy projectile 2 frames: $3C, $3D
+.define afTOPBALL				$40 ; Top half of ball 1 frame
+.define afBOTTOMBALL			$41 ; Bottom half of ball 1 frame
 .define afMETEOR 				$42 ; Meteor 1 frame
 .define afBLANK 				$43 ; Blank 1 frame
 
