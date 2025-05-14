@@ -914,47 +914,63 @@ Data_atB845:
 Data_atB859:
 ;.incbin "objects/data/data1/data-block-atB859.bin"
 .byte afBEE+0, -1, -1
-.byte afBEE+0, -1, 0
+.byte afBEE+0, -1,  0
 .byte afBEE+0, -1, -1
 .byte afBEE+1, -1, -1
-.byte afBEE+1, -1, 0
+.byte afBEE+1, -1,  0
 .byte afBEE+1, -1, -1
 .byte acLOOPBACK, 0
 
 Data_atB86D:
 ;.incbin "objects/data/data1/data-block-atB86D.bin"
+
+acWitchEntrance:
 .byte afWITCH, -3, 0, acTIMER+1
-.byte acLOOPN+24, 0
+.byte acLOOPN+24, (acWitchEntrance-Data_atB86D)
+
+acWitchPath1:
 .byte afWITCH, -4, 1, acTIMER+3
 .byte afWITCH, -4, 1, acTIMER+3
 .byte afWITCH, -3, 2, acTIMER+3
 .byte afWITCH, -2, 3, acTIMER+3
 .byte afWITCH, -1, 4, acTIMER+3
 .byte afWITCH, -1, 4, acTIMER+3
+
+acWitchPath2:
 .byte afWITCH, 0, 4, acTIMER+3
-.byte acLOOPN+29, $1E
+.byte acLOOPN+29, (acWitchPath2-Data_atB86D)
+
 .byte afWITCH, 1, 4, acTIMER+3
 .byte afWITCH, 1, 4, acTIMER+3
 .byte afWITCH, 2, 3, acTIMER+3
 .byte afWITCH, 3, 2, acTIMER+3
 .byte afWITCH, 4, 1, acTIMER+3
 .byte afWITCH, 4, 1, acTIMER+3
+
+acWitchPath3:
 .byte afWITCH, 4, 0, acTIMER+3
-.byte acLOOPN+2, $3C
+.byte acLOOPN+2, (acWitchPath3-Data_atB86D)
+
 .byte afWITCH, 4, -1, acTIMER+3
 .byte afWITCH, 4, -1, acTIMER+3
 .byte afWITCH, 3, -2, acTIMER+3
 .byte afWITCH, 2, -3, acTIMER+3
 .byte afWITCH, 1, -4, acTIMER+3
 .byte afWITCH, 1, -4, acTIMER+3
+
+acWitchPath4:
 .byte afWITCH, 0, -4, acTIMER+3
-.byte acLOOPN+29, $5A
+.byte acLOOPN+29, (acWitchPath4-Data_atB86D)
+
 .byte afWITCH, -1, -4, acTIMER+3
 .byte afWITCH, -1, -4, acTIMER+3
 .byte afWITCH, -2, -3, acTIMER+3
 .byte afWITCH, -3, -2, acTIMER+3
 .byte afWITCH, -4, -1, acTIMER+3
 .byte afWITCH, -4, -1, acTIMER+3
+
+acWitchPath6:
 .byte afWITCH, -4, 0, acTIMER+3
-.byte acLOOPN+2, $78
-.byte acLOOPBACK, 6
+.byte acLOOPN+2, (acWitchPath6-Data_atB86D)
+
+.byte acLOOPBACK, (acWitchPath1-Data_atB86D)

@@ -902,29 +902,51 @@ Data_atC485:
 
 Data_atC4BB:
 ;.incbin "objects/data/data2/data-block-atC4BB.bin"
+
+acCrocEntrance:
 .byte afCROC+1, -6, 0, acTIMER+2
-.byte acLOOPN+10, 0
+.byte acLOOPN+10, (acCrocEntrance-Data_atC4BB)
+
+acCrocPath1:
 .byte afCROC+0, -5, -1, acTIMER+2
-.byte acLOOPN+10, 6
+.byte acLOOPN+10, (acCrocPath1-Data_atC4BB)
+
+acCrocPath2:
 .byte afCROC+0, 5, 1, acTIMER+2
-.byte acLOOPN+10, $0C
+.byte acLOOPN+10, (acCrocPath2-Data_atC4BB)
+
+acCrocPath3:
 .byte afCROC+0, 0, -3, acTIMER+2
-.byte acLOOPN+20, $12
+.byte acLOOPN+20, (acCrocPath3-Data_atC4BB)
+
+acCrocPath4:
 .byte afCROC+0, -6, -1, acTIMER+2
-.byte acLOOPN+12, $18
+.byte acLOOPN+12, (acCrocPath4-Data_atC4BB)
+
+acCrocPath5:
 .byte afCROC+0, 6, -1, acTIMER+2
-.byte acLOOPN+12, $1E
+.byte acLOOPN+12, (acCrocPath5-Data_atC4BB)
+
+acCrocPath6:
 .byte afCROC+0, 0, -3, acTIMER+2
-.byte acLOOPN+20, $24
+.byte acLOOPN+20, (acCrocPath6-Data_atC4BB)
+
+acCrocPath7:
 .byte afCROC+0, -5, 1, acTIMER+2
-.byte acLOOPN+10, $2A
+.byte acLOOPN+10, (acCrocPath7-Data_atC4BB)
+
+acCrocPath8:
 .byte afCROC+0, 5, -1, acTIMER+2
-.byte acLOOPN+10, $30
+.byte acLOOPN+10, (acCrocPath8-Data_atC4BB)
+
+acCrocPath9:
 .byte afCROC+0, 2, 3, acTIMER+2
 .byte afCROC+0, 3, 4, acTIMER+3
 .byte afCROC+1, -3, 5, acTIMER+2
 .byte afCROC+1, -2, 3, acTIMER+3
-.byte acLOOPN+8, $36
+.byte acLOOPN+8, (acCrocPath9-Data_atC4BB)
+
 .byte afCROC+0, 0, 8, acTIMER+2
 .byte afCROC+0, 0, 9, acTIMER+2
-.byte acLOOPBACK, 6
+
+.byte acLOOPBACK, (acCrocPath1-Data_atC4BB)

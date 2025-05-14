@@ -8,7 +8,7 @@
 
 AnimationAtlas_A895:
 ; Because of the way the animation system works,
-; the whole game is limited to 128 frames of animation, 
+; the whole game is limited to 128 frames of animation,
 ; from $00 up to $7F.
 ; Indices from $80 and up are reserved for control codes.
 
@@ -48,8 +48,8 @@ AnimationAtlas_A895:
 .word DATA_ADDR_30                              ; Single Falling Sparkle
 .word ANFR_BLOCK_IDLE_31, ANFR_BLOCK_FLASHING_32, ANFR_BALL_1_33
 .word ANFR_BALL_2_34, ANFR_MINE_1_35, ANFR_MINE_2_36
-.word ANFR_MOUTH_OPENING_1_37
-.word ANFR_MOUTH_OPENING_2_38, ANFR_MOUTH_OPENING_3_39, ANFR_BLOCK_BREAKING_1_3A, ANFR_BLOCK_BREAKING_2_3B
+.word ANFR_MOUTH_OPENING_1_37, ANFR_MOUTH_OPENING_2_38, ANFR_MOUTH_OPENING_3_39
+.word ANFR_BLOCK_BREAKING_1_3A, ANFR_BLOCK_BREAKING_2_3B
 
 ;.define afSPARKLE ANIM_SPARKLE_1_3C
 .word ANIM_SPARKLE_1_3C, ANIM_SPARKLE_2_3D
@@ -332,4 +332,30 @@ Data_atE3A6:
 
 Data_atE801:
 ;.res 70
-.incbin "objects/data/stage4/data-block-atE801.bin"
+;.incbin "objects/data/stage4/data-block-atE801.bin"
+.byte afBLANK, -6, 0
+.byte acLOOPN+10, 0
+.byte afBLANK, -5, -1
+.byte acLOOPN+10, 5
+.byte afBLANK, 5, 1
+.byte acLOOPN+10, $0A
+.byte afBLANK, 0, -3
+.byte acLOOPN+20, $0F
+.byte afBLANK, -6, -1
+.byte acLOOPN+12, $14
+.byte afBLANK, 6, -1
+.byte acLOOPN+12, $19
+.byte afBLANK, 0, -3
+.byte acLOOPN+20, $1E
+.byte afBLANK, -5, 1
+.byte acLOOPN+10, $23
+.byte afBLANK, 5, -1
+.byte acLOOPN+10, $28
+.byte afBLANK, 2, 3
+.byte afBLANK, 3, 4, acTIMER+1
+.byte afBLANK, -3, 5
+.byte afBLANK, -2, 3, acTIMER+1
+.byte acLOOPN+8, $2D
+.byte afBLANK, 0, 8
+.byte afBLANK, 0, 9, acTIMER+1
+.byte acLOOPBACK, 5

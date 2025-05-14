@@ -24,17 +24,17 @@
 .define GAMEMODE_STARTSCREEN	$01
 .define GAMEMODE_BOSSFIGHT		$02
 
-; Animation
-.define acTIMER 				%10000000 ; $80
-.define acLOOPN					%11000000 ; $C0
-.define acLOOPBACK   			$FE
-.define acEND					$FF
-
 .define wvControl0 				$F0
 .define wvSET1ENEMIES  			$F1
 .define wvSET2ENEMIES  			$F2
 .define wvControl3  			$F3
 .define wvEND  					$FF
+
+; Animation
+.define acTIMER 				%10000000 ; $80
+.define acLOOPN					%11000000 ; $C0
+.define acLOOPBACK   			$FE
+.define acEND					$FF
 
 .define afPUFF					$12	; Puff 2 frames: $12, $13
 .define afBUBBLE    			$16	; Bubble enemy projectile 1 frame
@@ -55,9 +55,18 @@
 .define afBLANK 				$43 ; Blank 1 frame
 
 .define afWITCH 				$28 ; Stage 1 Boss
+.define afWITCHFLASHING 		$29
+
 .define afCROC 					$2A ; Stage 2 Boss
+.define afCROCSHOOTING 			$2B
+
 .define afSKULL					$22 ; Stage 3 Boss
+.define afSKULLFLASHING 		$23
+
 .define afMOUTH 				$37 ; Stage 4 Boss
+.define afMOUTHOPENING1 $37
+.define afMOUTHOPENING2 $38
+.define afMOUTHOPENING3 $39
 
 ; objAttributes_2_0405   7654 3210
 ; 						 |||| |||+-- 0: Enemy is part of SET 1
