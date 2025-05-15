@@ -1,6 +1,7 @@
 .feature force_range 	; enable hardcoding negative numbers for animations
 
 .define DISABLE_SOUND 0
+
 .include "macros.asm"
 .include "config/defines.asm"
 .include "config/engine_config.asm"
@@ -80,16 +81,16 @@ oamAddressPtr_3E:		.res 2	; $3E ; 6 (word address)
 
 tPositionXLo_40:		.res 1	; $40 ; 5
 tPositionXHi_41:		.res 1	; $41 ; 5
-tPositionYLo_42:			.res 1	; $42 ; 7
-tPositionYHi_43:			.res 1	; $43 ; 6
-tilesWidth_44:					.res 1	; $44 ; 2
+tPositionYLo_42:		.res 1	; $42 ; 7
+tPositionYHi_43:		.res 1	; $43 ; 6
+tilesWidth_44:			.res 1	; $44 ; 2
 counter_H_45:			.res 1	; $45 ; 2
 tile_X_Lo_46:			.res 1	; $46 ; 6 
-temp_47:			.res 1	; $47 ; 7
+temp_47:				.res 1	; $47 ; 7
 delta_Y_Lo_48:			.res 1	; $48 ; 2
-temp_49:			.res 1	; $49 ; 4
+temp_49:				.res 1	; $49 ; 4
 projectileIndex_4A:		.res 1	; $4A ; 7
-dirDelta_4B:		.res 1	; $4B ; 5
+dirDelta_4B:			.res 1	; $4B ; 5
 dirDeltaSmallest_4C:	.res 1	; $4C ; 6
 iterator_4D:			.res 1	; $4D ; 6
 flagLoadShots_4E:		.res 1	; $4E ; 3
@@ -454,9 +455,7 @@ StartingNewStage:
 	jsr ClearNametable_A
 	
 	ldy currentStage_15
-	lda BankSequenceArray,Y
-	tax
-	sta BankSwitching_FFF0,X
+	GAMEENGINE_BANKSWITCH BankSequenceArray,Y
 	inc currentStage_15
 	
 	clc
@@ -3059,9 +3058,7 @@ RegisterInput:
 	jsr ClearNametable_A
 	lda #$01
 	jsr ClearNametable_A
-	lda #$00
-	tax
-	sta BankSwitching_FFF0,X
+	GAMEENGINE_BANKSWITCH #$00
 	inc currentStage_15
 	lda #$0A
 	ldx #$00
@@ -3101,9 +3098,7 @@ RegisterInput:
 	jsr ClearNametable_A
 	lda #$01
 	jsr ClearNametable_A
-	lda #$02
-	tax
-	sta BankSwitching_FFF0,X
+	GAMEENGINE_BANKSWITCH #$02
 	lda flagPPUControl_17
 	TURNOFF FLAG_4				; and #(ALL1-FLAG_4)
 	sta flagPPUControl_17

@@ -19,6 +19,16 @@
 	sta BankSwitching_FFF0  ; Set mapper to Bank0
 .endmacro
 
+.macro GAMEENGINE_BANKSWITCH bank, offset
+	.ifblank offset
+		lda bank
+	.else
+		lda bank, offset
+	.endif
+	tax
+	sta BankSwitching_FFF0,X
+.endmacro
+
 .macro GAMEENGINE_PPU_WARMUP
 	; PPU Warm up
 	ldx #$10 ; Wait 16 cycles for PPU to reach its stable state
